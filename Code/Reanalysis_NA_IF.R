@@ -15,6 +15,9 @@ rm(list = ls())
 # Outputs
 # Source files / libraries
 library("readxl")
+library(caret) # for the confusion matrix
+library(colorRamps) # colours
+
 # 1. Load in the data -----------------------------------------------------
 
 # 1a. Load the datasets ---------------------------------------------------
@@ -862,11 +865,39 @@ for(j in sp.abb$Abbreviation) {
     dev.off()
   }
 }
+rm(i, j, tmp.no, tmp.tab)
 
 # Figure 4
 
 # 3g. Confusion matrix ----------------------------------------------------
+# this requires the data to be in long format
+slide125.long <- reshape(slide125, varying = list(names(slide125)[nchar(names(slide125)) < 5]), direction = "long", times = names(slide125)[nchar(names(slide125)) < 5], timevar = "Person")
+rownames(slide125.long) <- 1:nrow(slide125.long)
+slide125.long <- slide125.long[, (names(slide125.long) != "id")]
+names(slide125.long)[names(slide125.long) == "1a"] <- "origID"
+head(slide125.long)
+tail(slide125.long)
 
+# correct ID?
+slide125.long$Corr <- as.numeric(slide125.long$IFcMin == slide125.long$origID)
+
+# add a column to the abbreviation table to note if that species is present in the consensus
+sp.abb$p125s <- 2
+sp.abb$p125s[sp.abb$Abbreviation %in% slide125$IFcMin] <- 1
+sp.abb$p125s[sp.abb$Abbreviation %in% c("na", "nc")] <- 3
+
+# plot the confusion matrix
+sp.idd <- sp.abb$Abbreviation[order(sp.abb$p125s)]
+conf.sp <- confusionMatrix(factor(slide125.long$IFcMin, levels = sp.idd), factor(slide125.long$origID, levels = sp.idd))
+conf.splist <- sp.idd[rowSums(conf.sp$table) > 0]
+png("Figures/confusion_slide125.png", 800, 600)
+par(mar = c(15, 15, 2, 2))
+dim1 <- length(sp.idd)
+dim2 <- length(sp.idd[rowSums(conf.sp$table) > 0])
+image(t(conf.sp$table / rowSums(conf.sp$table)), col =c("grey70", matlab.like(1000)), ylim = c((dim2*((1+1/(dim1 - 1)))/dim1) - (1+1/(dim1 - 1))/dim1/2, -(1+1/(dim1 - 1))/dim1/2), axes = FALSE)
+axis(1, seq(0,1, length.out = dim1), sp.abb$Species[order(sp.abb$p125s)], las = 2)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2), sp.abb$Species[order(sp.abb$p125s)][rowSums(conf.sp$table) > 0], las = 1)
+dev.off()
 
 
 

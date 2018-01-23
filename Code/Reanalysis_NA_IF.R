@@ -203,19 +203,19 @@ write.csv(size150, file = "Outputs/Supp3_150.csv", row.names = FALSE)
 # 3. Agreement between workers (pairwise comparisons) ---------------------
 
 # 3a. C20_score_participant -----------------------------------------------
-accuracySlide <- data.frame(PersonID = names(slide125)[nchar(names(slide125)) < 5], stringsAsFactors = FALSE)
+accuracySlide <- data.frame(PersonID = names(slide125)[nchar(names(slide125)) < 5][c(1, 3, 2, 4:length(names(slide125)[nchar(names(slide125)) < 5]))], stringsAsFactors = FALSE)
 accuracyDigital <- data.frame(PersonID = names(digital125)[nchar(names(digital125)) < 5], stringsAsFactors = FALSE)
 
 # based on Nadia's consensus
-accuracySlide$NA_PA125 <- apply(slide125[,nchar(names(slide125)) < 5], 2, function(x) sum(x == slide125$consensus20) / 300 * 100)
-accuracySlide$NA_PA150 <- apply(slide150[,nchar(names(slide150)) < 5], 2, function(x) sum(x == slide150$consensus20) / 300 * 100)
+accuracySlide$NA_PA125 <- apply(slide125[,nchar(names(slide125)) < 5], 2, function(x) sum(x == slide125$consensus20) / 300 * 100)[accuracySlide$PersonID]
+accuracySlide$NA_PA150 <- apply(slide150[,nchar(names(slide150)) < 5], 2, function(x) sum(x == slide150$consensus20) / 300 * 100)[accuracySlide$PersonID]
 accuracyDigital$NA_PA125 <- apply(digital125[,nchar(names(digital125)) < 5], 2, function(x) sum(x == digital125$consensus20) / 300 * 100)
 accuracyDigital$NA_PA150 <- apply(digital150[,nchar(names(digital150)) < 5], 2, function(x) sum(x == digital150$consensus20) / 300 * 100)
 # n.b. these values agree with Nadia's (with the odd rounding error), which is good
 
 # based on my consensus
-accuracySlide$IF_PA125 <- apply(slide125[,nchar(names(slide125)) < 5], 2, function(x) sum(x == slide125$IFcMin) / 300 * 100)
-accuracySlide$IF_PA150 <- apply(slide150[,nchar(names(slide150)) < 5], 2, function(x) sum(x == slide150$IFcMin) / 300 * 100)
+accuracySlide$IF_PA125 <- apply(slide125[,nchar(names(slide125)) < 5], 2, function(x) sum(x == slide125$IFcMin) / 300 * 100)[accuracySlide$PersonID]
+accuracySlide$IF_PA150 <- apply(slide150[,nchar(names(slide150)) < 5], 2, function(x) sum(x == slide150$IFcMin) / 300 * 100)[accuracySlide$PersonID]
 accuracyDigital$IF_PA125 <- apply(digital125[,nchar(names(digital125)) < 5], 2, function(x) sum(x == digital125$IFcMin) / 300 * 100)
 accuracyDigital$IF_PA150 <- apply(digital150[,nchar(names(digital150)) < 5], 2, function(x) sum(x == digital150$IFcMin) / 300 * 100)
 
@@ -243,10 +243,17 @@ IF_PA150s_group_sd <- sd(accuracySlide$IF_PA150)
 IF_PA125d_group_sd <- sd(accuracyDigital$IF_PA125)
 IF_PA150d_group_sd <- sd(accuracyDigital$IF_PA150)
 
+# mean consensus value based on doing a full pairwise comparison - these are the same as calculated above, so no need to do them.
+sum(slide125$IFcMin == slide125[,nchar(names(slide125)) < 5]) / (300*(sum(nchar(names(slide125)) < 5))) * 100
+sum(slide150$IFcMin == slide150[,nchar(names(slide150)) < 5]) / (300*(sum(nchar(names(slide150)) < 5))) * 100
+sum(digital125$IFcMin == digital125[,nchar(names(digital125)) < 5]) / (300*(sum(nchar(names(digital125)) < 5))) * 100
+sum(digital150$IFcMin == digital150[,nchar(names(digital150)) < 5]) / (300*(sum(nchar(names(digital150)) < 5))) * 100
+
+
 # 3c. Average pairwise agreement scores -----------------------------------
 # mean
-accuracySlide$MPA125 <- apply(slide125[,nchar(names(slide125)) < 5], 2, function(x) (sum(x == slide125[,nchar(names(slide125)) < 5]) - 300) / (300*(sum(nchar(names(slide125)) < 5) - 1)) * 100)
-accuracySlide$MPA150 <- apply(slide150[,nchar(names(slide150)) < 5], 2, function(x) (sum(x == slide150[,nchar(names(slide150)) < 5]) - 300) / (300*(sum(nchar(names(slide150)) < 5) - 1)) * 100)
+accuracySlide$MPA125 <- apply(slide125[,nchar(names(slide125)) < 5], 2, function(x) (sum(x == slide125[,nchar(names(slide125)) < 5]) - 300) / (300*(sum(nchar(names(slide125)) < 5) - 1)) * 100)[accuracySlide$PersonID]
+accuracySlide$MPA150 <- apply(slide150[,nchar(names(slide150)) < 5], 2, function(x) (sum(x == slide150[,nchar(names(slide150)) < 5]) - 300) / (300*(sum(nchar(names(slide150)) < 5) - 1)) * 100)[accuracySlide$PersonID]
 accuracyDigital$MPA125 <- apply(digital125[,nchar(names(digital125)) < 5], 2, function(x) (sum(x == digital125[,nchar(names(digital125)) < 5]) - 300) / (300*(sum(nchar(names(digital125)) < 5) - 1)) * 100)
 accuracyDigital$MPA150 <- apply(digital150[,nchar(names(digital150)) < 5], 2, function(x) (sum(x == digital150[,nchar(names(digital150)) < 5]) - 300) / (300*(sum(nchar(names(digital150)) < 5) - 1)) * 100)
 # quite a lot of differences here, though fewer in the digital ones
@@ -345,25 +352,21 @@ with(accuracySlide, lines(c(Experience[PersonID == "2a"], Experience[PersonID ==
 text(38, 35, "Slide 150", cex = 1.5)
 
 with(accuracyDigital, plot(Experience, MPA125, ylim = c(30, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, IF_PA125s_group - IF_PA125s_group_sd, 45, IF_PA125s_group + IF_PA125s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA125s_group, lty = 4)
+rect(-5, IF_PA125d_group - IF_PA125d_group_sd, 45, IF_PA125d_group + IF_PA125d_group_sd, col = rgb(0, .8, .2, alpha = .5))
+abline(h = IF_PA125d_group, lty = 4)
 with(accuracyDigital, points(Experience, MPA125, pch = 16))
 with(accuracyDigital, err_bar(MPA125, sdPA125, Experience))
 with(accuracyDigital[1, ], text(Experience - 0.5, MPA125, labels = PersonID, cex = 0.7))
 with(accuracyDigital[2:nrow(accuracyDigital), ], text(Experience + 0.5, MPA125, labels = PersonID, cex = 0.7))
-with(accuracyDigital, lines(c(Experience[PersonID == "1a"], Experience[PersonID == "1b"]), c(MPA125[PersonID == "1a"], MPA125[PersonID == "1b"])))
-with(accuracyDigital, lines(c(Experience[PersonID == "2a"], Experience[PersonID == "2b"]), c(MPA125[PersonID == "2a"], MPA125[PersonID == "2b"])))
 text(38, 35, "Digital 125", cex = 1.5)
 
 with(accuracyDigital, plot(Experience, MPA150, ylim = c(30, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, IF_PA150s_group - IF_PA150s_group_sd, 45, IF_PA150s_group + IF_PA150s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA150s_group, lty = 4)
+rect(-5, IF_PA150d_group - IF_PA150d_group_sd, 45, IF_PA150d_group + IF_PA150d_group_sd, col = rgb(0, .8, .2, alpha = .5))
+abline(h = IF_PA150d_group, lty = 4)
 with(accuracyDigital, points(Experience, MPA150, pch = 16))
 with(accuracyDigital, err_bar(MPA150, sdPA150, Experience))
 with(accuracyDigital[1, ], text(Experience - 0.5, MPA150, labels = PersonID, cex = 0.7))
 with(accuracyDigital[2:nrow(accuracyDigital), ], text(Experience + 0.5, MPA150, labels = PersonID, cex = 0.7))
-with(accuracyDigital, lines(c(Experience[PersonID == "1a"], Experience[PersonID == "1b"]), c(MPA150[PersonID == "1a"], MPA150[PersonID == "1b"])))
-with(accuracyDigital, lines(c(Experience[PersonID == "2a"], Experience[PersonID == "2b"]), c(MPA150[PersonID == "2a"], MPA150[PersonID == "2b"])))
 text(38, 35, "Digital 150", cex = 1.5)
 mfrow = c(1,1)
 dev.off()
@@ -423,23 +426,19 @@ with(accuracySlide, lines(c(Experience[PersonID == "2a"], Experience[PersonID ==
 text(38, 35, "Slide 150", cex = 1.5)
 
 with(accuracyDigital, plot(Experience, IF_PA125, ylim = c(45, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, IF_PA125s_group - IF_PA125s_group_sd, 45, IF_PA125s_group + IF_PA125s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA125s_group, lty = 4)
+rect(-5, IF_PA125d_group - IF_PA125d_group_sd, 45, IF_PA125d_group + IF_PA125d_group_sd, col = rgb(0, .8, .2, alpha = .5))
+abline(h = IF_PA125d_group, lty = 4)
 with(accuracyDigital, points(Experience, IF_PA125, pch = 16))
 with(accuracyDigital[1, ], text(Experience - 0.5, IF_PA125, labels = PersonID, cex = 0.7))
 with(accuracyDigital[2:nrow(accuracyDigital), ], text(Experience + 0.5, IF_PA125, labels = PersonID, cex = 0.7))
-with(accuracyDigital, lines(c(Experience[PersonID == "1a"], Experience[PersonID == "1b"]), c(IF_PA125[PersonID == "1a"], IF_PA125[PersonID == "1b"])))
-with(accuracyDigital, lines(c(Experience[PersonID == "2a"], Experience[PersonID == "2b"]), c(IF_PA125[PersonID == "2a"], IF_PA125[PersonID == "2b"])))
 text(38, 35, "Digital 125", cex = 1.5)
 
 with(accuracyDigital, plot(Experience, IF_PA150, ylim = c(45, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, IF_PA150s_group - IF_PA150s_group_sd, 45, IF_PA150s_group + IF_PA150s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA150s_group, lty = 4)
+rect(-5, IF_PA150d_group - IF_PA150d_group_sd, 45, IF_PA150d_group + IF_PA150d_group_sd, col = rgb(0, .8, .2, alpha = .5))
+abline(h = IF_PA150d_group, lty = 4)
 with(accuracyDigital, points(Experience, IF_PA150, pch = 16))
 with(accuracyDigital[1, ], text(Experience - 0.5, IF_PA150, labels = PersonID, cex = 0.7))
 with(accuracyDigital[2:nrow(accuracyDigital), ], text(Experience + 0.5, IF_PA150, labels = PersonID, cex = 0.7))
-with(accuracyDigital, lines(c(Experience[PersonID == "1a"], Experience[PersonID == "1b"]), c(IF_PA150[PersonID == "1a"], IF_PA150[PersonID == "1b"])))
-with(accuracyDigital, lines(c(Experience[PersonID == "2a"], Experience[PersonID == "2b"]), c(IF_PA150[PersonID == "2a"], IF_PA150[PersonID == "2b"])))
 text(38, 35, "Digital 150", cex = 1.5)
 mfrow = c(1,1)
 dev.off()
@@ -452,41 +451,31 @@ axis(1, at = 1:17, labels = accuracySlide$PersonID)
 rect(0, IF_PA125s_group - IF_PA125s_group_sd, 18, IF_PA125s_group + IF_PA125s_group_sd, col = rgb(0, .8, .2, alpha = .5))
 abline(h = IF_PA125s_group, lty = 4)
 with(accuracySlide, points(1:17, IF_PA125, pch = 16))
-with(accuracySlide[1, ], text(1 - 0.25, IF_PA125, labels = PersonID, cex = 0.7))
-with(accuracySlide[2:nrow(accuracySlide), ], text(2:17 + 0.25, IF_PA125, labels = PersonID, cex = 0.7))
 with(accuracySlide, lines(c(1:2), c(IF_PA125[PersonID == "1a"], IF_PA125[PersonID == "1b"])))
 with(accuracySlide, lines(c(3:4), c(IF_PA125[PersonID == "2a"], IF_PA125[PersonID == "2b"])))
 text(38, 35, "Slide 125", cex = 1.5)
 
-with(accuracySlide, plot(Experience, IF_PA150, ylim = c(45, 90), pch = 16, type = "n", xlim = c(0, 40)))
+with(accuracySlide, plot(1:17, IF_PA150, ylim = c(45, 90), pch = 16, type = "n", xaxt = "n"))
+axis(1, at = 1:17, labels = accuracySlide$PersonID)
 rect(-5, IF_PA150s_group - IF_PA150s_group_sd, 45, IF_PA150s_group + IF_PA150s_group_sd, col = rgb(0, .8, .2, alpha = .5))
 abline(h = IF_PA150s_group, lty = 4)
-with(accuracySlide, points(Experience, IF_PA150, pch = 16))
-with(accuracySlide[1, ], text(Experience - 0.5, IF_PA150, labels = PersonID, cex = 0.7))
-with(accuracySlide[2:nrow(accuracySlide), ], text(Experience + 0.5, IF_PA150, labels = PersonID, cex = 0.7))
-with(accuracySlide, lines(c(Experience[PersonID == "1a"], Experience[PersonID == "1b"]), c(IF_PA150[PersonID == "1a"], IF_PA150[PersonID == "1b"])))
-with(accuracySlide, lines(c(Experience[PersonID == "2a"], Experience[PersonID == "2b"]), c(IF_PA150[PersonID == "2a"], IF_PA150[PersonID == "2b"])))
+with(accuracySlide, points(1:17, IF_PA150, pch = 16))
+with(accuracySlide, lines(c(1:2), c(IF_PA150[PersonID == "1a"], IF_PA150[PersonID == "1b"])))
+with(accuracySlide, lines(c(3:4), c(IF_PA150[PersonID == "2a"], IF_PA150[PersonID == "2b"])))
 text(38, 35, "Slide 150", cex = 1.5)
 
-with(accuracyDigital, plot(Experience, IF_PA125, ylim = c(45, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, IF_PA125s_group - IF_PA125s_group_sd, 45, IF_PA125s_group + IF_PA125s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA125s_group, lty = 4)
-with(accuracyDigital, points(Experience, IF_PA125, pch = 16))
-with(accuracyDigital[1, ], text(Experience - 0.5, IF_PA125, labels = PersonID, cex = 0.7))
-with(accuracyDigital[2:nrow(accuracyDigital), ], text(Experience + 0.5, IF_PA125, labels = PersonID, cex = 0.7))
-with(accuracyDigital, lines(c(Experience[PersonID == "1a"], Experience[PersonID == "1b"]), c(IF_PA125[PersonID == "1a"], IF_PA125[PersonID == "1b"])))
-with(accuracyDigital, lines(c(Experience[PersonID == "2a"], Experience[PersonID == "2b"]), c(IF_PA125[PersonID == "2a"], IF_PA125[PersonID == "2b"])))
+with(accuracyDigital, plot(1:9, IF_PA125, ylim = c(45, 90), pch = 16, type = "n", xaxt = "n"))
+axis(1, at = 1:9, labels = accuracyDigital$PersonID)
+rect(-5, IF_PA125d_group - IF_PA125d_group_sd, 45, IF_PA125d_group + IF_PA125d_group_sd, col = rgb(0, .8, .2, alpha = .5))
+abline(h = IF_PA125d_group, lty = 4)
+with(accuracyDigital, points(1:9, IF_PA125, pch = 16))
 text(38, 35, "Digital 125", cex = 1.5)
 
-with(accuracyDigital, plot(Experience, IF_PA150, ylim = c(45, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, IF_PA150s_group - IF_PA150s_group_sd, 45, IF_PA150s_group + IF_PA150s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA150s_group, lty = 4)
-with(accuracyDigital, points(Experience, IF_PA150, pch = 16))
-with(accuracyDigital[1, ], text(Experience - 0.5, IF_PA150, labels = PersonID, cex = 0.7))
-with(accuracyDigital[2:nrow(accuracyDigital), ], text(Experience + 0.5, IF_PA150, labels = PersonID, cex = 0.7))
-with(accuracyDigital, lines(c(Experience[PersonID == "1a"], Experience[PersonID == "1b"]), c(IF_PA150[PersonID == "1a"], IF_PA150[PersonID == "1b"])))
-with(accuracyDigital, lines(c(Experience[PersonID == "2a"], Experience[PersonID == "2b"]), c(IF_PA150[PersonID == "2a"], IF_PA150[PersonID == "2b"])))
-text(38, 35, "Digital 150", cex = 1.5)
+with(accuracyDigital, plot(1:9, IF_PA150, ylim = c(45, 90), pch = 16, type = "n", xaxt = "n"))
+axis(1, at = 1:9, labels = accuracyDigital$PersonID)
+rect(-5, IF_PA150d_group - IF_PA150d_group_sd, 45, IF_PA150d_group + IF_PA150d_group_sd, col = rgb(0, .8, .2, alpha = .5))
+abline(h = IF_PA150d_group, lty = 4)
+with(accuracyDigital, points(1:9, IF_PA150, pch = 16))
 mfrow = c(1,1)
 dev.off()
 

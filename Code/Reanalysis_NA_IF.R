@@ -11,12 +11,15 @@
 #   
 
 rm(list = ls())
+dev.off()
+par.def <- par()
 # Inputs
 # Outputs
 # Source files / libraries
 library("readxl")
 library(caret) # for the confusion matrix
 library(colorRamps) # colours
+library(stringr) # for confusion matrix axes
 
 # 1. Load in the data -----------------------------------------------------
 
@@ -870,6 +873,7 @@ rm(i, j, tmp.no, tmp.tab)
 # Figure 4
 
 # 3g. Confusion matrix ----------------------------------------------------
+# initially with slide 125
 # this requires the data to be in long format
 slide125.long <- reshape(slide125, varying = list(names(slide125)[nchar(names(slide125)) < 5]), direction = "long", times = names(slide125)[nchar(names(slide125)) < 5], timevar = "Person")
 rownames(slide125.long) <- 1:nrow(slide125.long)
@@ -888,18 +892,298 @@ sp.abb$p125s[sp.abb$Abbreviation %in% c("na", "nc")] <- 3
 
 # plot the confusion matrix
 sp.idd <- sp.abb$Abbreviation[order(sp.abb$p125s)]
+sp.full <- sp.abb$Species[order(sp.abb$p125s)]
+# remove "nc"
+sp.idd <- sp.idd[sp.idd != "nc"]
+sp.full <- sp.full[sp.full != "no strict consensus"]
 conf.sp <- confusionMatrix(factor(slide125.long$IFcMin, levels = sp.idd), factor(slide125.long$origID, levels = sp.idd))
 conf.splist <- sp.idd[rowSums(conf.sp$table) > 0]
-png("Figures/confusion_slide125.png", 800, 600)
+
+png("Figures/confusion_slide125.png", 1000, 700)
+par(fig = c(0, 0.9, 0, 1))
 par(mar = c(15, 15, 2, 2))
+# confusion matrix
 dim1 <- length(sp.idd)
 dim2 <- length(sp.idd[rowSums(conf.sp$table) > 0])
 image(t(conf.sp$table / rowSums(conf.sp$table)), col =c("grey70", matlab.like(1000)), ylim = c((dim2*((1+1/(dim1 - 1)))/dim1) - (1+1/(dim1 - 1))/dim1/2, -(1+1/(dim1 - 1))/dim1/2), axes = FALSE)
-axis(1, seq(0,1, length.out = dim1), sp.abb$Species[order(sp.abb$p125s)], las = 2)
-axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2), sp.abb$Species[order(sp.abb$p125s)][rowSums(conf.sp$table) > 0], las = 1)
+
+axis(1, seq(0,1, length.out = dim1), sp.full, las = 2)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2), sp.full[rowSums(conf.sp$table) > 0], las = 1)
 dev.off()
 
+png("Figures/confusion_slide125_key.png", 1000, 700)
+par(fig = c(0, 0.9, 0, 1))
+par(mar = c(16, 16, 2, 2))
+# confusion matrix
+dim1 <- length(sp.idd)
+dim2 <- length(sp.idd[rowSums(conf.sp$table) > 0])
+image(t(conf.sp$table / rowSums(conf.sp$table)), col =c("grey70", matlab.like(1000)), ylim = c((dim2*((1+1/(dim1 - 1)))/dim1) - (1+1/(dim1 - 1))/dim1/2, -(1+1/(dim1 - 1))/dim1/2), axes = FALSE)
 
+title(xlab = expression(bold("Individual ID")), ylab = expression(bold("Consensus ID")), line = 13, cex.axis = 1.2)
+
+# x axis names
+xaxis.names <- sp.full
+axis(1, seq(0,1, length.out = length(xaxis.names))[intersect(which(str_count(xaxis.names, " ") != 2),grep("^[A-Z]", xaxis.names))], xaxis.names[intersect(which(str_count(xaxis.names, " ") != 2),grep("^[A-Z]", xaxis.names))], las = 2, font = 3, cex.axis = 1.05)
+axis(1, seq(0,1, length.out = length(xaxis.names))[-grep("^[A-Z]", xaxis.names)], xaxis.names[-grep("^[A-Z]", xaxis.names)], las = 2, cex.axis = 1.05)
+axis(1, seq(0,1, length.out = length(xaxis.names))[str_count(xaxis.names, " ") == 2], labels = parse(text = paste(paste("italic('", gsub("^([^ ]* [^ ]*) (.*$)", "\\1", xaxis.names[str_count(xaxis.names, " ") == 2]), "')", sep = ""), gsub("^([^ ]* [^ ]*) (.*$)", "\\2", xaxis.names[str_count(xaxis.names, " ") == 2]), sep = "~")), las = 2, cex.axis = 1.05)
+
+# number of specimens in Individual ID
+axis(3, seq(0,1, length.out = length(xaxis.names)) - 0.002, table(slide125.long$origID)[match(sp.idd, names(table(slide125.long$origID)))], cex.axis = 0.8, las = 2, tick = FALSE, mgp = c(3, 0.5, 0))
+
+# y axis names
+yaxis.names <- sp.full[rowSums(conf.sp$table) > 0]
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2), labels = FALSE)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2)[str_count(yaxis.names, " ") == 1], yaxis.names[str_count(yaxis.names, " ") == 1], las = 1, font = 3, cex.axis = 1.05)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2)[-grep("^[A-Z]", yaxis.names)], yaxis.names[-grep("^[A-Z]", yaxis.names)], las = 1, cex.axis = 1.05)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2)[str_count(yaxis.names, " ") == 2], labels = parse(text = paste(paste("italic('", gsub("^([^ ]* [^ ]*) (.*$)", "\\1", yaxis.names[str_count(yaxis.names, " ") == 2]), "')", sep = ""), gsub("^([^ ]* [^ ]*) (.*$)", "\\2", yaxis.names[str_count(yaxis.names, " ") == 2]), sep = "~")), las = 2, cex.axis = 1.05)
+
+# number of specimens in Definitive ID
+axis(4, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2) - 0.002, (table(slide125.long$IFcMin)/length(unique(slide125.long$Person)))[match(sp.idd[rowSums(conf.sp$table) > 0], names(table(slide125.long$IFcMin)))], cex.axis = 0.8, las = 1, tick = FALSE, mgp = c(3, 0.5, 0))
+
+# add key
+par(fig = c(0.9, 1, 0.35, 1), new = TRUE)
+par(mai = c(1, 0.4, 0.8, 0.5))
+names.key <- rep("", 101)
+names.key[seq(1, 101, by = 20)] <- seq(0.0, 1.0, by = 0.2)
+key <- rep(1, 101)
+barplot(key, main = "\nFraction of\nSpecimens", horiz = TRUE, space = 0, border = NA, col = c("grey70", matlab.like(100)), fg = "white", cex.main = 1.1, font.main = 1, xaxt = "n", yaxt = "n")
+axis(4, at = 1:101, names.key, las = 1, mgp = c(0, 1, 0), xaxt = "n", cex.axis = 1, tick = FALSE)
+par(par.def)
+dev.off() 
+
+# same for the other datasets
+# so slide 150
+slide150.long <- reshape(slide150, varying = list(names(slide150)[nchar(names(slide150)) < 5]), direction = "long", times = names(slide150)[nchar(names(slide150)) < 5], timevar = "Person")
+rownames(slide150.long) <- 1:nrow(slide150.long)
+slide150.long <- slide150.long[, (names(slide150.long) != "id")]
+names(slide150.long)[names(slide150.long) == "1a"] <- "origID"
+head(slide150.long)
+tail(slide150.long)
+
+# correct ID?
+slide150.long$Corr <- as.numeric(slide150.long$IFcMin == slide150.long$origID)
+
+# add a column to the abbreviation table to note if that species is present in the consensus
+sp.abb$p150s <- 2
+sp.abb$p150s[sp.abb$Abbreviation %in% slide150$IFcMin] <- 1
+sp.abb$p150s[sp.abb$Abbreviation %in% c("na", "nc")] <- 3
+
+# plot the confusion matrix
+sp.idd <- sp.abb$Abbreviation[order(sp.abb$p150s)]
+sp.full <- sp.abb$Species[order(sp.abb$p150s)]
+# remove "nc"
+sp.idd <- sp.idd[sp.idd != "nc"]
+sp.full <- sp.full[sp.full != "no strict consensus"]
+conf.sp <- confusionMatrix(factor(slide150.long$IFcMin, levels = sp.idd), factor(slide150.long$origID, levels = sp.idd))
+conf.splist <- sp.idd[rowSums(conf.sp$table) > 0]
+
+png("Figures/confusion_slide150.png", 1000, 700)
+par(fig = c(0, 0.9, 0, 1))
+par(mar = c(15, 15, 2, 2))
+# confusion matrix
+dim1 <- length(sp.idd)
+dim2 <- length(sp.idd[rowSums(conf.sp$table) > 0])
+image(t(conf.sp$table / rowSums(conf.sp$table)), col =c("grey70", matlab.like(1000)), ylim = c((dim2*((1+1/(dim1 - 1)))/dim1) - (1+1/(dim1 - 1))/dim1/2, -(1+1/(dim1 - 1))/dim1/2), axes = FALSE)
+
+axis(1, seq(0,1, length.out = dim1), sp.full, las = 2)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2), sp.full[rowSums(conf.sp$table) > 0], las = 1)
+dev.off()
+
+png("Figures/confusion_slide150_key.png", 1000, 700)
+par(fig = c(0, 0.9, 0, 1))
+par(mar = c(16, 16, 2, 2))
+# confusion matrix
+dim1 <- length(sp.idd)
+dim2 <- length(sp.idd[rowSums(conf.sp$table) > 0])
+image(t(conf.sp$table / rowSums(conf.sp$table)), col =c("grey70", matlab.like(1000)), ylim = c((dim2*((1+1/(dim1 - 1)))/dim1) - (1+1/(dim1 - 1))/dim1/2, -(1+1/(dim1 - 1))/dim1/2), axes = FALSE)
+
+title(xlab = expression(bold("Individual ID")), ylab = expression(bold("Consensus ID")), line = 13, cex.axis = 1.2)
+
+# x axis names
+xaxis.names <- sp.full
+axis(1, seq(0,1, length.out = length(xaxis.names))[intersect(which(str_count(xaxis.names, " ") != 2),grep("^[A-Z]", xaxis.names))], xaxis.names[intersect(which(str_count(xaxis.names, " ") != 2),grep("^[A-Z]", xaxis.names))], las = 2, font = 3, cex.axis = 1.05)
+axis(1, seq(0,1, length.out = length(xaxis.names))[-grep("^[A-Z]", xaxis.names)], xaxis.names[-grep("^[A-Z]", xaxis.names)], las = 2, cex.axis = 1.05)
+axis(1, seq(0,1, length.out = length(xaxis.names))[str_count(xaxis.names, " ") == 2], labels = parse(text = paste(paste("italic('", gsub("^([^ ]* [^ ]*) (.*$)", "\\1", xaxis.names[str_count(xaxis.names, " ") == 2]), "')", sep = ""), gsub("^([^ ]* [^ ]*) (.*$)", "\\2", xaxis.names[str_count(xaxis.names, " ") == 2]), sep = "~")), las = 2, cex.axis = 1.05)
+
+# number of specimens in Individual ID
+axis(3, seq(0,1, length.out = length(xaxis.names)) - 0.002, table(slide150.long$origID)[match(sp.idd, names(table(slide150.long$origID)))], cex.axis = 0.8, las = 2, tick = FALSE, mgp = c(3, 0.5, 0))
+
+# y axis names
+yaxis.names <- sp.full[rowSums(conf.sp$table) > 0]
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2), labels = FALSE)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2)[str_count(yaxis.names, " ") == 1], yaxis.names[str_count(yaxis.names, " ") == 1], las = 1, font = 3, cex.axis = 1.05)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2)[-grep("^[A-Z]", yaxis.names)], yaxis.names[-grep("^[A-Z]", yaxis.names)], las = 1, cex.axis = 1.05)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2)[str_count(yaxis.names, " ") == 2], labels = parse(text = paste(paste("italic('", gsub("^([^ ]* [^ ]*) (.*$)", "\\1", yaxis.names[str_count(yaxis.names, " ") == 2]), "')", sep = ""), gsub("^([^ ]* [^ ]*) (.*$)", "\\2", yaxis.names[str_count(yaxis.names, " ") == 2]), sep = "~")), las = 2, cex.axis = 1.05)
+
+# number of specimens in Definitive ID
+axis(4, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2) - 0.002, (table(slide150.long$IFcMin)/length(unique(slide150.long$Person)))[match(sp.idd[rowSums(conf.sp$table) > 0], names(table(slide150.long$IFcMin)))], cex.axis = 0.8, las = 1, tick = FALSE, mgp = c(3, 0.5, 0))
+
+# add key
+par(fig = c(0.9, 1, 0.35, 1), new = TRUE)
+par(mai = c(1, 0.4, 0.8, 0.5))
+names.key <- rep("", 101)
+names.key[seq(1, 101, by = 20)] <- seq(0.0, 1.0, by = 0.2)
+key <- rep(1, 101)
+barplot(key, main = "\nFraction of\nSpecimens", horiz = TRUE, space = 0, border = NA, col = c("grey70", matlab.like(100)), fg = "white", cex.main = 1.1, font.main = 1, xaxt = "n", yaxt = "n")
+axis(4, at = 1:101, names.key, las = 1, mgp = c(0, 1, 0), xaxt = "n", cex.axis = 1, tick = FALSE)
+par(par.def)
+dev.off() 
+
+
+# digital 125
+digital125.long <- reshape(digital125, varying = list(names(digital125)[nchar(names(digital125)) < 5]), direction = "long", times = names(digital125)[nchar(names(digital125)) < 5], timevar = "Person")
+rownames(digital125.long) <- 1:nrow(digital125.long)
+digital125.long <- digital125.long[, (names(digital125.long) != "id")]
+names(digital125.long)[names(digital125.long) == "A"] <- "origID"
+head(digital125.long)
+tail(digital125.long)
+
+# correct ID?
+digital125.long$Corr <- as.numeric(digital125.long$IFcMin == digital125.long$origID)
+
+# add a column to the abbreviation table to note if that species is present in the consensus
+sp.abb$p125s <- 2
+sp.abb$p125s[sp.abb$Abbreviation %in% digital125$IFcMin] <- 1
+sp.abb$p125s[sp.abb$Abbreviation %in% c("na", "nc")] <- 3
+
+# plot the confusion matrix
+sp.idd <- sp.abb$Abbreviation[order(sp.abb$p125s)]
+sp.full <- sp.abb$Species[order(sp.abb$p125s)]
+# remove "nc"
+sp.idd <- sp.idd[sp.idd != "nc"]
+sp.full <- sp.full[sp.full != "no strict consensus"]
+conf.sp <- confusionMatrix(factor(digital125.long$IFcMin, levels = sp.idd), factor(digital125.long$origID, levels = sp.idd))
+conf.splist <- sp.idd[rowSums(conf.sp$table) > 0]
+
+png("Figures/confusion_digital125.png", 1000, 700)
+par(fig = c(0, 0.9, 0, 1))
+par(mar = c(15, 15, 2, 2))
+# confusion matrix
+dim1 <- length(sp.idd)
+dim2 <- length(sp.idd[rowSums(conf.sp$table) > 0])
+image(t(conf.sp$table / rowSums(conf.sp$table)), col =c("grey70", matlab.like(1000)), ylim = c((dim2*((1+1/(dim1 - 1)))/dim1) - (1+1/(dim1 - 1))/dim1/2, -(1+1/(dim1 - 1))/dim1/2), axes = FALSE)
+
+axis(1, seq(0,1, length.out = dim1), sp.full, las = 2)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2), sp.full[rowSums(conf.sp$table) > 0], las = 1)
+dev.off()
+
+png("Figures/confusion_digital125_key.png", 1000, 700)
+par(fig = c(0, 0.9, 0, 1))
+par(mar = c(16, 16, 2, 2))
+# confusion matrix
+dim1 <- length(sp.idd)
+dim2 <- length(sp.idd[rowSums(conf.sp$table) > 0])
+image(t(conf.sp$table / rowSums(conf.sp$table)), col =c("grey70", matlab.like(1000)), ylim = c((dim2*((1+1/(dim1 - 1)))/dim1) - (1+1/(dim1 - 1))/dim1/2, -(1+1/(dim1 - 1))/dim1/2), axes = FALSE)
+
+title(xlab = expression(bold("Individual ID")), ylab = expression(bold("Consensus ID")), line = 13, cex.axis = 1.2)
+
+# x axis names
+xaxis.names <- sp.full
+axis(1, seq(0,1, length.out = length(xaxis.names))[intersect(which(str_count(xaxis.names, " ") != 2),grep("^[A-Z]", xaxis.names))], xaxis.names[intersect(which(str_count(xaxis.names, " ") != 2),grep("^[A-Z]", xaxis.names))], las = 2, font = 3, cex.axis = 1.05)
+axis(1, seq(0,1, length.out = length(xaxis.names))[-grep("^[A-Z]", xaxis.names)], xaxis.names[-grep("^[A-Z]", xaxis.names)], las = 2, cex.axis = 1.05)
+axis(1, seq(0,1, length.out = length(xaxis.names))[str_count(xaxis.names, " ") == 2], labels = parse(text = paste(paste("italic('", gsub("^([^ ]* [^ ]*) (.*$)", "\\1", xaxis.names[str_count(xaxis.names, " ") == 2]), "')", sep = ""), gsub("^([^ ]* [^ ]*) (.*$)", "\\2", xaxis.names[str_count(xaxis.names, " ") == 2]), sep = "~")), las = 2, cex.axis = 1.05)
+
+# number of specimens in Individual ID
+axis(3, seq(0,1, length.out = length(xaxis.names)) - 0.002, table(digital125.long$origID)[match(sp.idd, names(table(digital125.long$origID)))], cex.axis = 0.8, las = 2, tick = FALSE, mgp = c(3, 0.5, 0))
+
+# y axis names
+yaxis.names <- sp.full[rowSums(conf.sp$table) > 0]
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2), labels = FALSE)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2)[str_count(yaxis.names, " ") == 1], yaxis.names[str_count(yaxis.names, " ") == 1], las = 1, font = 3, cex.axis = 1.05)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2)[-grep("^[A-Z]", yaxis.names)], yaxis.names[-grep("^[A-Z]", yaxis.names)], las = 1, cex.axis = 1.05)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2)[str_count(yaxis.names, " ") == 2], labels = parse(text = paste(paste("italic('", gsub("^([^ ]* [^ ]*) (.*$)", "\\1", yaxis.names[str_count(yaxis.names, " ") == 2]), "')", sep = ""), gsub("^([^ ]* [^ ]*) (.*$)", "\\2", yaxis.names[str_count(yaxis.names, " ") == 2]), sep = "~")), las = 2, cex.axis = 1.05)
+
+# number of specimens in Definitive ID
+axis(4, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2) - 0.002, (table(digital125.long$IFcMin)/length(unique(digital125.long$Person)))[match(sp.idd[rowSums(conf.sp$table) > 0], names(table(digital125.long$IFcMin)))], cex.axis = 0.8, las = 1, tick = FALSE, mgp = c(3, 0.5, 0))
+
+# add key
+par(fig = c(0.9, 1, 0.35, 1), new = TRUE)
+par(mai = c(1, 0.4, 0.8, 0.5))
+names.key <- rep("", 101)
+names.key[seq(1, 101, by = 20)] <- seq(0.0, 1.0, by = 0.2)
+key <- rep(1, 101)
+barplot(key, main = "\nFraction of\nSpecimens", horiz = TRUE, space = 0, border = NA, col = c("grey70", matlab.like(100)), fg = "white", cex.main = 1.1, font.main = 1, xaxt = "n", yaxt = "n")
+axis(4, at = 1:101, names.key, las = 1, mgp = c(0, 1, 0), xaxt = "n", cex.axis = 1, tick = FALSE)
+par(par.def)
+dev.off() 
+
+
+# digital 150
+digital150.long <- reshape(digital150, varying = list(names(digital150)[nchar(names(digital150)) < 5]), direction = "long", times = names(digital150)[nchar(names(digital150)) < 5], timevar = "Person")
+rownames(digital150.long) <- 1:nrow(digital150.long)
+digital150.long <- digital150.long[, (names(digital150.long) != "id")]
+names(digital150.long)[names(digital150.long) == "A"] <- "origID"
+head(digital150.long)
+tail(digital150.long)
+
+# correct ID?
+digital150.long$Corr <- as.numeric(digital150.long$IFcMin == digital150.long$origID)
+
+# add a column to the abbreviation table to note if that species is present in the consensus
+sp.abb$p150s <- 2
+sp.abb$p150s[sp.abb$Abbreviation %in% digital150$IFcMin] <- 1
+sp.abb$p150s[sp.abb$Abbreviation %in% c("na", "nc")] <- 3
+
+# plot the confusion matrix
+sp.idd <- sp.abb$Abbreviation[order(sp.abb$p150s)]
+sp.full <- sp.abb$Species[order(sp.abb$p150s)]
+# remove "nc"
+sp.idd <- sp.idd[sp.idd != "nc"]
+sp.full <- sp.full[sp.full != "no strict consensus"]
+conf.sp <- confusionMatrix(factor(digital150.long$IFcMin, levels = sp.idd), factor(digital150.long$origID, levels = sp.idd))
+conf.splist <- sp.idd[rowSums(conf.sp$table) > 0]
+
+png("Figures/confusion_digital150.png", 1000, 700)
+par(fig = c(0, 0.9, 0, 1))
+par(mar = c(15, 15, 2, 2))
+# confusion matrix
+dim1 <- length(sp.idd)
+dim2 <- length(sp.idd[rowSums(conf.sp$table) > 0])
+image(t(conf.sp$table / rowSums(conf.sp$table)), col =c("grey70", matlab.like(1000)), ylim = c((dim2*((1+1/(dim1 - 1)))/dim1) - (1+1/(dim1 - 1))/dim1/2, -(1+1/(dim1 - 1))/dim1/2), axes = FALSE)
+
+axis(1, seq(0,1, length.out = dim1), sp.full, las = 2)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2), sp.full[rowSums(conf.sp$table) > 0], las = 1)
+dev.off()
+
+png("Figures/confusion_digital150_key.png", 1000, 700)
+par(fig = c(0, 0.9, 0, 1))
+par(mar = c(16, 16, 2, 2))
+# confusion matrix
+dim1 <- length(sp.idd)
+dim2 <- length(sp.idd[rowSums(conf.sp$table) > 0])
+image(t(conf.sp$table / rowSums(conf.sp$table)), col =c("grey70", matlab.like(1000)), ylim = c((dim2*((1+1/(dim1 - 1)))/dim1) - (1+1/(dim1 - 1))/dim1/2, -(1+1/(dim1 - 1))/dim1/2), axes = FALSE)
+
+title(xlab = expression(bold("Individual ID")), ylab = expression(bold("Consensus ID")), line = 13, cex.axis = 1.2)
+
+# x axis names
+xaxis.names <- sp.full
+axis(1, seq(0,1, length.out = length(xaxis.names))[intersect(which(str_count(xaxis.names, " ") != 2),grep("^[A-Z]", xaxis.names))], xaxis.names[intersect(which(str_count(xaxis.names, " ") != 2),grep("^[A-Z]", xaxis.names))], las = 2, font = 3, cex.axis = 1.05)
+axis(1, seq(0,1, length.out = length(xaxis.names))[-grep("^[A-Z]", xaxis.names)], xaxis.names[-grep("^[A-Z]", xaxis.names)], las = 2, cex.axis = 1.05)
+axis(1, seq(0,1, length.out = length(xaxis.names))[str_count(xaxis.names, " ") == 2], labels = parse(text = paste(paste("italic('", gsub("^([^ ]* [^ ]*) (.*$)", "\\1", xaxis.names[str_count(xaxis.names, " ") == 2]), "')", sep = ""), gsub("^([^ ]* [^ ]*) (.*$)", "\\2", xaxis.names[str_count(xaxis.names, " ") == 2]), sep = "~")), las = 2, cex.axis = 1.05)
+
+# number of specimens in Individual ID
+axis(3, seq(0,1, length.out = length(xaxis.names)) - 0.002, table(digital150.long$origID)[match(sp.idd, names(table(digital150.long$origID)))], cex.axis = 0.8, las = 2, tick = FALSE, mgp = c(3, 0.5, 0))
+
+# y axis names
+yaxis.names <- sp.full[rowSums(conf.sp$table) > 0]
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2), labels = FALSE)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2)[str_count(yaxis.names, " ") == 1], yaxis.names[str_count(yaxis.names, " ") == 1], las = 1, font = 3, cex.axis = 1.05)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2)[-grep("^[A-Z]", yaxis.names)], yaxis.names[-grep("^[A-Z]", yaxis.names)], las = 1, cex.axis = 1.05)
+axis(2, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2)[str_count(yaxis.names, " ") == 2], labels = parse(text = paste(paste("italic('", gsub("^([^ ]* [^ ]*) (.*$)", "\\1", yaxis.names[str_count(yaxis.names, " ") == 2]), "')", sep = ""), gsub("^([^ ]* [^ ]*) (.*$)", "\\2", yaxis.names[str_count(yaxis.names, " ") == 2]), sep = "~")), las = 2, cex.axis = 1.05)
+
+# number of specimens in Definitive ID
+axis(4, seq(0,((dim2 - 1)*((1+1/(dim1 - 1)))/dim1), length.out = dim2) - 0.002, (table(digital150.long$IFcMin)/length(unique(digital150.long$Person)))[match(sp.idd[rowSums(conf.sp$table) > 0], names(table(digital150.long$IFcMin)))], cex.axis = 0.8, las = 1, tick = FALSE, mgp = c(3, 0.5, 0))
+
+# add key
+par(fig = c(0.9, 1, 0.35, 1), new = TRUE)
+par(mai = c(1, 0.4, 0.8, 0.5))
+names.key <- rep("", 101)
+names.key[seq(1, 101, by = 20)] <- seq(0.0, 1.0, by = 0.2)
+key <- rep(1, 101)
+barplot(key, main = "\nFraction of\nSpecimens", horiz = TRUE, space = 0, border = NA, col = c("grey70", matlab.like(100)), fg = "white", cex.main = 1.1, font.main = 1, xaxt = "n", yaxt = "n")
+axis(4, at = 1:101, names.key, las = 1, mgp = c(0, 1, 0), xaxt = "n", cex.axis = 1, tick = FALSE)
+par(par.def)
+dev.off() 
 
 
 # 4. NMDS -----------------------------------------------------------------

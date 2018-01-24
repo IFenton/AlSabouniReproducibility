@@ -20,6 +20,9 @@ library("readxl")
 library(caret) # for the confusion matrix
 library(colorRamps) # colours
 library(stringr) # for confusion matrix axes
+library(vegan)
+library(cluster) # for the dendrogram
+library(RColorBrewer)
 
 # 1. Load in the data -----------------------------------------------------
 
@@ -85,7 +88,7 @@ rm(tmp) # no, it makes it worse
 
 # 2b. Consensus 20 --------------------------------------------------------
 # check whether 20% is actually the maximum for the consensus (so what is the highest count per specimen) ignoring na's
-slide125$IFmaxCon <- apply(slide125[, nchar(names(slide125)) < 5], 1, function (x)  max(table(x[x != 'na']))) 
+slide125$IFmaxCon <- apply(slide125, 1, function (x)  max(table(x[x != 'na']))) 
 slide150$IFmaxCon <- apply(slide150[, nchar(names(slide150)) < 5], 1, function (x) max(table(x[x != 'na']))) 
 digital125$IFmaxCon <- apply(digital125[, nchar(names(digital125)) < 5], 1, function (x) max(table(x[x != 'na']))) 
 digital150$IFmaxCon <- apply(digital150[, nchar(names(digital150)) < 5], 1, function (x) max(table(x[x != 'na']))) 
@@ -1187,8 +1190,133 @@ dev.off()
 
 
 # 4. NMDS -----------------------------------------------------------------
-# Figure 2
 
+# 4a. Recreating Nadia's NMDS ---------------------------------------------
+# I think this was originally run on the species counts (i.e. working at the community level)
+# I attempted to do this and failed to produce the same results
+
+# Figure 2
+# for size fraction 125 (slide and digital are combined, with the consensus values)
+# the data needs to be the other way round, so transpose it
+sp.125 <- merge(slide125sp, digital125sp, by = "species")
+NA_t.125sp <- data.frame(t(sp.125[, !(names(sp.125) %in% c("species", "IFmaxCon.x", "IFmaxCon.y", "IFc50.x", "IFcMin.x", "IFc50.y", "IFcMin.y"))]))
+names(NA_t.125sp) <- sp.125$species
+rownames(NA_t.125sp)[nchar(rownames(NA_t.125sp)) >= 5] <- c("Sc50", "Sc20", "Dc50", "Dc20")
+# re-running this creates a certain amount of movement
+NA_mds.125sp <- metaMDS(NA_t.125sp)
+
+# create a dataframe for the colours
+mds.col <- data.frame(person = rownames(NA_t.125sp))
+# add in the school
+mds.col$school <- people$School[match(mds.col$person, people$SlideID)]
+mds.col$school[mds.col$person %in% people$DigitalID] <- people$School[order(people$DigitalID)[1:sum(!is.na(people$DigitalID))]]
+mds.col$school[grep("1[a-z]", mds.col$person)] <- people$School[people$SlideID == "1"][1]
+mds.col$school[grep("2[a-z]", mds.col$person)] <- people$School[people$SlideID == "2"][1]
+mds.col$school[is.na(mds.col$school)] <- as.character(mds.col$person[is.na(mds.col$school)])
+mds.col$sch.col <- NA
+mds.col$sch.col[grep("^[1-9]", mds.col$school)] <- mds.col$school[grep("^[1-9]", mds.col$school)]
+mds.col$sch.col <- gsub("_.*", "", mds.col$sch.col)
+mds.col$sch.col <- as.numeric(mds.col$sch.col)
+
+# add in the paired analyses
+mds.col$pair <- NA
+for (i in which(!is.na(people$SlideID) & !is.na(people$DigitalID))) {
+  mds.col$pair[mds.col$person %in% people$DigitalID[i]] <- i
+  mds.col$pair[grep(paste("^",people$SlideID[i], sep = ""), mds.col$person)] <- i
+}
+
+# plot the NMDS
+plot(NA_mds.125sp, type = "n", display = "sites", cex = 1)
+points(NA_mds.125sp, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
+text(NA_mds.125sp, labels = rownames(NA_t.125sp))
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16)
+
+# for 150
+sp.150 <- merge(slide150sp, digital150sp, by = "species")
+NA_t.150sp <- data.frame(t(sp.150[, !(names(sp.150) %in% c("species", "IFmaxCon.x", "IFmaxCon.y", "IFc50.x", "IFcMin.x", "IFc50.y", "IFcMin.y"))]))
+names(NA_t.150sp) <- sp.150$species
+rownames(NA_t.150sp)[nchar(rownames(NA_t.150sp)) >= 5] <- c("Sc50", "Sc20", "Dc50", "Dc20")
+NA_mds.150sp <- metaMDS(NA_t.150sp)
+plot(NA_mds.150sp, type = "n", display = "sites", cex = 1)
+points(NA_mds.150sp, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
+text(NA_mds.150sp, labels = rownames(NA_t.150sp))
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16)
+# these are currently very different from Nadia's data
+
+# 4b. Using raw data rather than species counts ---------------------------
+# again this is run initially for Nadia's consensus values
+# I think instead it is more sensible to use the raw data
+# try using the original data instead (n.b. I can't seem to do this in PAST)
+
+# for 125
+full.125 <- merge(slide125, digital125, by = "Specimen")
+NA_t.125f <- data.frame(t(full.125[, !(names(full.125) %in% c("Specimen", "IFmaxCon.x", "IFmaxCon.y", "IFc50.x", "IFcMin.x", "IFc50.y", "IFcMin.y"))]))
+rownames(NA_t.125f)[nchar(rownames(NA_t.125f)) >= 5] <- c("Sc50", "Sc20", "Dc50", "Dc20")
+NA_mds.125f <- metaMDS(daisy(NA_t.125f))
+plot(NA_mds.125f, type = "n", display = "sites", cex = 1)
+points(NA_mds.125f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
+text(NA_mds.125f, labels = rownames(NA_t.125f))
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16)
+
+
+# and for 150
+full.150 <- merge(slide150, digital150, by = "Specimen")
+NA_t.150f <- data.frame(t(full.150[, !(names(full.150) %in% c("Specimen", "IFmaxCon.x", "IFmaxCon.y", "IFc50.x", "IFcMin.x", "IFc50.y", "IFcMin.y"))]))
+rownames(NA_t.150f)[nchar(rownames(NA_t.150f)) >= 5] <- c("Sc50", "Sc20", "Dc50", "Dc20")
+NA_mds.150f <- metaMDS(daisy(NA_t.150f))
+# the full plot
+plot(NA_mds.150f, type = "n", display = "sites", cex = 1)
+points(NA_mds.150f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
+text(NA_mds.150f, labels = rownames(NA_t.150f))
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16)
+# focussing on the main section
+plot(NA_mds.150f, type = "n", display = "sites", xlim = c(-0.2, 0.1), ylim = c(-0.1, 0.1), cex = 1)
+points(NA_mds.150f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
+text(NA_mds.150f, labels = rownames(NA_t.150f))
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16)
+
+# 4c. plotting using my consensus estimates -------------------------------
+# for 125
+IF_t.125f <- data.frame(t(full.125[, !(names(full.125) %in% c("Specimen", "consensus50.x", "consensus20.x", "consensus50.y", "consensus20.y", "IFmaxCon.x", "IFmaxCon.y"))]))
+rownames(IF_t.125f)[nchar(rownames(IF_t.125f)) >= 5] <- c("Sc50", "ScMin", "Dc50", "DcMin")
+IF_mds.125f <- metaMDS(daisy(IF_t.125f))
+png("Figures/IF_NMDS_125.png")
+plot(IF_mds.125f, type = "n", display = "sites", cex = 1)
+points(IF_mds.125f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
+text(IF_mds.125f, labels = rownames(IF_t.125f))
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16)
+dev.off()
+
+# for 150
+full.150 <- merge(slide150, digital150, by = "Specimen")
+IF_t.150f <- data.frame(t(full.150[, !(names(full.150) %in% c("Specimen", "consensus50.x", "consensus20.x", "consensus50.y", "consensus20.y", "IFmaxCon.x", "IFmaxCon.y"))]))
+rownames(IF_t.150f)[nchar(rownames(IF_t.150f)) >= 5] <- c("Sc50", "ScMin", "Dc50", "DcMin")
+IF_mds.150f <- metaMDS(daisy(IF_t.150f))
+# the full plot
+png("Figures/IF_NMDS_150.png")
+plot(IF_mds.150f, type = "n", display = "sites", cex = 1)
+points(IF_mds.150f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
+text(IF_mds.150f, labels = rownames(IF_t.150f))
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16)
+dev.off()
+
+# focussing on the main section
+png("Figures/IF_NMDS_150_zoom.png")
+plot(IF_mds.150f, type = "n", display = "sites", xlim = c(-0.1, 0.15), ylim = c(-0.1, 0.2), cex = 1)
+points(IF_mds.150f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
+text(IF_mds.150f, labels = rownames(IF_t.150f))
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16)
+dev.off()
+
+# 4b. Dendrogram ----------------------------------------------------------
+# an alternative way of plotting this is as a dendrogram
+# based on the community
+plot(hclust(daisy(data.frame(t.125))))
+
+# based on the original IDs
+plot(hclust(daisy(data.frame(t(merge(slide125, digital125, by = "Specimen")[, !(names(sp.125) %in% c("species", "IFmaxCon.x", "IFmaxCon.y", "IFc50.x", "IFcMin.x", "IFc50.y", "IFcMin.y"))])))))
+
+# but I don't think this is as helpful
 
 # 5. Repeated analysis by workers -----------------------------------------
 # ex figure 6

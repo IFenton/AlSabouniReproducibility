@@ -1241,12 +1241,148 @@ mfrow = c(1,1)
 dev.off()
 
 # 8. Diversity ------------------------------------------------------------
+
+# 8a. Calculating diversity -----------------------------------------------
 # Table 5
+# compare the results I calculate with those that Nadia has
+head(slide125sp)
+
+# these all included 'na' (and 'nc') as a species (to get the match. )
+# richness Slide 125
+divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == "125" & nchar(divTemp$Person) < 4] <- specnumber(t(slide125sp[3:nrow(slide125sp),2:ncol(slide125sp)]))[1:17] # richness
+divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == "125" & divTemp$Person == "consensus"] <- specnumber(t(slide125sp[3:nrow(slide125sp),2:ncol(slide125sp)]))["IFcMin"]
+
+# ShannonWiener
+divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == "125" & nchar(divTemp$Person) < 4] <- diversity(t(slide125sp[3:nrow(slide125sp),2:ncol(slide125sp)]))[1:17] 
+divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == "125" & divTemp$Person == "consensus"] <- diversity(t(slide125sp[3:nrow(slide125sp),2:ncol(slide125sp)]))["IFcMin"]
+
+# Dominance
+divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == "125" & nchar(divTemp$Person) < 4] <- (1 - diversity(t(slide125sp[3:nrow(slide125sp),2:ncol(slide125sp)]), index = "simpson"))[1:17]  
+divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == "125" & divTemp$Person == "consensus"] <- (1 - diversity(t(slide125sp[3:nrow(slide125sp),2:ncol(slide125sp)]), index = "simpson"))["IFcMin"]  
+
+# Evenness
+divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == "125" & nchar(divTemp$Person) < 4] <- (exp(diversity(t(slide125sp[3:nrow(slide125sp),2:ncol(slide125sp)]))) / specnumber(t(slide125sp[3:nrow(slide125sp),2:ncol(slide125sp)])))[1:17]
+divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == "125" & divTemp$Person == "consensus"] <- (exp(diversity(t(slide125sp[3:nrow(slide125sp),2:ncol(slide125sp)]))) / specnumber(t(slide125sp[3:nrow(slide125sp),2:ncol(slide125sp)])))["IFcMin"]
+
+
+# Slide 150
+# richness 
+divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == "150" & nchar(divTemp$Person) < 4] <- specnumber(t(slide150sp[3:nrow(slide150sp),2:ncol(slide150sp)]))[1:17] # richness
+divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == "150" & divTemp$Person == "consensus"] <- specnumber(t(slide150sp[3:nrow(slide150sp),2:ncol(slide150sp)]))["IFcMin"]
+
+# ShannonWiener
+divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == "150" & nchar(divTemp$Person) < 4] <- diversity(t(slide150sp[3:nrow(slide150sp),2:ncol(slide150sp)]))[1:17] 
+divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == "150" & divTemp$Person == "consensus"] <- diversity(t(slide150sp[3:nrow(slide150sp),2:ncol(slide150sp)]))["IFcMin"]
+
+# Dominance
+divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == "150" & nchar(divTemp$Person) < 4] <- (1 - diversity(t(slide150sp[3:nrow(slide150sp),2:ncol(slide150sp)]), index = "simpson"))[1:17]  
+divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == "150" & divTemp$Person == "consensus"] <- (1 - diversity(t(slide150sp[3:nrow(slide150sp),2:ncol(slide150sp)]), index = "simpson"))["IFcMin"]  
+
+# Evenness
+divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == "150" & nchar(divTemp$Person) < 4] <- (exp(diversity(t(slide150sp[3:nrow(slide125sp),2:ncol(slide150sp)]))) / specnumber(t(slide150sp[3:nrow(slide125sp),2:ncol(slide150sp)])))[1:17]
+divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == "150" & divTemp$Person == "consensus"] <- (exp(diversity(t(slide150sp[3:nrow(slide125sp),2:ncol(slide150sp)]))) / specnumber(t(slide150sp[3:nrow(slide125sp),2:ncol(slide150sp)])))["IFcMin"]
+
+# Digital 125
+# richness 
+divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == "125" & nchar(divTemp$Person) < 4] <- specnumber(t(digital125sp[3:nrow(digital125sp),2:ncol(digital125sp)]))[1:9] # richness
+divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == "125" & divTemp$Person == "consensus"] <- specnumber(t(digital125sp[3:nrow(digital125sp),2:ncol(digital125sp)]))["IFcMin"]
+
+# ShannonWiener
+divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == "125" & nchar(divTemp$Person) < 4] <- diversity(t(digital125sp[3:nrow(digital125sp),2:ncol(digital125sp)]))[1:9] 
+divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == "125" & divTemp$Person == "consensus"] <- diversity(t(digital125sp[3:nrow(digital125sp),2:ncol(digital125sp)]))["IFcMin"]
+
+# Dominance
+divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == "125" & nchar(divTemp$Person) < 4] <- (1 - diversity(t(digital125sp[3:nrow(digital125sp),2:ncol(digital125sp)]), index = "simpson"))[1:9]  
+divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == "125" & divTemp$Person == "consensus"] <- (1 - diversity(t(digital125sp[3:nrow(digital125sp),2:ncol(digital125sp)]), index = "simpson"))["IFcMin"]  
+
+# Evenness
+divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == "125" & nchar(divTemp$Person) < 4] <- (exp(diversity(t(digital125sp[3:nrow(slide125sp),2:ncol(digital125sp)]))) / specnumber(t(digital125sp[3:nrow(slide125sp),2:ncol(digital125sp)])))[1:9]
+divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == "125" & divTemp$Person == "consensus"] <- (exp(diversity(t(digital125sp[3:nrow(slide125sp),2:ncol(digital125sp)]))) / specnumber(t(digital125sp[3:nrow(slide125sp),2:ncol(digital125sp)])))["IFcMin"]
+
+# Digital 150
+# richness 
+divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == "150" & nchar(divTemp$Person) < 4] <- specnumber(t(digital150sp[3:nrow(digital150sp),2:ncol(digital150sp)]))[1:9] # richness
+divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == "150" & divTemp$Person == "consensus"] <- specnumber(t(digital150sp[3:nrow(digital150sp),2:ncol(digital150sp)]))["IFcMin"]
+
+# ShannonWiener
+divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == "150" & nchar(divTemp$Person) < 4] <- diversity(t(digital150sp[3:nrow(digital150sp),2:ncol(digital150sp)]))[1:9] 
+divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == "150" & divTemp$Person == "consensus"] <- diversity(t(digital150sp[3:nrow(digital150sp),2:ncol(digital150sp)]))["IFcMin"]
+
+# Dominance
+divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == "150" & nchar(divTemp$Person) < 4] <- (1 - diversity(t(digital150sp[3:nrow(digital150sp),2:ncol(digital150sp)]), index = "simpson"))[1:9]  
+divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == "150" & divTemp$Person == "consensus"] <- (1 - diversity(t(digital150sp[3:nrow(digital150sp),2:ncol(digital150sp)]), index = "simpson"))["IFcMin"]  
+
+# Evenness
+divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == "150" & nchar(divTemp$Person) < 4] <- (exp(diversity(t(digital150sp[3:nrow(slide125sp),2:ncol(digital150sp)]))) / specnumber(t(digital150sp[3:nrow(slide125sp),2:ncol(digital150sp)])))[1:9]
+divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == "150" & divTemp$Person == "consensus"] <- (exp(diversity(t(digital150sp[3:nrow(slide125sp),2:ncol(digital150sp)]))) / specnumber(t(digital150sp[3:nrow(slide125sp),2:ncol(digital150sp)])))["IFcMin"]
+
+# 8b. Plotting diversity --------------------------------------------------
+ord.div <- c("1a", "1b", "2a", "2b", "A", 3:6, "F", 7:9, "G", 10:15, LETTERS[2:5], LETTERS[8:9])
 
 # Figure 7
+png("Figures/Fig7_richness.png", 500, 800)
+# 125
+with(divTemp[divTemp$Size == 125,], plot(1:26, IF_Richness[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Person", ylab = "Richness", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+axis(1, at = 1:26, labels = ord.div)
+with(divTemp[divTemp$Size == 125 & divTemp$Person == "consensus",], abline(h = IF_Richness, col = ((Analysis != "Slide")*3 + 1)))
+# 150
+with(divTemp[divTemp$Size == 150,], points(1:26, IF_Richness[match(ord.div, Person)], pch = 1, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+axis(1, at = 1:26, labels = ord.div)
+with(divTemp[divTemp$Size == 150 & divTemp$Person == "consensus",], abline(h = IF_Richness, lty = 4, col = ((Analysis != "Slide")*3 + 1)))
+legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(16, 1, 16, 1), col = c(1, 1, 4, 4))
+dev.off()
+
+png("Figures/Fig7_Dominance.png", 500, 800)
+# 125
+with(divTemp[divTemp$Size == 125,], plot(1:26, IF_Dominance[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Person", ylab = "Dominance", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+axis(1, at = 1:26, labels = ord.div)
+with(divTemp[divTemp$Size == 125 & divTemp$Person == "consensus",], abline(h = IF_Dominance, col = ((Analysis != "Slide")*3 + 1)))
+# 150
+with(divTemp[divTemp$Size == 150,], points(1:26, IF_Dominance[match(ord.div, Person)], pch = 1, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+axis(1, at = 1:26, labels = ord.div)
+with(divTemp[divTemp$Size == 150 & divTemp$Person == "consensus",], abline(h = IF_Dominance, lty = 4, col = ((Analysis != "Slide")*3 + 1)))
+legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(16, 1, 16, 1), col = c(1, 1, 4, 4))
+dev.off()
+
+png("Figures/Fig7_ShannonWiener.png", 500, 800)
+# 125
+with(divTemp[divTemp$Size == 125,], plot(1:26, IF_ShannonWiener[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Person", ylab = "ShannonWiener", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+axis(1, at = 1:26, labels = ord.div)
+with(divTemp[divTemp$Size == 125 & divTemp$Person == "consensus",], abline(h = IF_ShannonWiener, col = ((Analysis != "Slide")*3 + 1)))
+# 150
+with(divTemp[divTemp$Size == 150,], points(1:26, IF_ShannonWiener[match(ord.div, Person)], pch = 1, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+axis(1, at = 1:26, labels = ord.div)
+with(divTemp[divTemp$Size == 150 & divTemp$Person == "consensus",], abline(h = IF_ShannonWiener, lty = 4, col = ((Analysis != "Slide")*3 + 1)))
+legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(16, 1, 16, 1), col = c(1, 1, 4, 4))
+dev.off()
+
+png("Figures/Fig7_Evenness.png", 500, 800)
+# 125
+with(divTemp[divTemp$Size == 125,], plot(1:26, IF_Evenness[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Person", ylab = "Evenness", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+axis(1, at = 1:26, labels = ord.div)
+with(divTemp[divTemp$Size == 125 & divTemp$Person == "consensus",], abline(h = IF_Evenness, col = ((Analysis != "Slide")*3 + 1)))
+# 150
+with(divTemp[divTemp$Size == 150,], points(1:26, IF_Evenness[match(ord.div, Person)], pch = 1, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+axis(1, at = 1:26, labels = ord.div)
+with(divTemp[divTemp$Size == 150 & divTemp$Person == "consensus",], abline(h = IF_Evenness, lty = 4, col = ((Analysis != "Slide")*3 + 1)))
+legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(16, 1, 16, 1), col = c(1, 1, 4, 4))
+dev.off()
+
+# # 8c. Shannon Wiener comparison -----------------------------------------
+png("Figures/Fig8_SWcomp.png")
+plot(divTemp$ShannonWiener[divTemp$Size == 125 & nchar(divTemp$Person) < 4], divTemp$ShannonWiener[divTemp$Size == 150 & nchar(divTemp$Person) < 4], pch = 16, xlab = "Shannon-Wiener 125", ylab = "Shannon-Wiener 150")
+summary(lm(divTemp$ShannonWiener[divTemp$Size == 125 & nchar(divTemp$Person) < 4] ~ divTemp$ShannonWiener[divTemp$Size == 150 & nchar(divTemp$Person) < 4]))
+
+abline(lm(divTemp$ShannonWiener[divTemp$Size == 125 & nchar(divTemp$Person) < 4] ~ divTemp$ShannonWiener[divTemp$Size == 150 & nchar(divTemp$Person) < 4]))
 
 # Figure 8
+points(divTemp$ShannonWiener[divTemp$Size == 125 & divTemp$Person %in% c("10", "13", "15", "B")], divTemp$ShannonWiener[divTemp$Size == 150 & divTemp$Person %in% c("10", "13", "15", "B")], pch = 16, xlab = "Shannon-Wiener 125", ylab = "Shannon-Wiener 150", col = "red")
 
+
+summary(lm(divTemp$ShannonWiener[divTemp$Size == 125 & !(divTemp$Person %in% c("10", "13", "15", "B"))] ~ divTemp$ShannonWiener[divTemp$Size == 150 & !(divTemp$Person %in% c("10", "13", "15", "B"))]))
+
+abline(lm(divTemp$ShannonWiener[divTemp$Size == 125 & !(divTemp$Person %in% c("10", "13", "15", "B"))] ~ divTemp$ShannonWiener[divTemp$Size == 150 & !(divTemp$Person %in% c("10", "13", "15", "B"))]), lty = 2)
+dev.off()
 
 # 9. Outliers -------------------------------------------------------------
 # Table 7

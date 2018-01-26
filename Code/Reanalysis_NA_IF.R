@@ -47,6 +47,9 @@ people <- as.data.frame(read_excel("Data/PeopleMetadata.xlsx", na = "NA"))
 size125 <- as.data.frame(read_excel("Data/SpecimenSize.xlsx", sheet = "Size125"))
 size150 <- as.data.frame(read_excel("Data/SpecimenSize.xlsx", sheet = "Size150"))
 
+# diversity / temperature 
+divTemp <- as.data.frame(read_excel("Data/DiversityTemp.xlsx", na = "NA"))
+
 # 1b. Sanity check --------------------------------------------------------
 str(slide125)
 
@@ -890,7 +893,7 @@ tail(slide125.long)
 # correct ID?
 slide125.long$Corr <- as.numeric(slide125.long$IFcMin == slide125.long$origID)
 
-png("Figures/confusion_slide125_key.png", 1000, 700)
+png("Figures/confusion_slide125.png", 1000, 700)
 conf_mat(slide125.long, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Individual ID", ylab = "Consensus ID")
 dev.off() 
 
@@ -906,7 +909,7 @@ tail(slide150.long)
 # correct ID?
 slide150.long$Corr <- as.numeric(slide150.long$IFcMin == slide150.long$origID)
 
-png("Figures/confusion_slide150_key.png", 1000, 700)
+png("Figures/confusion_slide150.png", 1000, 700)
 conf_mat(slide150.long, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Individual ID", ylab = "Consensus ID")
 dev.off() 
 
@@ -922,7 +925,7 @@ tail(digital125.long)
 # correct ID?
 digital125.long$Corr <- as.numeric(digital125.long$IFcMin == digital125.long$origID)
 
-png("Figures/confusion_digital125_key.png", 1000, 700)
+png("Figures/confusion_digital125.png", 1000, 700)
 conf_mat(digital125.long, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Individual ID", ylab = "Consensus ID")
 dev.off() 
 
@@ -938,7 +941,7 @@ tail(digital150.long)
 # correct ID?
 digital150.long$Corr <- as.numeric(digital150.long$IFcMin == digital150.long$origID)
 
-png("Figures/confusion_digital150_key.png", 1000, 700)
+png("Figures/confusion_digital150.png", 1000, 700)
 conf_mat(digital150.long, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Individual ID", ylab = "Consensus ID")
 dev.off() 
 
@@ -1079,59 +1082,163 @@ plot(hclust(daisy(data.frame(t(merge(slide125, digital125, by = "Specimen")[, !(
 # for 1a / 1b slide 125
 head(slide125.long)
 
-png("Figures/confusion_125_1a1b_key.png", 1000, 700)
+# I considered different ways of plotting this:
 conf_mat(slide125.long, "origID", axis.col = "Person", axis1 = "1b", axis2 = "1a", spec.abb = sp.abb, abb.end = c("na", "nc"))
+# or
+conf_mat(slide125.long, "origID", axis.col = "Person", axis1 = "1a", axis2 = "1b", spec.abb = sp.abb, abb.end = c("na", "nc"))
+# but these only highlight changes, not increasing accuracy, so instead I'm plotting them both against the consensus
+
+png("Figures/Time/confusion_125_1aCon.png", 1000, 700)
+conf_mat(slide125.long[slide125.long$Person == "1a", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "1a", ylab = "Consensus")
+dev.off() 
+png("Figures/Time/confusion_125_1bCon.png", 1000, 700)
+conf_mat(slide125.long[slide125.long$Person == "1b", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "1b", ylab = "Consensus")
 dev.off() 
 
 # and for 2a / 2b
 # again, do this as a confusion matrix
-png("Figures/confusion_125_2a2b_key.png", 1000, 700)
-conf_mat(slide125.long, "origID", axis.col = "Person", axis1 = "2b", axis2 = "2a", spec.abb = sp.abb, abb.end = c("na", "nc"))
+png("Figures/Time/confusion_125_2aCon.png", 1000, 700)
+conf_mat(slide125.long[slide125.long$Person == "2a", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2a", ylab = "Consensus")
+dev.off() 
+png("Figures/Time/confusion_125_2bCon.png", 1000, 700)
+conf_mat(slide125.long[slide125.long$Person == "2b", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2b", ylab = "Consensus")
 dev.off() 
 
 # And for 150
-png("Figures/confusion_150_1a1b_key.png", 1000, 700)
-conf_mat(slide150.long, "origID", axis.col = "Person", axis1 = "1b", axis2 = "1a", spec.abb = sp.abb, abb.end = c("na", "nc"))
+png("Figures/Time/confusion_150_1aCon.png", 1000, 700)
+conf_mat(slide150.long[slide150.long$Person == "1a", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "1a", ylab = "Consensus")
+dev.off() 
+png("Figures/Time/confusion_150_1aCon.png", 1000, 700)
+conf_mat(slide150.long[slide150.long$Person == "1b", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "1b", ylab = "Consensus")
 dev.off() 
 
-png("Figures/confusion_150_2a2b_key.png", 1000, 700)
-conf_mat(slide150.long, "origID", axis.col = "Person", axis1 = "2b", axis2 = "2a", spec.abb = sp.abb, abb.end = c("na", "nc"))
-dev.off() 
+png("Figures/Time/confusion_150_2aCon.png", 1000, 700)
+conf_mat(slide150.long[slide150.long$Person == "2a", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2a", ylab = "Consensus")
+dev.off()
+png("Figures/Time/confusion_150_2bCon.png", 1000, 700)
+conf_mat(slide150.long[slide150.long$Person == "2b", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2b", ylab = "Consensus")
+dev.off()
+
 
 
 # 6. Digital vs. slides ---------------------------------------------------
+
+# 6a. Individual comparisons ----------------------------------------------
 # Table 6
 full125.long <- rbind(slide125.long, digital125.long)
 
-png("Figures/confusion_125_A2b_key.png", 1000, 700)
-conf_mat(full125.long, "origID", axis.col = "Person", axis1 = "A", axis2 = "2b", spec.abb = sp.abb, abb.end = c("na", "nc"), ylab = "Slide: 2b", xlab = "Digital: A")
+# 125 2b vs. A
+png("Figures/DigitalSlide/confusion_125_2bA.png", 1000, 700)
+conf_mat(full125.long, "origID", axis.col = "Person", axis1 = "2b", axis2 = "A", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
 dev.off() 
 
-png("Figures/confusion_125_F6_key.png", 1000, 700)
-conf_mat(full125.long, "origID", axis.col = "Person", axis1 = "F", axis2 = "6", spec.abb = sp.abb, abb.end = c("na", "nc"), ylab = "Slide: 6", xlab = "Digital: F")
+png("Figures/DigitalSlide/confusion_125_2bCon.png", 1000, 700)
+conf_mat(full125.long[full125.long$Person == "2b", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2b", ylab = "Consensus")
+dev.off() 
+png("Figures/DigitalSlide/confusion_125_ACon.png", 1000, 700)
+conf_mat(full125.long[full125.long$Person == "A", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "A", ylab = "Consensus")
 dev.off() 
 
-png("Figures/confusion_125_G9_key.png", 1000, 700)
-conf_mat(full125.long, "origID", axis.col = "Person", axis1 = "G", axis2 = "9", spec.abb = sp.abb, abb.end = c("na", "nc"), ylab = "Slide: 9", xlab = "Digital: G")
+# 125 6 vs. F
+png("Figures/DigitalSlide/confusion_125_6F.png", 1000, 700)
+conf_mat(full125.long, "origID", axis.col = "Person", axis1 = "6", axis2 = "F", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
+dev.off() 
+png("Figures/DigitalSlide/confusion_125_FCon.png", 1000, 700)
+conf_mat(full125.long[full125.long$Person == "F", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "F", ylab = "Consensus")
+dev.off() 
+png("Figures/DigitalSlide/confusion_125_6Con.png", 1000, 700)
+conf_mat(full125.long[full125.long$Person == "6", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "6", ylab = "Consensus")
+dev.off() 
+
+# 125 9 vs. G
+png("Figures/DigitalSlide/confusion_125_9G.png", 1000, 700)
+conf_mat(full125.long, "origID", axis.col = "Person", axis1 = "9", axis2 = "G", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
+dev.off() 
+
+png("Figures/DigitalSlide/confusion_125_GCon.png", 1000, 700)
+conf_mat(full125.long[full125.long$Person == "G", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "G", ylab = "Consensus")
+dev.off() 
+png("Figures/DigitalSlide/confusion_125_9Con.png", 1000, 700)
+conf_mat(full125.long[full125.long$Person == "9", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "9", ylab = "Consensus")
 dev.off() 
 
 # for 150
 full150.long <- rbind(slide150.long, digital150.long)
 
-png("Figures/confusion_150_A2b_key.png", 1000, 700)
-conf_mat(full150.long, "origID", axis.col = "Person", axis1 = "A", axis2 = "2b", spec.abb = sp.abb, abb.end = c("na", "nc"), ylab = "Slide: 2b", xlab = "Digital: A")
+# 150 2b vs. A
+png("Figures/DigitalSlide/confusion_150_2bA.png", 1000, 700)
+conf_mat(full150.long, "origID", axis.col = "Person", axis1 = "2b", axis2 = "A", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
 dev.off() 
 
-png("Figures/confusion_150_F6_key.png", 1000, 700)
-conf_mat(full150.long, "origID", axis.col = "Person", axis1 = "F", axis2 = "6", spec.abb = sp.abb, abb.end = c("na", "nc"), ylab = "Slide: 6", xlab = "Digital: F")
+png("Figures/DigitalSlide/confusion_150_2bCon.png", 1000, 700)
+conf_mat(full150.long[full150.long$Person == "2b", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2b", ylab = "Consensus")
+dev.off() 
+png("Figures/DigitalSlide/confusion_150_ACon.png", 1000, 700)
+conf_mat(full150.long[full150.long$Person == "A", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "A", ylab = "Consensus")
 dev.off() 
 
-png("Figures/confusion_150_G9_key.png", 1000, 700)
-conf_mat(full150.long, "origID", axis.col = "Person", axis1 = "G", axis2 = "9", spec.abb = sp.abb, abb.end = c("na", "nc"), ylab = "Slide: 9", xlab = "Digital: G")
+# 150 6 vs. F
+png("Figures/DigitalSlide/confusion_150_6F.png", 1000, 700)
+conf_mat(full150.long, "origID", axis.col = "Person", axis1 = "6", axis2 = "F", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
 dev.off() 
+
+png("Figures/DigitalSlide/confusion_150_FCon.png", 1000, 700)
+conf_mat(full150.long[full150.long$Person == "F", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "F", ylab = "Consensus")
+dev.off() 
+png("Figures/DigitalSlide/confusion_150_6Con.png", 1000, 700)
+conf_mat(full150.long[full150.long$Person == "6", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "6", ylab = "Consensus")
+dev.off() 
+
+# 150 9 vs. G
+png("Figures/DigitalSlide/confusion_150_9G.png", 1000, 700)
+conf_mat(full150.long, "origID", axis.col = "Person", axis1 = "9", axis2 = "G", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
+dev.off() 
+
+png("Figures/DigitalSlide/confusion_150_GCon.png", 1000, 700)
+conf_mat(full150.long[full150.long$Person == "G", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "G", ylab = "Consensus")
+dev.off() 
+png("Figures/DigitalSlide/confusion_150_9Con.png", 1000, 700)
+conf_mat(full150.long[full150.long$Person == "9", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "9", ylab = "Consensus")
+dev.off() 
+
+# 6b. Consensus comparisons -----------------------------------------------
+# plotting the consensus' against each other
+png("Figures/DigitalSlide/confusion_125_Con.png", 1000, 700)
+conf_mat(full125.long, "IFcMin", axis.col = "Person", axis1 = "A", axis2 = "1a", spec.abb = sp.abb, abb.end = c("na", "nc"), xlab = "Digital", ylab = "Slide")
+dev.off()
+png("Figures/DigitalSlide/confusion_150_Con.png", 1000, 700)
+conf_mat(full150.long, "IFcMin", axis.col = "Person", axis1 = "A", axis2 = "1a", spec.abb = sp.abb, abb.end = c("na", "nc"), xlab = "Digital", ylab = "Slide")
+dev.off()
 
 # 7. SST ------------------------------------------------------------------
+# this was only done 150 size fraction.
+# it is also not perfect as it currently uses Nadia's consensus values not mine. But that's because I can't currently rerun the ANN analysis. 
 # Figure 6
+head(divTemp)
+
+png("Figures/Fig6_SST.png", 500, 800)
+par(mfrow = c(2, 1), mar = c(2.5, 4.1, .5, 1))
+tmp <- divTemp[divTemp$Analysis == "Slide" & !is.na(divTemp$SST10m),]
+plot(1:17, tmp$SST10m[nchar(tmp$Person ) < 3], pch = 16, type = "n", xaxt = "n", xlab = "Person", ylab = expression(paste("SST / ", degree, "C")), ylim = c(20, 24))
+axis(1, at = 1:17, labels = tmp$Person[nchar(tmp$Person ) < 3])
+with(tmp[tmp$Person == "consensus", ], rect(0, SST10m - SD, 18, SST10m + SD, col = rgb(0, .8, .2, alpha = .5)))
+abline(h = tmp$SST10m[tmp$Person == "consensus"], lty = 4)
+points(1:17, tmp$SST10m[nchar(tmp$Person ) < 3], pch = 16)
+with(tmp[nchar(tmp$Person ) < 3, ], err_bar(SST10m, SD, 1:17))
+with(tmp, lines(c(1:2), c(SST10m[Person == "1a"], SST10m[Person == "1b"])))
+with(tmp[tmp$Analysis == "Slide" & !is.na(tmp$SST10m) & nchar(tmp$Person ) < 3,], lines(c(3:4), c(SST10m[Person == "2a"], SST10m[Person == "2b"])))
+text(16.5, 24, "Slide 150", cex = 1.2)
+
+tmp <- divTemp[divTemp$Analysis == "Digital" & !is.na(divTemp$SST10m),]
+plot(1:9, tmp$SST10m[nchar(tmp$Person ) < 3], pch = 16, type = "n", xaxt = "n", xlab = "Person", ylab = expression(paste("SST / ", degree, "C")), ylim = c(20, 24))
+axis(1, at = 1:9, labels = tmp$Person[nchar(tmp$Person ) < 3])
+with(tmp[tmp$Person == "consensus", ], rect(0, SST10m - SD, 18, SST10m + SD, col = rgb(0, .8, .2, alpha = .5)))
+abline(h = tmp$SST10m[tmp$Person == "consensus"], lty = 4)
+points(1:9, tmp$SST10m[nchar(tmp$Person ) < 3], pch = 16)
+with(tmp[nchar(tmp$Person ) < 3, ], err_bar(SST10m, SD, 1:9))
+text(8.5, 24, "Digital 150", cex = 1.2)
+mfrow = c(1,1)
+dev.off()
 
 # 8. Diversity ------------------------------------------------------------
 # Table 5

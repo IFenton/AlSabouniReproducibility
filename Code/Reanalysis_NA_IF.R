@@ -11,8 +11,6 @@
 #   
 
 rm(list = ls())
-dev.off()
-par.def <- par()
 # Inputs
 # Outputs
 # Source files / libraries
@@ -58,45 +56,51 @@ for (i in datasets) {
   tmp <- sort(unique(unlist(sapply(i[, 2:ncol(i)], unique))))
   print(tmp %in% sp.abb$Abbreviation) 
 }
+rm(i, datasets, tmp)
 # all of those are true, so all the abbreviations match to real species
 
 # get the digital pair and the slide pair are the same size
 dim(digital125) == dim(digital150)
 dim(slide125) == dim(slide150)
 
+# create a list of the columns containing data
+col.nam <- list(s125 = which(nchar(names(slide125)) < 5), s150 = which(nchar(names(slide125)) < 5), d125 = which(nchar(names(digital125)) < 5), d150 = which(nchar(names(digital125)) < 5))
+
 # 2. Calculate the consensus ----------------------------------------------
 
 # 2a. Consensus 50 --------------------------------------------------------
 # calculate the cutoff for consensus 50
-c50_cutoff_slide <- round(ncol(slide125[, nchar(names(slide125)) < 5])/2, 0)
-c50_cutoff_digital <- round(ncol(digital125[, nchar(names(digital125)) < 5])/2, 0)
+# as both are odd numbres, by rounding down, the cutoff anything greater than this value.  
+c50_cutoff <- list()
+c50_cutoff$slide <- round(ncol(slide125[, col.nam$s125])/2, 0)
+c50_cutoff$digital <- round(ncol(digital125[, col.nam$d125])/2, 0)
 
 # calculate the consensus values
-slide125$IFc50 <- apply(slide125[, nchar(names(slide125)) < 5], 1, function (x) ifelse(length(which(table(x) > c50_cutoff_slide)) > 0, names(table(x))[which(table(x) > c50_cutoff_slide)], "nc")) 
+slide125$IFc50 <- apply(slide125[, col.nam$s125], 1, function (x) ifelse(length(which(table(x) > c50_cutoff$slide)) > 0, names(table(x))[which(table(x) > c50_cutoff$slide)], "nc")) 
 # if one name has the majority (i.e. the length of the table > 8 is 1), then return that name
 # if the there are no names that have more than 8 (given there are 17 IDs, then consensus-50 needs at least 9 to match), then return "nc"
-slide150$IFc50 <- apply(slide150[, nchar(names(slide150)) < 5], 1, function (x) ifelse(length(which(table(x) > c50_cutoff_slide)) > 0, names(table(x))[which(table(x) > c50_cutoff_slide)], "nc")) 
-digital125$IFc50 <- apply(digital125[, nchar(names(digital125)) < 5], 1, function (x) ifelse(length(which(table(x) > c50_cutoff_digital)) > 0, names(table(x))[which(table(x) > c50_cutoff_digital)], "nc")) 
-digital150$IFc50 <- apply(digital150[, nchar(names(digital150)) < 5], 1, function (x) ifelse(length(which(table(x) > c50_cutoff_digital)) > 0, names(table(x))[which(table(x) > c50_cutoff_digital)], "nc")) 
+slide150$IFc50 <- apply(slide150[, col.nam$s150], 1, function (x) ifelse(length(which(table(x) > c50_cutoff$slide)) > 0, names(table(x))[which(table(x) > c50_cutoff$slide)], "nc")) 
+digital125$IFc50 <- apply(digital125[, col.nam$d125], 1, function (x) ifelse(length(which(table(x) > c50_cutoff$digital)) > 0, names(table(x))[which(table(x) > c50_cutoff$digital)], "nc")) 
+digital150$IFc50 <- apply(digital150[, col.nam$d150], 1, function (x) ifelse(length(which(table(x) > c50_cutoff$digital)) > 0, names(table(x))[which(table(x) > c50_cutoff$digital)], "nc")) 
 
 
 # see if this matches Nadia's results
 write.csv(slide125[which(slide125$consensus50 != slide125$IFc50), ], "Outputs/Slide125Cmismatch.csv", row.names = FALSE)
-slide150[which(slide150$consensus50 != slide150$IFc50), ]
+slide150[which(slide150$consensus50 != slide150$IFc50), ] # errors are in Nadia's
 digital125[which(digital125$consensus50 != digital125$IFc50), ] # 2 errors in Nadia's results
 digital150[which(digital150$consensus50 != digital150$IFc50), ] # matches for everything
 
-# does removing in NAs help?
-tmp <- apply(slide125[, nchar(names(slide125)) < 5], 1, function (x) ifelse(length(which(table(x) > (c50_cutoff_slide - sum(x == "na")))) > 0, names(table(x))[which(table(x) > (c50_cutoff_slide - sum(x == "na")))], "nc")) 
+# does removing those that are NAs help?
+tmp <- apply(slide125[, col.nam$s125], 1, function (x) ifelse(length(which(table(x) > (c50_cutoff$slide - sum(x == "na")))) > 0, names(table(x))[which(table(x) > (c50_cutoff$slide - sum(x == "na")))], "nc")) 
 write.csv(slide125[which(slide125$consensus50 != tmp), ], "Outputs/Slide125CmismatchNA.csv", row.names = FALSE)
-rm(tmp) # no, it makes it worse
+# no, it makes it worse
 
 # 2b. Consensus 20 --------------------------------------------------------
 # check whether 20% is actually the maximum for the consensus (so what is the highest count per specimen) ignoring na's
-slide125$IFmaxCon <- apply(slide125[, nchar(names(slide150)) < 5], 1, function (x)  max(table(x[x != 'na']))) 
-slide150$IFmaxCon <- apply(slide150[, nchar(names(slide150)) < 5], 1, function (x) max(table(x[x != 'na']))) 
-digital125$IFmaxCon <- apply(digital125[, nchar(names(digital125)) < 5], 1, function (x) max(table(x[x != 'na']))) 
-digital150$IFmaxCon <- apply(digital150[, nchar(names(digital150)) < 5], 1, function (x) max(table(x[x != 'na']))) 
+slide125$IFmaxCon <- apply(slide125[, col.nam$s125], 1, function (x)  max(table(x[x != 'na']))) 
+slide150$IFmaxCon <- apply(slide150[, col.nam$s150], 1, function (x) max(table(x[x != 'na']))) 
+digital125$IFmaxCon <- apply(digital125[, col.nam$d125], 1, function (x) max(table(x[x != 'na']))) 
+digital150$IFmaxCon <- apply(digital150[, col.nam$d150], 1, function (x) max(table(x[x != 'na']))) 
 
 # look at the summaries of these
 table(slide125$IFmaxCon) # so actually for the slides, it should be consensus-18 (3/17)
@@ -108,10 +112,10 @@ table(digital150$IFmaxCon)
 # I'm actually calculating this a the minimum consensus. So take most frequent name - if there are multiple take the first alphabetically.
 # where the maximum is 'na', Nadia has ignored that
 # I'll see if that is what Nadia has done.
-slide125$IFcMin <- apply(slide125[, nchar(names(slide125)) < 5], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][1]) 
-slide150$IFcMin <- apply(slide150[, nchar(names(slide150)) < 5], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][1])
-digital125$IFcMin <- apply(digital125[, nchar(names(digital125)) < 5], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][1])
-digital150$IFcMin <- apply(digital150[, nchar(names(digital150)) < 5], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][1])
+slide125$IFcMin <- apply(slide125[, col.nam$s125], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][1]) 
+slide150$IFcMin <- apply(slide150[, col.nam$s150], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][1])
+digital125$IFcMin <- apply(digital125[, col.nam$d125], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][1])
+digital150$IFcMin <- apply(digital150[, col.nam$d150], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][1])
 
 # see if this matches Nadia's results
 slide125[which(slide125$consensus20 != slide125$IFcMin), ] # I think they are errors
@@ -119,13 +123,14 @@ slide150[which(slide150$consensus20 != slide150$IFcMin), ] # I think they are er
 digital125[which(digital125$consensus20 != digital125$IFcMin), ] # pachS vs rub
 digital150[which(digital150$consensus20 != digital150$IFcMin), ] # I think these were both errors (assuming ruber pink comes after ruber)
 
-# by alphabetical, was that based on abbreviations or on the full names. It was based on the abbreviations (which is what I am doing)
+# by alphabetical, was that based on abbreviations or on the full names. 
 slide150[order(slide150$IFmaxCon),][1,]
-apply(slide150[146, nchar(names(slide150)) < 5], 1, function (x) table(x))
+apply(slide150[146, col.nam$s150], 1, function (x) table(x))
 sp.abb[sp.abb$Abbreviation %in% c("cal", "falc"),] # if it were on full names, then consensus name would be falconensis, but it is calida
+# It was based on the abbreviations (which is what I am doing)
 
-# was the alphabet only used when there wasn't a single maximum
-tmp <- apply(slide125[, nchar(names(slide125)) < 5], 1, function (x) names(table(x))[which(table(x) > 2)][1])
+# was the alphabet only used when there wasn't a single maximum or was it used for all those greater than 20%
+tmp <- apply(slide125[, col.nam$s125], 1, function (x) names(table(x))[which(table(x) > 2)][1])
 sum(tmp != slide125$consensus20) # 71 mismatches
 sum(slide125$consensus20 != slide125$IFcMin) # 14 mismatches
 rm(tmp)
@@ -138,7 +143,9 @@ slide125sp[, names(slide125)[2:ncol(slide125)]] <- NA
 head(slide125sp)
 # fill that dataframe
 for (i in 2:ncol(slide125)) {
+  # table each column
   tmp <- table(slide125[,i]) 
+  # add them in in the right order
   slide125sp[, names(slide125)[i] == names(slide125sp)] <- tmp[match(slide125sp$species, names(tmp))]
 }
 slide125sp[is.na(slide125sp)] <- 0
@@ -194,14 +201,15 @@ size150[, c("slideCon1", "slideCon2", "slideAgreement", "digitalCon1", "digitalC
 
 for (i in 1:4) {
   # add consensus values for 125
-  size125[, grep("slideCon", names(size125))[i]] <- apply(slide125[, nchar(names(slide125)) < 5], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][i]) 
-  size125[, grep("digitalCon", names(size125))[i]] <- apply(digital125[, nchar(names(digital125)) < 5], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][i])
+  size125[, grep("slideCon", names(size125))[i]] <- apply(slide125[, col.nam$s125], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][i]) 
+  size125[, grep("digitalCon", names(size125))[i]] <- apply(digital125[, col.nam$d125], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][i])
   # and the consensus values for 150
-  if (length(grep("slideCon", names(size150))) >= i) 
-    size150[, grep("slideCon", names(size150))[i]] <- apply(slide150[, nchar(names(slide150)) < 5], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][i])
+  if (length(grep("slideCon", names(size150))) >= i)  # there aren't as many choices for the 150 consensus
+    size150[, grep("slideCon", names(size150))[i]] <- apply(slide150[, col.nam$s150], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][i])
   if (length(grep("digitalCon", names(size150))) >= i)
-    size150[, grep("digitalCon", names(size150))[i]] <- apply(digital150[, nchar(names(digital150)) < 5], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][i])
+    size150[, grep("digitalCon", names(size150))[i]] <- apply(digital150[, col.nam$d150], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][i])
 }
+rm(i)
 
 # add in the specimen agreement values
 size125$slideAgreement <- slide125$IFmaxCon/17*100
@@ -217,59 +225,61 @@ write.csv(size150, file = "Outputs/Supp3_150.csv", row.names = FALSE)
 # 3. Agreement between workers (pairwise comparisons) ---------------------
 
 # 3a. C20_score_participant -----------------------------------------------
-accuracySlide <- data.frame(PersonID = names(slide125)[nchar(names(slide125)) < 5][c(1, 3, 2, 4:length(names(slide125)[nchar(names(slide125)) < 5]))], stringsAsFactors = FALSE)
-accuracyDigital <- data.frame(PersonID = names(digital125)[nchar(names(digital125)) < 5], stringsAsFactors = FALSE)
+accuracySlide <- data.frame(PersonID = names(slide125)[col.nam$s125][c(1, 3, 2, 4:length(names(slide125)[col.nam$s125]))], stringsAsFactors = FALSE)
+accuracyDigital <- data.frame(PersonID = names(digital125)[col.nam$d125], stringsAsFactors = FALSE)
 
 # based on Nadia's consensus
-accuracySlide$NA_PA125 <- apply(slide125[,nchar(names(slide125)) < 5], 2, function(x) sum(x == slide125$consensus20) / 300 * 100)[accuracySlide$PersonID]
-accuracySlide$NA_PA150 <- apply(slide150[,nchar(names(slide150)) < 5], 2, function(x) sum(x == slide150$consensus20) / 300 * 100)[accuracySlide$PersonID]
-accuracyDigital$NA_PA125 <- apply(digital125[,nchar(names(digital125)) < 5], 2, function(x) sum(x == digital125$consensus20) / 300 * 100)
-accuracyDigital$NA_PA150 <- apply(digital150[,nchar(names(digital150)) < 5], 2, function(x) sum(x == digital150$consensus20) / 300 * 100)
+accuracySlide$NA_PA125 <- apply(slide125[,col.nam$s125], 2, function(x) sum(x == slide125$consensus20) / 300 * 100)[accuracySlide$PersonID]
+accuracySlide$NA_PA150 <- apply(slide150[,col.nam$s150], 2, function(x) sum(x == slide150$consensus20) / 300 * 100)[accuracySlide$PersonID]
+accuracyDigital$NA_PA125 <- apply(digital125[,col.nam$d125], 2, function(x) sum(x == digital125$consensus20) / 300 * 100)
+accuracyDigital$NA_PA150 <- apply(digital150[,col.nam$d150], 2, function(x) sum(x == digital150$consensus20) / 300 * 100)
 # n.b. these values agree with Nadia's (with the odd rounding error), which is good
 
 # based on my consensus
-accuracySlide$IF_PA125 <- apply(slide125[,nchar(names(slide125)) < 5], 2, function(x) sum(x == slide125$IFcMin) / 300 * 100)[accuracySlide$PersonID]
-accuracySlide$IF_PA150 <- apply(slide150[,nchar(names(slide150)) < 5], 2, function(x) sum(x == slide150$IFcMin) / 300 * 100)[accuracySlide$PersonID]
-accuracyDigital$IF_PA125 <- apply(digital125[,nchar(names(digital125)) < 5], 2, function(x) sum(x == digital125$IFcMin) / 300 * 100)
-accuracyDigital$IF_PA150 <- apply(digital150[,nchar(names(digital150)) < 5], 2, function(x) sum(x == digital150$IFcMin) / 300 * 100)
+accuracySlide$IF_PA125 <- apply(slide125[,col.nam$s125], 2, function(x) sum(x == slide125$IFcMin) / 300 * 100)[accuracySlide$PersonID]
+accuracySlide$IF_PA150 <- apply(slide150[,col.nam$s150], 2, function(x) sum(x == slide150$IFcMin) / 300 * 100)[accuracySlide$PersonID]
+accuracyDigital$IF_PA125 <- apply(digital125[,col.nam$d125], 2, function(x) sum(x == digital125$IFcMin) / 300 * 100)
+accuracyDigital$IF_PA150 <- apply(digital150[,col.nam$d150], 2, function(x) sum(x == digital150$IFcMin) / 300 * 100)
 
 # 3b. C20_score_group -----------------------------------------------------
 # the mean value for the group
+c20_mn <- list()
 # Nadia's value
-NA_PA125s_group <- mean(accuracySlide$NA_PA125)
-NA_PA150s_group <- mean(accuracySlide$NA_PA150)
-NA_PA125d_group <- mean(accuracyDigital$NA_PA125)
-NA_PA150d_group <- mean(accuracyDigital$NA_PA150)
+c20_mn$NA_PA125s <- mean(accuracySlide$NA_PA125)
+c20_mn$NA_PA150s <- mean(accuracySlide$NA_PA150)
+c20_mn$NA_PA125d <- mean(accuracyDigital$NA_PA125)
+c20_mn$NA_PA150d <- mean(accuracyDigital$NA_PA150)
 # My value
-IF_PA125s_group <- mean(accuracySlide$IF_PA125)
-IF_PA150s_group <- mean(accuracySlide$IF_PA150)
-IF_PA125d_group <- mean(accuracyDigital$IF_PA125)
-IF_PA150d_group <- mean(accuracyDigital$IF_PA150)
+c20_mn$IF_PA125s <- mean(accuracySlide$IF_PA125)
+c20_mn$IF_PA150s <- mean(accuracySlide$IF_PA150)
+c20_mn$IF_PA125d <- mean(accuracyDigital$IF_PA125)
+c20_mn$IF_PA150d <- mean(accuracyDigital$IF_PA150)
 
 # and sd
-NA_PA125s_group_sd <- sd(accuracySlide$NA_PA125)
-NA_PA150s_group_sd <- sd(accuracySlide$NA_PA150)
-NA_PA125d_group_sd <- sd(accuracyDigital$NA_PA125)
-NA_PA150d_group_sd <- sd(accuracyDigital$NA_PA150)
+c20_sd <- list()
+c20_sd$NA_PA125s <- sd(accuracySlide$NA_PA125)
+c20_sd$NA_PA150s <- sd(accuracySlide$NA_PA150)
+c20_sd$NA_PA125d <- sd(accuracyDigital$NA_PA125)
+c20_sd$NA_PA150d <- sd(accuracyDigital$NA_PA150)
 # My value
-IF_PA125s_group_sd <- sd(accuracySlide$IF_PA125)
-IF_PA150s_group_sd <- sd(accuracySlide$IF_PA150)
-IF_PA125d_group_sd <- sd(accuracyDigital$IF_PA125)
-IF_PA150d_group_sd <- sd(accuracyDigital$IF_PA150)
+c20_sd$IF_PA125s <- sd(accuracySlide$IF_PA125)
+c20_sd$IF_PA150s <- sd(accuracySlide$IF_PA150)
+c20_sd$IF_PA125d <- sd(accuracyDigital$IF_PA125)
+c20_sd$IF_PA150d <- sd(accuracyDigital$IF_PA150)
 
 # mean consensus value based on doing a full pairwise comparison - these are the same as calculated above, so no need to do them.
-sum(slide125$IFcMin == slide125[,nchar(names(slide125)) < 5]) / (300*(sum(nchar(names(slide125)) < 5))) * 100
-sum(slide150$IFcMin == slide150[,nchar(names(slide150)) < 5]) / (300*(sum(nchar(names(slide150)) < 5))) * 100
-sum(digital125$IFcMin == digital125[,nchar(names(digital125)) < 5]) / (300*(sum(nchar(names(digital125)) < 5))) * 100
-sum(digital150$IFcMin == digital150[,nchar(names(digital150)) < 5]) / (300*(sum(nchar(names(digital150)) < 5))) * 100
+sum(slide125$IFcMin == slide125[,col.nam$s125]) / (300*(length(col.nam$s125))) * 100
+sum(slide150$IFcMin == slide150[,col.nam$s150]) / (300*(length(col.nam$s150))) * 100
+sum(digital125$IFcMin == digital125[,col.nam$d125]) / (300*(length(col.nam$d125))) * 100
+sum(digital150$IFcMin == digital150[,col.nam$d150]) / (300*(length(col.nam$d150))) * 100
 
 
 # 3c. Average pairwise agreement scores -----------------------------------
 # mean
-accuracySlide$MPA125 <- apply(slide125[,nchar(names(slide125)) < 5], 2, function(x) (sum(x == slide125[,nchar(names(slide125)) < 5]) - 300) / (300*(sum(nchar(names(slide125)) < 5) - 1)) * 100)[accuracySlide$PersonID]
-accuracySlide$MPA150 <- apply(slide150[,nchar(names(slide150)) < 5], 2, function(x) (sum(x == slide150[,nchar(names(slide150)) < 5]) - 300) / (300*(sum(nchar(names(slide150)) < 5) - 1)) * 100)[accuracySlide$PersonID]
-accuracyDigital$MPA125 <- apply(digital125[,nchar(names(digital125)) < 5], 2, function(x) (sum(x == digital125[,nchar(names(digital125)) < 5]) - 300) / (300*(sum(nchar(names(digital125)) < 5) - 1)) * 100)
-accuracyDigital$MPA150 <- apply(digital150[,nchar(names(digital150)) < 5], 2, function(x) (sum(x == digital150[,nchar(names(digital150)) < 5]) - 300) / (300*(sum(nchar(names(digital150)) < 5) - 1)) * 100)
+accuracySlide$MPA125 <- apply(slide125[,col.nam$s125], 2, function(x) (sum(x == slide125[,col.nam$s125]) - 300) / (300*(sum(col.nam$s125) - 1)) * 100)[accuracySlide$PersonID]
+accuracySlide$MPA150 <- apply(slide150[,col.nam$s150], 2, function(x) (sum(x == slide150[,col.nam$s150]) - 300) / (300*(sum(col.nam$s150) - 1)) * 100)[accuracySlide$PersonID]
+accuracyDigital$MPA125 <- apply(digital125[,col.nam$d125], 2, function(x) (sum(x == digital125[,col.nam$d125]) - 300) / (300*(sum(col.nam$d125) - 1)) * 100)
+accuracyDigital$MPA150 <- apply(digital150[,col.nam$d150], 2, function(x) (sum(x == digital150[,col.nam$d150]) - 300) / (300*(sum(col.nam$d150) - 1)) * 100)
 # quite a lot of differences here, though fewer in the digital ones
 
 # SD
@@ -277,16 +287,16 @@ accuracySlide$sdPA125 <- NA
 accuracySlide$sdPA150 <- NA
 
 for (i in accuracySlide$PersonID) {
-  accuracySlide$sdPA125[accuracySlide$PersonID == i] <- sd(apply(slide125[,nchar(names(slide125)) < 5][, i] == slide125[,nchar(names(slide125)) < 5], 2, sum)[which(names(slide125[,nchar(names(slide125)) < 5]) != i)])/300*100
-  accuracySlide$sdPA150[accuracySlide$PersonID == i] <- sd(apply(slide150[,nchar(names(slide150)) < 5][, i] == slide150[,nchar(names(slide150)) < 5], 2, sum)[which(names(slide150[,nchar(names(slide150)) < 5]) != i)])/300*100
+  accuracySlide$sdPA125[accuracySlide$PersonID == i] <- sd(apply(slide125[,col.nam$s125][, i] == slide125[,col.nam$s125], 2, sum)[which(names(slide125[,col.nam$s125]) != i)])/300*100
+  accuracySlide$sdPA150[accuracySlide$PersonID == i] <- sd(apply(slide150[,col.nam$s150][, i] == slide150[,col.nam$s150], 2, sum)[which(names(slide150[,col.nam$s150]) != i)])/300*100
 }
 
 accuracyDigital$sdPA125 <- NA
 accuracyDigital$sdPA150 <- NA
 
 for (i in accuracyDigital$PersonID) {
-  accuracyDigital$sdPA125[accuracyDigital$PersonID == i] <- sd(apply(digital125[,nchar(names(digital125)) < 5][, i] == digital125[,nchar(names(digital125)) < 5], 2, sum)[which(names(digital125[,nchar(names(digital125)) < 5]) != i)])/300*100
-  accuracyDigital$sdPA150[accuracyDigital$PersonID == i] <- sd(apply(digital150[,nchar(names(digital150)) < 5][, i] == digital150[,nchar(names(digital150)) < 5], 2, sum)[which(names(digital150[,nchar(names(digital150)) < 5]) != i)])/300*100
+  accuracyDigital$sdPA125[accuracyDigital$PersonID == i] <- sd(apply(digital125[,col.nam$d125][, i] == digital125[,col.nam$d125], 2, sum)[which(names(digital125[,col.nam$d125]) != i)])/300*100
+  accuracyDigital$sdPA150[accuracyDigital$PersonID == i] <- sd(apply(digital150[,col.nam$d150][, i] == digital150[,col.nam$d150], 2, sum)[which(names(digital150[,col.nam$d150]) != i)])/300*100
 }
 
 # 3d. Look at this pairwise agreement as plots ----------------------------
@@ -294,39 +304,39 @@ for (i in accuracyDigital$PersonID) {
 par(mfrow = c(2, 2))
 plot(factor(accuracySlide$PersonID), accuracySlide$NA_PA125, main = "Pairwise Agreement 125", ylim = c(45, 90), pch = 16)
 points(factor(accuracySlide$PersonID), accuracySlide$IF_PA125, col = "blue", main = "Pairwise Agreement 125", pch = 16)
-abline(h = NA_PA125s_group)
-abline(h = NA_PA125s_group - NA_PA125s_group_sd, lty = 2)
-abline(h = NA_PA125s_group + NA_PA125s_group_sd, lty = 2)
-abline(h = IF_PA125s_group, col = "blue")
-abline(h = IF_PA125s_group - IF_PA125s_group_sd, lty = 2, col = "blue")
-abline(h = IF_PA125s_group + IF_PA125s_group_sd, lty = 2, col = "blue")
+abline(h = c20_mn$NA_PA125s)
+abline(h = c20_mn$NA_PA125s - c20_sd$NA_PA125s, lty = 2)
+abline(h = c20_mn$NA_PA125s + c20_sd$NA_PA125s, lty = 2)
+abline(h = c20_mn$IF_PA125s, col = "blue")
+abline(h = c20_mn$IF_PA125s - c20_sd$IF_PA125s, lty = 2, col = "blue")
+abline(h = c20_mn$IF_PA125s + c20_sd$IF_PA125s, lty = 2, col = "blue")
 
 plot(factor(accuracySlide$PersonID), accuracySlide$NA_PA150, main = "Pairwise Agreement 150", ylim = c(45, 90))
 points(factor(accuracySlide$PersonID), accuracySlide$IF_PA150, col = "blue", main = "Pairwise Agreement 150", pch = 16)
-abline(h = NA_PA150s_group)
-abline(h = NA_PA150s_group - NA_PA150s_group_sd, lty = 2)
-abline(h = NA_PA150s_group + NA_PA150s_group_sd, lty = 2)
-abline(h = IF_PA150s_group, col = "blue")
-abline(h = IF_PA150s_group - IF_PA150s_group_sd, lty = 2, col = "blue")
-abline(h = IF_PA150s_group + IF_PA150s_group_sd, lty = 2, col = "blue")
+abline(h = c20_mn$NA_PA150s)
+abline(h = c20_mn$NA_PA150s - c20_sd$NA_PA150s, lty = 2)
+abline(h = c20_mn$NA_PA150s + c20_sd$NA_PA150s, lty = 2)
+abline(h = c20_mn$IF_PA150s, col = "blue")
+abline(h = c20_mn$IF_PA150s - c20_sd$IF_PA150s, lty = 2, col = "blue")
+abline(h = c20_mn$IF_PA150s + c20_sd$IF_PA150s, lty = 2, col = "blue")
 
 plot(factor(accuracyDigital$PersonID), accuracyDigital$NA_PA125, main = "Pairwise Agreement 125", ylim = c(45, 90))
 points(factor(accuracyDigital$PersonID), accuracyDigital$IF_PA125, col = "blue", main = "Pairwise Agreement 125", pch = 16)
-abline(h = NA_PA125d_group)
-abline(h = NA_PA125d_group - NA_PA125d_group_sd, lty = 2)
-abline(h = NA_PA125d_group + NA_PA125d_group_sd, lty = 2)
-abline(h = IF_PA125d_group, col = "blue")
-abline(h = IF_PA125d_group - IF_PA125d_group_sd, lty = 2, col = "blue")
-abline(h = IF_PA125d_group + IF_PA125d_group_sd, lty = 2, col = "blue")
+abline(h = c20_mn$NA_PA125d)
+abline(h = c20_mn$NA_PA125d - c20_sd$A_PA125d, lty = 2)
+abline(h = c20_mn$NA_PA125d + c20_sd$NA_PA125d, lty = 2)
+abline(h = c20_mn$IF_PA125d, col = "blue")
+abline(h = c20_mn$IF_PA125d - c20_sd$IF_PA125d, lty = 2, col = "blue")
+abline(h = c20_mn$IF_PA125d + c20_sd$IF_PA125d, lty = 2, col = "blue")
 
 plot(factor(accuracyDigital$PersonID), accuracyDigital$NA_PA150, main = "Pairwise Agreement 150", ylim = c(45, 90))
 points(factor(accuracyDigital$PersonID), accuracyDigital$IF_PA150, col = "blue", main = "Pairwise Agreement 150", pch = 16)
-abline(h = NA_PA150d_group)
-abline(h = NA_PA150d_group - NA_PA150d_group_sd, lty = 2)
-abline(h = NA_PA150d_group + NA_PA150d_group_sd, lty = 2)
-abline(h = IF_PA150d_group, col = "blue")
-abline(h = IF_PA150d_group - IF_PA150d_group_sd, lty = 2, col = "blue")
-abline(h = IF_PA150d_group + IF_PA150d_group_sd, lty = 2, col = "blue")
+abline(h = c20_mn$NA_PA150d)
+abline(h = c20_mn$NA_PA150d - c20_sd$NA_PA150d, lty = 2)
+abline(h = c20_mn$NA_PA150d + c20_sd$NA_PA150d, lty = 2)
+abline(h = c20_mn$IF_PA150d, col = "blue")
+abline(h = c20_mn$IF_PA150d - c20_sd$IF_PA150d, lty = 2, col = "blue")
+abline(h = c20_mn$IF_PA150d + c20_sd$IF_PA150d, lty = 2, col = "blue")
 par(mfrow = c(1,1))
 
 # recreate figure 3
@@ -344,8 +354,8 @@ accuracyDigital$Experience <- people$ExperienceDigital[match(accuracyDigital$Per
 png("Figures/Fig3_Pairwise_agreement.png", 500, 800)
 par(mfrow = c(4, 1), mar = c(2.5, 4.1, .5, 1))
 with(accuracySlide, plot(Experience, MPA125, ylim = c(30, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, IF_PA125s_group - IF_PA125s_group_sd, 45, IF_PA125s_group + IF_PA125s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA125s_group, lty = 4)
+rect(-5, c20_mn$IF_PA125s - c20_sd$IF_PA125s, 45, c20_mn$IF_PA125s + c20_sd$IF_PA125s, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_mn$IF_PA125s, lty = 4)
 with(accuracySlide, points(Experience, MPA125, pch = 16))
 with(accuracySlide, err_bar(MPA125, sdPA125, Experience))
 with(accuracySlide[1, ], text(Experience - 0.5, MPA125, labels = PersonID, cex = 0.7))
@@ -355,8 +365,8 @@ with(accuracySlide, lines(c(Experience[PersonID == "2a"], Experience[PersonID ==
 text(38, 35, "Slide 125", cex = 1.5)
 
 with(accuracySlide, plot(Experience, MPA150, ylim = c(30, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, IF_PA150s_group - IF_PA150s_group_sd, 45, IF_PA150s_group + IF_PA150s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA150s_group, lty = 4)
+rect(-5, c20_mn$IF_PA150s - c20_sd$IF_PA150s, 45, c20_mn$IF_PA150s + c20_sd$IF_PA150s, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_mn$IF_PA150s, lty = 4)
 with(accuracySlide, points(Experience, MPA150, pch = 16))
 with(accuracySlide, err_bar(MPA150, sdPA150, Experience))
 with(accuracySlide[1, ], text(Experience - 0.5, MPA150, labels = PersonID, cex = 0.7))
@@ -366,8 +376,8 @@ with(accuracySlide, lines(c(Experience[PersonID == "2a"], Experience[PersonID ==
 text(38, 35, "Slide 150", cex = 1.5)
 
 with(accuracyDigital, plot(Experience, MPA125, ylim = c(30, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, IF_PA125d_group - IF_PA125d_group_sd, 45, IF_PA125d_group + IF_PA125d_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA125d_group, lty = 4)
+rect(-5, c20_mn$IF_PA125d - c20_sd$IF_PA125d, 45, c20_mn$IF_PA125d + c20_sd$IF_PA125d, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_mn$IF_PA125d, lty = 4)
 with(accuracyDigital, points(Experience, MPA125, pch = 16))
 with(accuracyDigital, err_bar(MPA125, sdPA125, Experience))
 with(accuracyDigital[1, ], text(Experience - 0.5, MPA125, labels = PersonID, cex = 0.7))
@@ -375,8 +385,8 @@ with(accuracyDigital[2:nrow(accuracyDigital), ], text(Experience + 0.5, MPA125, 
 text(38, 35, "Digital 125", cex = 1.5)
 
 with(accuracyDigital, plot(Experience, MPA150, ylim = c(30, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, IF_PA150d_group - IF_PA150d_group_sd, 45, IF_PA150d_group + IF_PA150d_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA150d_group, lty = 4)
+rect(-5, c20_mn$IF_PA150d - c20_sd$IF_PA150d, 45, c20_mn$IF_PA150d + c20_sd$IF_PA150d, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_mn$IF_PA150d, lty = 4)
 with(accuracyDigital, points(Experience, MPA150, pch = 16))
 with(accuracyDigital, err_bar(MPA150, sdPA150, Experience))
 with(accuracyDigital[1, ], text(Experience - 0.5, MPA150, labels = PersonID, cex = 0.7))
@@ -420,8 +430,8 @@ dev.off()
 png("Figures/Fig3_Consensus_agreement.png", 500, 800)
 par(mfrow = c(4, 1), mar = c(2.5, 4.1, .5, 1))
 with(accuracySlide, plot(Experience, IF_PA125, ylim = c(45, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, IF_PA125s_group - IF_PA125s_group_sd, 45, IF_PA125s_group + IF_PA125s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA125s_group, lty = 4)
+rect(-5, c20_mn$IF_PA125s - c20_sd$IF_PA125s, 45, c20_mn$IF_PA125s + c20_sd$IF_PA125s, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_mn$IF_PA125s, lty = 4)
 with(accuracySlide, points(Experience, IF_PA125, pch = 16))
 with(accuracySlide[1, ], text(Experience - 0.5, IF_PA125, labels = PersonID, cex = 0.7))
 with(accuracySlide[2:nrow(accuracySlide), ], text(Experience + 0.5, IF_PA125, labels = PersonID, cex = 0.7))
@@ -430,8 +440,8 @@ with(accuracySlide, lines(c(Experience[PersonID == "2a"], Experience[PersonID ==
 text(38, 48, "Slide 125", cex = 1.5)
 
 with(accuracySlide, plot(Experience, IF_PA150, ylim = c(45, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, IF_PA150s_group - IF_PA150s_group_sd, 45, IF_PA150s_group + IF_PA150s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA150s_group, lty = 4)
+rect(-5, c20_mn$IF_PA150s - c20_sd$IF_PA150s, 45, c20_mn$IF_PA150s + c20_sd$IF_PA150s, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_mn$IF_PA150s, lty = 4)
 with(accuracySlide, points(Experience, IF_PA150, pch = 16))
 with(accuracySlide[1, ], text(Experience - 0.5, IF_PA150, labels = PersonID, cex = 0.7))
 with(accuracySlide[2:nrow(accuracySlide), ], text(Experience + 0.5, IF_PA150, labels = PersonID, cex = 0.7))
@@ -440,16 +450,16 @@ with(accuracySlide, lines(c(Experience[PersonID == "2a"], Experience[PersonID ==
 text(38, 48, "Slide 150", cex = 1.5)
 
 with(accuracyDigital, plot(Experience, IF_PA125, ylim = c(45, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, IF_PA125d_group - IF_PA125d_group_sd, 45, IF_PA125d_group + IF_PA125d_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA125d_group, lty = 4)
+rect(-5, c20_mn$IF_PA125d - c20_sd$IF_PA125d, 45, c20_mn$IF_PA125d + c20_sd$IF_PA125d, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_mn$IF_PA125d, lty = 4)
 with(accuracyDigital, points(Experience, IF_PA125, pch = 16))
 with(accuracyDigital[1, ], text(Experience - 0.5, IF_PA125, labels = PersonID, cex = 0.7))
 with(accuracyDigital[2:nrow(accuracyDigital), ], text(Experience + 0.5, IF_PA125, labels = PersonID, cex = 0.7))
 text(38, 48, "Digital 125", cex = 1.5)
 
 with(accuracyDigital, plot(Experience, IF_PA150, ylim = c(45, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, IF_PA150d_group - IF_PA150d_group_sd, 45, IF_PA150d_group + IF_PA150d_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA150d_group, lty = 4)
+rect(-5, c20_mn$IF_PA150d - c20_sd$IF_PA150d, 45, c20_mn$IF_PA150d + c20_sd$IF_PA150d, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_mn$IF_PA150d, lty = 4)
 with(accuracyDigital, points(Experience, IF_PA150, pch = 16))
 with(accuracyDigital[1, ], text(Experience - 0.5, IF_PA150, labels = PersonID, cex = 0.7))
 with(accuracyDigital[2:nrow(accuracyDigital), ], text(Experience + 0.5, IF_PA150, labels = PersonID, cex = 0.7))
@@ -462,8 +472,8 @@ png("Figures/Fig3_Consensus_agreement_ID.png", 500, 800)
 par(mfrow = c(4, 1), mar = c(2.5, 4.1, .5, 1))
 with(accuracySlide, plot(1:17, IF_PA125, ylim = c(45, 90), pch = 16, type = "n", xaxt = "n"))
 axis(1, at = 1:17, labels = accuracySlide$PersonID)
-rect(0, IF_PA125s_group - IF_PA125s_group_sd, 18, IF_PA125s_group + IF_PA125s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA125s_group, lty = 4)
+rect(0, c20_mn$IF_PA125s - c20_sd$IF_PA125s, 18, c20_mn$IF_PA125s + c20_sd$IF_PA125s, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_mn$IF_PA125s, lty = 4)
 with(accuracySlide, points(1:17, IF_PA125, pch = 16))
 with(accuracySlide, lines(c(1:2), c(IF_PA125[PersonID == "1a"], IF_PA125[PersonID == "1b"])))
 with(accuracySlide, lines(c(3:4), c(IF_PA125[PersonID == "2a"], IF_PA125[PersonID == "2b"])))
@@ -471,8 +481,8 @@ text(2, 48, "Slide 125", cex = 1.5)
 
 with(accuracySlide, plot(1:17, IF_PA150, ylim = c(45, 90), pch = 16, type = "n", xaxt = "n"))
 axis(1, at = 1:17, labels = accuracySlide$PersonID)
-rect(-5, IF_PA150s_group - IF_PA150s_group_sd, 45, IF_PA150s_group + IF_PA150s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA150s_group, lty = 4)
+rect(-5, c20_mn$IF_PA150s - c20_sd$IF_PA150s, 45, c20_mn$IF_PA150s + c20_sd$IF_PA150s, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_mn$IF_PA150s, lty = 4)
 with(accuracySlide, points(1:17, IF_PA150, pch = 16))
 with(accuracySlide, lines(c(1:2), c(IF_PA150[PersonID == "1a"], IF_PA150[PersonID == "1b"])))
 with(accuracySlide, lines(c(3:4), c(IF_PA150[PersonID == "2a"], IF_PA150[PersonID == "2b"])))
@@ -480,15 +490,15 @@ text(2, 48, "Slide 150", cex = 1.5)
 
 with(accuracyDigital, plot(1:9, IF_PA125, ylim = c(45, 90), pch = 16, type = "n", xaxt = "n"))
 axis(1, at = 1:9, labels = accuracyDigital$PersonID)
-rect(-5, IF_PA125d_group - IF_PA125d_group_sd, 45, IF_PA125d_group + IF_PA125d_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA125d_group, lty = 4)
+rect(-5, c20_mn$IF_PA125d - c20_sd$IF_PA125d, 45, c20_mn$IF_PA125d + c20_sd$IF_PA125d, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_mn$IF_PA125d, lty = 4)
 with(accuracyDigital, points(1:9, IF_PA125, pch = 16))
 text(1.5, 48, "Digital 125", cex = 1.5)
 
 with(accuracyDigital, plot(1:9, IF_PA150, ylim = c(45, 90), pch = 16, type = "n", xaxt = "n"))
 axis(1, at = 1:9, labels = accuracyDigital$PersonID)
-rect(-5, IF_PA150d_group - IF_PA150d_group_sd, 45, IF_PA150d_group + IF_PA150d_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = IF_PA150d_group, lty = 4)
+rect(-5, c20_mn$IF_PA150d - c20_sd$IF_PA150d, 45, c20_mn$IF_PA150d + c20_sd$IF_PA150d, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_mn$IF_PA150d, lty = 4)
 with(accuracyDigital, points(1:9, IF_PA150, pch = 16))
 text(1.5, 48, "Digital 150", cex = 1.5)
 mfrow = c(1,1)
@@ -503,10 +513,10 @@ png("Figures/Fig3_Consensus_agreement_fullID.png", 800, 1000)
 par(mfrow = c(2, 1))
 with(accuracyFull, plot(IF_PA125[match(ord.div, PersonID)], ylim = c(43, 90), pch = 16, type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Person"))
 axis(1, at = 1:26, labels = accuracyFull$PersonID[match(ord.div, accuracyFull$PersonID)])
-abline(h = IF_PA125s_group, lty = 1)
-abline(h = c(IF_PA125s_group - IF_PA125s_group_sd, IF_PA125s_group + IF_PA125s_group_sd), lty = 4)
-abline(h = IF_PA125d_group, lty = 1, col = "blue")
-abline(h = c(IF_PA125d_group - IF_PA125d_group_sd, IF_PA125d_group + IF_PA125d_group_sd), lty = 4, col = "blue")
+abline(h = c20_mn$IF_PA125s, lty = 1)
+abline(h = c(c20_mn$IF_PA125s - c20_sd$IF_PA125s, c20_mn$IF_PA125s + c20_sd$IF_PA125s), lty = 4)
+abline(h = c20_mn$IF_PA125d, lty = 1, col = "blue")
+abline(h = c(c20_mn$IF_PA125d - c20_sd$IF_PA125d, c20_mn$IF_PA125d + c20_sd$IF_PA125d), lty = 4, col = "blue")
 with(accuracyFull, points(1:26, IF_PA125[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
 with(accuracyFull, lines(c(1:2), c(IF_PA125[PersonID == "1a"], IF_PA125[PersonID == "1b"])))
 with(accuracyFull, lines(c(3:4), c(IF_PA125[PersonID == "2a"], IF_PA125[PersonID == "2b"])))
@@ -514,10 +524,10 @@ text(26, 90, "125", cex = 1.5)
 
 with(accuracyFull, plot(IF_PA150[match(ord.div, PersonID)], ylim = c(43, 90), pch = 16, type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Person"))
 axis(1, at = 1:26, labels = accuracyFull$PersonID[match(ord.div, accuracyFull$PersonID)])
-abline(h = IF_PA150s_group, lty = 1)
-abline(h = c(IF_PA150s_group - IF_PA150s_group_sd, IF_PA150s_group + IF_PA150s_group_sd), lty = 4)
-abline(h = IF_PA150d_group, lty = 1, col = "blue")
-abline(h = c(IF_PA150d_group - IF_PA150d_group_sd, IF_PA150d_group + IF_PA150d_group_sd), lty = 4, col = "blue")
+abline(h = c20_mn$IF_PA150s, lty = 1)
+abline(h = c(c20_mn$IF_PA150s - c20_sd$IF_PA150s, c20_mn$IF_PA150s + c20_sd$IF_PA150s), lty = 4)
+abline(h = c20_mn$IF_PA150d, lty = 1, col = "blue")
+abline(h = c(c20_mn$IF_PA150d - c20_sd$IF_PA150d, c20_mn$IF_PA150d + c20_sd$IF_PA150d), lty = 4, col = "blue")
 with(accuracyFull, points(1:26, IF_PA150[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
 with(accuracyFull, lines(c(1:2), c(IF_PA150[PersonID == "1a"], IF_PA150[PersonID == "1b"])))
 with(accuracyFull, lines(c(3:4), c(IF_PA150[PersonID == "2a"], IF_PA150[PersonID == "2b"])))
@@ -569,27 +579,29 @@ accuracyDigital$l.IF_PA150 <- apply(l.digital150[,nchar(names(l.digital150)) < 5
 
 # C20_score_group
 # the mean value for the group
+c20_lmn <- list()
 # Nadia's value
-l.NA_PA125s_group <- mean(accuracySlide$l.NA_PA125)
-l.NA_PA150s_group <- mean(accuracySlide$l.NA_PA150)
-l.NA_PA125d_group <- mean(accuracyDigital$l.NA_PA125)
-l.NA_PA150d_group <- mean(accuracyDigital$l.NA_PA150)
+c20_lmn$NA_PA125s <- mean(accuracySlide$l.NA_PA125)
+c20_lmn$NA_PA150s <- mean(accuracySlide$l.NA_PA150)
+c20_lmn$NA_PA125d <- mean(accuracyDigital$l.NA_PA125)
+c20_lmn$NA_PA150d <- mean(accuracyDigital$l.NA_PA150)
 # My value
-l.IF_PA125s_group <- mean(accuracySlide$l.IF_PA125)
-l.IF_PA150s_group <- mean(accuracySlide$l.IF_PA150)
-l.IF_PA125d_group <- mean(accuracyDigital$l.IF_PA125)
-l.IF_PA150d_group <- mean(accuracyDigital$l.IF_PA150)
+c20_lmn$IF_PA125s <- mean(accuracySlide$l.IF_PA125)
+c20_lmn$IF_PA150s <- mean(accuracySlide$l.IF_PA150)
+c20_lmn$IF_PA125d <- mean(accuracyDigital$l.IF_PA125)
+c20_lmn$IF_PA150d <- mean(accuracyDigital$l.IF_PA150)
 
 # and sd
-l.NA_PA125s_group_sd <- sd(accuracySlide$l.NA_PA125)
-l.NA_PA150s_group_sd <- sd(accuracySlide$l.NA_PA150)
-l.NA_PA125d_group_sd <- sd(accuracyDigital$l.NA_PA125)
-l.NA_PA150d_group_sd <- sd(accuracyDigital$l.NA_PA150)
+c20_lsd <- list()
+c20_lsd$NA_PA125s <- sd(accuracySlide$l.NA_PA125)
+c20_lsd$NA_PA150s <- sd(accuracySlide$l.NA_PA150)
+c20_lsd$NA_PA125d <- sd(accuracyDigital$l.NA_PA125)
+c20_lsd$NA_PA150d <- sd(accuracyDigital$l.NA_PA150)
 # My value
-l.IF_PA125s_group_sd <- sd(accuracySlide$l.IF_PA125)
-l.IF_PA150s_group_sd <- sd(accuracySlide$l.IF_PA150)
-l.IF_PA125d_group_sd <- sd(accuracyDigital$l.IF_PA125)
-l.IF_PA150d_group_sd <- sd(accuracyDigital$l.IF_PA150)
+c20_lsd$IF_PA125s <- sd(accuracySlide$l.IF_PA125)
+c20_lsd$IF_PA150s <- sd(accuracySlide$l.IF_PA150)
+c20_lsd$IF_PA125d <- sd(accuracyDigital$l.IF_PA125)
+c20_lsd$IF_PA150d <- sd(accuracyDigital$l.IF_PA150)
 
 # mean consensus value based on doing a full pairwise comparison - these are the same as calculated above, so no need to do them.
 sum(l.slide125$IFcMin == l.slide125[,nchar(names(l.slide125)) < 5]) / (300*(sum(nchar(names(l.slide125)) < 5))) * 100
@@ -628,39 +640,39 @@ for (i in accuracyDigital$PersonID) {
 par(mfrow = c(2, 2))
 plot(factor(accuracySlide$PersonID), accuracySlide$l.NA_PA125, main = "Pairwise Agreement 125", ylim = c(45, 90), pch = 16)
 points(factor(accuracySlide$PersonID), accuracySlide$l.IF_PA125, col = "blue", main = "Pairwise Agreement 125", pch = 16)
-abline(h = l.NA_PA125s_group)
-abline(h = l.NA_PA125s_group - l.NA_PA125s_group_sd, lty = 2)
-abline(h = l.NA_PA125s_group + l.NA_PA125s_group_sd, lty = 2)
-abline(h = l.IF_PA125s_group, col = "blue")
-abline(h = l.IF_PA125s_group - l.IF_PA125s_group_sd, lty = 2, col = "blue")
-abline(h = l.IF_PA125s_group + l.IF_PA125s_group_sd, lty = 2, col = "blue")
+abline(h = c20_lmn$NA_PA125s)
+abline(h = c20_lmn$NA_PA125s - c20_lsd$NA_PA125s, lty = 2)
+abline(h = c20_lmn$NA_PA125s + c20_lsd$NA_PA125s, lty = 2)
+abline(h = c20_lmn$IF_PA125s, col = "blue")
+abline(h = c20_lmn$IF_PA125s - c20_lsd$IF_PA125s, lty = 2, col = "blue")
+abline(h = c20_lmn$IF_PA125s + c20_lsd$IF_PA125s, lty = 2, col = "blue")
 
 plot(factor(accuracySlide$PersonID), accuracySlide$l.NA_PA150, main = "Pairwise Agreement 150", ylim = c(45, 90))
 points(factor(accuracySlide$PersonID), accuracySlide$l.IF_PA150, col = "blue", main = "Pairwise Agreement 150", pch = 16)
-abline(h = l.NA_PA150s_group)
-abline(h = l.NA_PA150s_group - l.NA_PA150s_group_sd, lty = 2)
-abline(h = l.NA_PA150s_group + l.NA_PA150s_group_sd, lty = 2)
-abline(h = l.IF_PA150s_group, col = "blue")
-abline(h = l.IF_PA150s_group - l.IF_PA150s_group_sd, lty = 2, col = "blue")
-abline(h = l.IF_PA150s_group + l.IF_PA150s_group_sd, lty = 2, col = "blue")
+abline(h = c20_lmn$NA_PA150s)
+abline(h = c20_lmn$NA_PA150s - c20_lsd$NA_PA150s, lty = 2)
+abline(h = c20_lmn$NA_PA150s + c20_lsd$NA_PA150s, lty = 2)
+abline(h = c20_lmn$IF_PA150s, col = "blue")
+abline(h = c20_lmn$IF_PA150s - c20_lsd$IF_PA150s, lty = 2, col = "blue")
+abline(h = c20_lmn$IF_PA150s + c20_lsd$IF_PA150s, lty = 2, col = "blue")
 
 plot(factor(accuracyDigital$PersonID), accuracyDigital$l.NA_PA125, main = "Pairwise Agreement 125", ylim = c(45, 90))
 points(factor(accuracyDigital$PersonID), accuracyDigital$l.IF_PA125, col = "blue", main = "Pairwise Agreement 125", pch = 16)
-abline(h = l.NA_PA125d_group)
-abline(h = l.NA_PA125d_group - l.NA_PA125d_group_sd, lty = 2)
-abline(h = l.NA_PA125d_group + l.NA_PA125d_group_sd, lty = 2)
-abline(h = l.IF_PA125d_group, col = "blue")
-abline(h = l.IF_PA125d_group - l.IF_PA125d_group_sd, lty = 2, col = "blue")
-abline(h = l.IF_PA125d_group + l.IF_PA125d_group_sd, lty = 2, col = "blue")
+abline(h = c20_lmn$NA_PA125d)
+abline(h = c20_lmn$NA_PA125d - c20_lsd$NA_PA125d, lty = 2)
+abline(h = c20_lmn$NA_PA125d + c20_lsd$NA_PA125d, lty = 2)
+abline(h = c20_lmn$IF_PA125d, col = "blue")
+abline(h = c20_lmn$IF_PA125d - c20_lsd$IF_PA125d, lty = 2, col = "blue")
+abline(h = c20_lmn$IF_PA125d + c20_lsd$IF_PA125d, lty = 2, col = "blue")
 
 plot(factor(accuracyDigital$PersonID), accuracyDigital$l.NA_PA150, main = "Pairwise Agreement 150", ylim = c(45, 90))
 points(factor(accuracyDigital$PersonID), accuracyDigital$l.IF_PA150, col = "blue", main = "Pairwise Agreement 150", pch = 16)
-abline(h = l.NA_PA150d_group)
-abline(h = l.NA_PA150d_group - l.NA_PA150d_group_sd, lty = 2)
-abline(h = l.NA_PA150d_group + l.NA_PA150d_group_sd, lty = 2)
-abline(h = l.IF_PA150d_group, col = "blue")
-abline(h = l.IF_PA150d_group - l.IF_PA150d_group_sd, lty = 2, col = "blue")
-abline(h = l.IF_PA150d_group + l.IF_PA150d_group_sd, lty = 2, col = "blue")
+abline(h = c20_lmn$NA_PA150d)
+abline(h = c20_lmn$NA_PA150d - c20_lsd$NA_PA150d, lty = 2)
+abline(h = c20_lmn$NA_PA150d + c20_lsd$NA_PA150d, lty = 2)
+abline(h = c20_lmn$IF_PA150d, col = "blue")
+abline(h = c20_lmn$IF_PA150d - c20_lsd$IF_PA150d, lty = 2, col = "blue")
+abline(h = c20_lmn$IF_PA150d + c20_lsd$IF_PA150d, lty = 2, col = "blue")
 par(mfrow = c(1,1))
 
 # recreate figure 3
@@ -672,8 +684,8 @@ accuracyDigital$Experience <- people$ExperienceDigital[match(accuracyDigital$Per
 png("Figures/Fig3_Pairwise_agreement_lump.png", 500, 800)
 par(mfrow = c(4, 1), mar = c(2.5, 4.1, .5, 1))
 with(accuracySlide, plot(Experience, l.MPA125, ylim = c(30, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, l.IF_PA125s_group - l.IF_PA125s_group_sd, 45, l.IF_PA125s_group + l.IF_PA125s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = l.IF_PA125s_group, lty = 4)
+rect(-5, c20_lmn$IF_PA125s - c20_lsd$IF_PA125s, 45, c20_lmn$IF_PA125s + c20_lsd$IF_PA125s, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_lmn$IF_PA125s, lty = 4)
 with(accuracySlide, points(Experience, l.MPA125, pch = 16))
 with(accuracySlide, err_bar(l.MPA125, l.sdPA125, Experience))
 with(accuracySlide[1, ], text(Experience - 0.5, l.MPA125, labels = PersonID, cex = 0.7))
@@ -683,8 +695,8 @@ with(accuracySlide, lines(c(Experience[PersonID == "2a"], Experience[PersonID ==
 text(38, 35, "Slide 125", cex = 1.5)
 
 with(accuracySlide, plot(Experience, l.MPA150, ylim = c(30, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, l.IF_PA150s_group - l.IF_PA150s_group_sd, 45, l.IF_PA150s_group + l.IF_PA150s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = l.IF_PA150s_group, lty = 4)
+rect(-5, c20_lmn$IF_PA150s - c20_lsd$IF_PA150s, 45, c20_lmn$IF_PA150s + c20_lsd$IF_PA150s, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_lmn$IF_PA150s, lty = 4)
 with(accuracySlide, points(Experience, l.MPA150, pch = 16))
 with(accuracySlide, err_bar(l.MPA150, l.sdPA150, Experience))
 with(accuracySlide[1, ], text(Experience - 0.5, l.MPA150, labels = PersonID, cex = 0.7))
@@ -694,8 +706,8 @@ with(accuracySlide, lines(c(Experience[PersonID == "2a"], Experience[PersonID ==
 text(38, 35, "Slide 150", cex = 1.5)
 
 with(accuracyDigital, plot(Experience, l.MPA125, ylim = c(30, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, l.IF_PA125d_group - l.IF_PA125d_group_sd, 45, l.IF_PA125d_group + l.IF_PA125d_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = l.IF_PA125d_group, lty = 4)
+rect(-5, c20_lmn$IF_PA125d - c20_lsd$IF_PA125d, 45, c20_lmn$IF_PA125d + c20_lsd$IF_PA125d, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_lmn$IF_PA125d, lty = 4)
 with(accuracyDigital, points(Experience, l.MPA125, pch = 16))
 with(accuracyDigital, err_bar(l.MPA125, l.sdPA125, Experience))
 with(accuracyDigital[1, ], text(Experience - 0.5, l.MPA125, labels = PersonID, cex = 0.7))
@@ -703,8 +715,8 @@ with(accuracyDigital[2:nrow(accuracyDigital), ], text(Experience + 0.5, l.MPA125
 text(38, 35, "Digital 125", cex = 1.5)
 
 with(accuracyDigital, plot(Experience, l.MPA150, ylim = c(30, 90), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, l.IF_PA150d_group - l.IF_PA150d_group_sd, 45, l.IF_PA150d_group + l.IF_PA150d_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = l.IF_PA150d_group, lty = 4)
+rect(-5, c20_lmn$IF_PA150d - c20_lsd$IF_PA150d, 45, c20_lmn$IF_PA150d + c20_lsd$IF_PA150d, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_lmn$IF_PA150d, lty = 4)
 with(accuracyDigital, points(Experience, l.MPA150, pch = 16))
 with(accuracyDigital, err_bar(l.MPA150, l.sdPA150, Experience))
 with(accuracyDigital[1, ], text(Experience - 0.5, l.MPA150, labels = PersonID, cex = 0.7))
@@ -748,8 +760,8 @@ dev.off()
 png("Figures/Fig3_Consensus_agreement_lump.png", 500, 800)
 par(mfrow = c(4, 1), mar = c(2.5, 4.1, .5, 1))
 with(accuracySlide, plot(Experience, l.IF_PA125, ylim = c(45, 95), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, l.IF_PA125s_group - l.IF_PA125s_group_sd, 45, l.IF_PA125s_group + l.IF_PA125s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = l.IF_PA125s_group, lty = 4)
+rect(-5, c20_lmn$IF_PA125s - c20_lsd$IF_PA125s, 45, c20_lmn$IF_PA125s + c20_lsd$IF_PA125s, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_lmn$IF_PA125s, lty = 4)
 with(accuracySlide, points(Experience, l.IF_PA125, pch = 16))
 with(accuracySlide[1, ], text(Experience - 0.5, l.IF_PA125, labels = PersonID, cex = 0.7))
 with(accuracySlide[2:nrow(accuracySlide), ], text(Experience + 0.5, l.IF_PA125, labels = PersonID, cex = 0.7))
@@ -758,8 +770,8 @@ with(accuracySlide, lines(c(Experience[PersonID == "2a"], Experience[PersonID ==
 text(38, 50, "Slide 125", cex = 1.5)
 
 with(accuracySlide, plot(Experience, l.IF_PA150, ylim = c(45, 95), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, l.IF_PA150s_group - l.IF_PA150s_group_sd, 45, l.IF_PA150s_group + l.IF_PA150s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = l.IF_PA150s_group, lty = 4)
+rect(-5, c20_lmn$IF_PA150s - c20_lsd$IF_PA150s, 45, c20_lmn$IF_PA150s + c20_lsd$IF_PA150s, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_lmn$IF_PA150s, lty = 4)
 with(accuracySlide, points(Experience, l.IF_PA150, pch = 16))
 with(accuracySlide[1, ], text(Experience - 0.5, l.IF_PA150, labels = PersonID, cex = 0.7))
 with(accuracySlide[2:nrow(accuracySlide), ], text(Experience + 0.5, l.IF_PA150, labels = PersonID, cex = 0.7))
@@ -768,16 +780,16 @@ with(accuracySlide, lines(c(Experience[PersonID == "2a"], Experience[PersonID ==
 text(38, 50, "Slide 150", cex = 1.5)
 
 with(accuracyDigital, plot(Experience, l.IF_PA125, ylim = c(45, 95), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, l.IF_PA125d_group - l.IF_PA125d_group_sd, 45, l.IF_PA125d_group + l.IF_PA125d_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = l.IF_PA125d_group, lty = 4)
+rect(-5, c20_lmn$IF_PA125d - c20_lsd$IF_PA125d, 45, c20_lmn$IF_PA125d + c20_lsd$IF_PA125d, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_lmn$IF_PA125d, lty = 4)
 with(accuracyDigital, points(Experience, l.IF_PA125, pch = 16))
 with(accuracyDigital[1, ], text(Experience - 0.5, l.IF_PA125, labels = PersonID, cex = 0.7))
 with(accuracyDigital[2:nrow(accuracyDigital), ], text(Experience + 0.5, l.IF_PA125, labels = PersonID, cex = 0.7))
 text(38, 50, "Digital 125", cex = 1.5)
 
 with(accuracyDigital, plot(Experience, l.IF_PA150, ylim = c(45, 95), pch = 16, type = "n", xlim = c(0, 40)))
-rect(-5, l.IF_PA150d_group - l.IF_PA150d_group_sd, 45, l.IF_PA150d_group + l.IF_PA150d_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = l.IF_PA150d_group, lty = 4)
+rect(-5, c20_lmn$IF_PA150d - c20_lsd$IF_PA150d, 45, c20_lmn$IF_PA150d + c20_lsd$IF_PA150d, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_lmn$IF_PA150d, lty = 4)
 with(accuracyDigital, points(Experience, l.IF_PA150, pch = 16))
 with(accuracyDigital[1, ], text(Experience - 0.5, l.IF_PA150, labels = PersonID, cex = 0.7))
 with(accuracyDigital[2:nrow(accuracyDigital), ], text(Experience + 0.5, l.IF_PA150, labels = PersonID, cex = 0.7))
@@ -790,8 +802,8 @@ png("Figures/Fig3_Consensus_agreement_ID_lump.png", 500, 800)
 par(mfrow = c(4, 1), mar = c(2.5, 4.1, .5, 1))
 with(accuracySlide, plot(1:17, l.IF_PA125, ylim = c(45, 95), pch = 16, type = "n", xaxt = "n"))
 axis(1, at = 1:17, labels = accuracySlide$PersonID)
-rect(0, l.IF_PA125s_group - l.IF_PA125s_group_sd, 18, l.IF_PA125s_group + l.IF_PA125s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = l.IF_PA125s_group, lty = 4)
+rect(0, c20_lmn$IF_PA125s - c20_lsd$IF_PA125s, 18, c20_lmn$IF_PA125s + c20_lsd$IF_PA125s, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_lmn$IF_PA125s, lty = 4)
 with(accuracySlide, points(1:17, l.IF_PA125, pch = 16))
 with(accuracySlide, lines(c(1:2), c(l.IF_PA125[PersonID == "1a"], l.IF_PA125[PersonID == "1b"])))
 with(accuracySlide, lines(c(3:4), c(l.IF_PA125[PersonID == "2a"], l.IF_PA125[PersonID == "2b"])))
@@ -799,8 +811,8 @@ text(2, 48, "Slide 125", cex = 1.5)
 
 with(accuracySlide, plot(1:17, l.IF_PA150, ylim = c(45, 95), pch = 16, type = "n", xaxt = "n"))
 axis(1, at = 1:17, labels = accuracySlide$PersonID)
-rect(-5, l.IF_PA150s_group - l.IF_PA150s_group_sd, 45, l.IF_PA150s_group + l.IF_PA150s_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = l.IF_PA150s_group, lty = 4)
+rect(-5, c20_lmn$IF_PA150s - c20_lsd$IF_PA150s, 45, c20_lmn$IF_PA150s + c20_lsd$IF_PA150s, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_lmn$IF_PA150s, lty = 4)
 with(accuracySlide, points(1:17, l.IF_PA150, pch = 16))
 with(accuracySlide, lines(c(1:2), c(l.IF_PA150[PersonID == "1a"], l.IF_PA150[PersonID == "1b"])))
 with(accuracySlide, lines(c(3:4), c(l.IF_PA150[PersonID == "2a"], l.IF_PA150[PersonID == "2b"])))
@@ -808,15 +820,15 @@ text(2, 48, "Slide 150", cex = 1.5)
 
 with(accuracyDigital, plot(1:9, l.IF_PA125, ylim = c(45, 95), pch = 16, type = "n", xaxt = "n"))
 axis(1, at = 1:9, labels = accuracyDigital$PersonID)
-rect(-5, l.IF_PA125d_group - l.IF_PA125d_group_sd, 45, l.IF_PA125d_group + l.IF_PA125d_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = l.IF_PA125d_group, lty = 4)
+rect(-5, c20_lmn$IF_PA125d - c20_lsd$IF_PA125d, 45, c20_lmn$IF_PA125d + c20_lsd$IF_PA125d, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_lmn$IF_PA125d, lty = 4)
 with(accuracyDigital, points(1:9, l.IF_PA125, pch = 16))
 text(1.5, 48, "Digital 125", cex = 1.5)
 
 with(accuracyDigital, plot(1:9, l.IF_PA150, ylim = c(45, 95), pch = 16, type = "n", xaxt = "n"))
 axis(1, at = 1:9, labels = accuracyDigital$PersonID)
-rect(-5, l.IF_PA150d_group - l.IF_PA150d_group_sd, 45, l.IF_PA150d_group + l.IF_PA150d_group_sd, col = rgb(0, .8, .2, alpha = .5))
-abline(h = l.IF_PA150d_group, lty = 4)
+rect(-5, c20_lmn$IF_PA150d - c20_lsd$IF_PA150d, 45, c20_lmn$IF_PA150d + c20_lsd$IF_PA150d, col = rgb(0, .8, .2, alpha = .5))
+abline(h = c20_lmn$IF_PA150d, lty = 4)
 with(accuracyDigital, points(1:9, l.IF_PA150, pch = 16))
 text(1.5, 48, "Digital 150", cex = 1.5)
 mfrow = c(1,1)
@@ -830,10 +842,10 @@ png("Figures/Fig3_Consensus_agreement_fullID_lump.png", 800, 1000)
 par(mfrow = c(2, 1))
 with(accuracyFull, plot(l.IF_PA125[match(ord.div, PersonID)], ylim = c(45, 92), pch = 16, type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Person"))
 axis(1, at = 1:26, labels = accuracyFull$PersonID[match(ord.div, accuracyFull$PersonID)])
-abline(h = l.IF_PA125s_group, lty = 1)
-abline(h = c(l.IF_PA125s_group - l.IF_PA125s_group_sd, l.IF_PA125s_group + l.IF_PA125s_group_sd), lty = 4)
-abline(h = l.IF_PA125d_group, lty = 1, col = "blue")
-abline(h = c(l.IF_PA125d_group - l.IF_PA125d_group_sd, l.IF_PA125d_group + l.IF_PA125d_group_sd), lty = 4, col = "blue")
+abline(h = c20_lmn$IF_PA125s, lty = 1)
+abline(h = c(c20_lmn$IF_PA125s - c20_lsd$IF_PA125s, c20_lmn$IF_PA125s + c20_lsd$IF_PA125s), lty = 4)
+abline(h = c20_lmn$IF_PA125d, lty = 1, col = "blue")
+abline(h = c(c20_lmn$IF_PA125d - c20_lsd$IF_PA125d, c20_lmn$IF_PA125d + c20_lsd$IF_PA125d), lty = 4, col = "blue")
 with(accuracyFull, points(1:26, l.IF_PA125[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
 with(accuracyFull, lines(c(1:2), c(l.IF_PA125[PersonID == "1a"], l.IF_PA125[PersonID == "1b"])))
 with(accuracyFull, lines(c(3:4), c(l.IF_PA125[PersonID == "2a"], l.IF_PA125[PersonID == "2b"])))
@@ -841,10 +853,10 @@ text(26, 92, "125", cex = 1.5)
 
 with(accuracyFull, plot(l.IF_PA150[match(ord.div, PersonID)], ylim = c(45, 92), pch = 16, type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Person"))
 axis(1, at = 1:26, labels = accuracyFull$PersonID[match(ord.div, accuracyFull$PersonID)])
-abline(h = l.IF_PA150s_group, lty = 1)
-abline(h = c(l.IF_PA150s_group - l.IF_PA150s_group_sd, l.IF_PA150s_group + l.IF_PA150s_group_sd), lty = 4)
-abline(h = l.IF_PA150d_group, lty = 1, col = "blue")
-abline(h = c(l.IF_PA150d_group - l.IF_PA150d_group_sd, l.IF_PA150d_group + l.IF_PA150d_group_sd), lty = 4, col = "blue")
+abline(h = c20_lmn$IF_PA150s, lty = 1)
+abline(h = c(c20_lmn$IF_PA150s - c20_lsd$IF_PA150s, c20_lmn$IF_PA150s + c20_lsd$IF_PA150s), lty = 4)
+abline(h = c20_lmn$IF_PA150d, lty = 1, col = "blue")
+abline(h = c(c20_lmn$IF_PA150d - c20_lsd$IF_PA150d, c20_lmn$IF_PA150d + c20_lsd$IF_PA150d), lty = 4, col = "blue")
 with(accuracyFull, points(1:26, l.IF_PA150[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
 with(accuracyFull, lines(c(1:2), c(l.IF_PA150[PersonID == "1a"], l.IF_PA150[PersonID == "1b"])))
 with(accuracyFull, lines(c(3:4), c(l.IF_PA150[PersonID == "2a"], l.IF_PA150[PersonID == "2b"])))
@@ -865,7 +877,7 @@ for(j in sp.abb$Abbreviation) {
   tmp.no <- sum(slide125$IFcMin == tmp.sp)
   if (tmp.no > 0) {
     # sorted list of IDs
-    tmp.tab <- rev(sort(table(unlist(head(slide125[which(slide125$IFcMin == tmp.sp),nchar(names(slide125)) < 5])))))
+    tmp.tab <- rev(sort(table(unlist(head(slide125[which(slide125$IFcMin == tmp.sp),col.nam$s125])))))
     # create a radial barplot
     png(paste("Figures/Radial/slide125_", j, ".png", sep = ""))
     plot(1, type = "n", xlim = c(0, 1), ylim = c(0, 1), xaxt = "n", yaxt = "n", xlab = "", ylab = "")
@@ -886,7 +898,7 @@ for(j in sp.abb$Abbreviation) {
   tmp.no <- sum(slide150$IFcMin == tmp.sp)
   if (tmp.no > 0) {
     # sorted list of IDs
-    tmp.tab <- rev(sort(table(unlist(head(slide150[which(slide150$IFcMin == tmp.sp),nchar(names(slide150)) < 5])))))
+    tmp.tab <- rev(sort(table(unlist(head(slide150[which(slide150$IFcMin == tmp.sp),col.nam$s150])))))
     # create a radial barplot
     png(paste("Figures/Radial/slide150_", j, ".png", sep = ""))
     plot(1, type = "n", xlim = c(0, 1), ylim = c(0, 1), xaxt = "n", yaxt = "n", xlab = "", ylab = "")
@@ -907,7 +919,7 @@ for(j in sp.abb$Abbreviation) {
   tmp.no <- sum(digital125$IFcMin == tmp.sp)
   if (tmp.no > 0) {
     # sorted list of IDs
-    tmp.tab <- rev(sort(table(unlist(head(digital125[which(digital125$IFcMin == tmp.sp),nchar(names(digital125)) < 5])))))
+    tmp.tab <- rev(sort(table(unlist(head(digital125[which(digital125$IFcMin == tmp.sp),col.nam$d125])))))
     # create a radial barplot
     png(paste("Figures/Radial/digital125_", j, ".png", sep = ""))
     plot(1, type = "n", xlim = c(0, 1), ylim = c(0, 1), xaxt = "n", yaxt = "n", xlab = "", ylab = "")
@@ -928,7 +940,7 @@ for(j in sp.abb$Abbreviation) {
   tmp.no <- sum(digital150$IFcMin == tmp.sp)
   if (tmp.no > 0) {
     # sorted list of IDs
-    tmp.tab <- rev(sort(table(unlist(head(digital150[which(digital150$IFcMin == tmp.sp),nchar(names(digital150)) < 5])))))
+    tmp.tab <- rev(sort(table(unlist(head(digital150[which(digital150$IFcMin == tmp.sp),col.nam$d150])))))
     # create a radial barplot
     png(paste("Figures/Radial/digital150_", j, ".png", sep = ""))
     plot(1, type = "n", xlim = c(0, 1), ylim = c(0, 1), xaxt = "n", yaxt = "n", xlab = "", ylab = "")
@@ -947,7 +959,7 @@ rm(i, j, tmp.no, tmp.tab)
 # 3g. Confusion matrix ----------------------------------------------------
 # initially with slide 125
 # this requires the data to be in long format
-slide125.long <- reshape(slide125, varying = list(names(slide125)[nchar(names(slide125)) < 5]), direction = "long", times = names(slide125)[nchar(names(slide125)) < 5], timevar = "Person")
+slide125.long <- reshape(slide125, varying = list(names(slide125)[col.nam$s125]), direction = "long", times = names(slide125)[col.nam$s125], timevar = "Person")
 rownames(slide125.long) <- 1:nrow(slide125.long)
 slide125.long <- slide125.long[, (names(slide125.long) != "id")]
 names(slide125.long)[names(slide125.long) == "1a"] <- "origID"
@@ -963,7 +975,7 @@ dev.off()
 
 # same for the other datasets
 # so slide 150
-slide150.long <- reshape(slide150, varying = list(names(slide150)[nchar(names(slide150)) < 5]), direction = "long", times = names(slide150)[nchar(names(slide150)) < 5], timevar = "Person")
+slide150.long <- reshape(slide150, varying = list(names(slide150)[col.nam$s150]), direction = "long", times = names(slide150)[col.nam$s150], timevar = "Person")
 rownames(slide150.long) <- 1:nrow(slide150.long)
 slide150.long <- slide150.long[, (names(slide150.long) != "id")]
 names(slide150.long)[names(slide150.long) == "1a"] <- "origID"
@@ -979,7 +991,7 @@ dev.off()
 
 
 # digital 125
-digital125.long <- reshape(digital125, varying = list(names(digital125)[nchar(names(digital125)) < 5]), direction = "long", times = names(digital125)[nchar(names(digital125)) < 5], timevar = "Person")
+digital125.long <- reshape(digital125, varying = list(names(digital125)[col.nam$d125]), direction = "long", times = names(digital125)[col.nam$d125], timevar = "Person")
 rownames(digital125.long) <- 1:nrow(digital125.long)
 digital125.long <- digital125.long[, (names(digital125.long) != "id")]
 names(digital125.long)[names(digital125.long) == "A"] <- "origID"
@@ -995,7 +1007,7 @@ dev.off()
 
 
 # digital 150
-digital150.long <- reshape(digital150, varying = list(names(digital150)[nchar(names(digital150)) < 5]), direction = "long", times = names(digital150)[nchar(names(digital150)) < 5], timevar = "Person")
+digital150.long <- reshape(digital150, varying = list(names(digital150)[col.nam$d150]), direction = "long", times = names(digital150)[col.nam$d150], timevar = "Person")
 rownames(digital150.long) <- 1:nrow(digital150.long)
 digital150.long <- digital150.long[, (names(digital150.long) != "id")]
 names(digital150.long)[names(digital150.long) == "A"] <- "origID"
@@ -1706,10 +1718,10 @@ outliers$wtSumPt <- outliers$wtSum / c(rep(4*17, 17), rep(4*9, 9)) * 100
 
 # Table 8 
 # add percentage of specimens identified to accuracy
-accuracySlide$ptID125 <- apply(slide125[,nchar(names(slide125)) < 5], 2, function(x) sum(x != "na") / 300 * 100)[accuracySlide$PersonID]
-accuracySlide$ptID150 <- apply(slide150[,nchar(names(slide150)) < 5], 2, function(x) sum(x != "na") / 300 * 100)[accuracySlide$PersonID]
-accuracyDigital$ptID125 <- apply(digital125[,nchar(names(digital125)) < 5], 2, function(x) sum(x != "na") / 300 * 100)[accuracyDigital$PersonID]
-accuracyDigital$ptID150 <- apply(digital150[,nchar(names(digital150)) < 5], 2, function(x) sum(x != "na") / 300 * 100)[accuracyDigital$PersonID]
+accuracySlide$ptID125 <- apply(slide125[,col.nam$s125], 2, function(x) sum(x != "na") / 300 * 100)[accuracySlide$PersonID]
+accuracySlide$ptID150 <- apply(slide150[,col.nam$s150], 2, function(x) sum(x != "na") / 300 * 100)[accuracySlide$PersonID]
+accuracyDigital$ptID125 <- apply(digital125[,col.nam$d125], 2, function(x) sum(x != "na") / 300 * 100)[accuracyDigital$PersonID]
+accuracyDigital$ptID150 <- apply(digital150[,col.nam$d150], 2, function(x) sum(x != "na") / 300 * 100)[accuracyDigital$PersonID]
 accuracyFull <- rbind(accuracySlide, accuracyDigital)
 accuracyFull$Analysis <- c(rep("Slide", 17), rep("Digital", 9))
 

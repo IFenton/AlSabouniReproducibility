@@ -1640,3 +1640,13 @@ dev.off()
 
 # 11. Comparison of different tests ---------------------------------------
 # ex. Figure 12
+png("Figures/exFig12_Consensus frequency.png", 500, 800)
+par(mfrow = c(2,1))
+# for slide
+barplot(t(cbind(table(slide125$IFmaxCon), table(slide150$IFmaxCon))), beside = TRUE, xlab = "Maximum consensus", legend.text = c("125", "150"), args.legend = c(x = 6, y = 70))
+
+
+# for digital
+barplot(t(cbind(table(digital125$IFmaxCon), table(digital150$IFmaxCon))), beside = TRUE, xlab = "Maximum consensus", legend.text = c("125", "150"), args.legend = c(x = 4, y = 70))
+par(mfrow = c(1,1))
+dev.off()

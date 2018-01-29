@@ -93,7 +93,7 @@ rm(tmp) # no, it makes it worse
 
 # 2b. Consensus 20 --------------------------------------------------------
 # check whether 20% is actually the maximum for the consensus (so what is the highest count per specimen) ignoring na's
-slide125$IFmaxCon <- apply(slide125, 1, function (x)  max(table(x[x != 'na']))) 
+slide125$IFmaxCon <- apply(slide125[, nchar(names(slide150)) < 5], 1, function (x)  max(table(x[x != 'na']))) 
 slide150$IFmaxCon <- apply(slide150[, nchar(names(slide150)) < 5], 1, function (x) max(table(x[x != 'na']))) 
 digital125$IFmaxCon <- apply(digital125[, nchar(names(digital125)) < 5], 1, function (x) max(table(x[x != 'na']))) 
 digital150$IFmaxCon <- apply(digital150[, nchar(names(digital150)) < 5], 1, function (x) max(table(x[x != 'na']))) 
@@ -1582,7 +1582,61 @@ accuracyFull$Analysis <- c(rep("Slide", 17), rep("Digital", 9))
 
 # 10. Size vs. maximum agreement ------------------------------------------
 # Figure 5
+png("Figures/Fig5_size_agreement_125.png")
+with(size125, plot(slideAgreement, Length, pch = 16))
+lines(names(tapply(size125$Length, size125$slideAgreement, max)), tapply(size125$Length, size125$slideAgreement, max), pch = 16)
+with(size125, points(digitalAgreement, Length, pch = 16, col = "blue"))
+lines(names(tapply(size125$Length, size125$digitalAgreement, max)), tapply(size125$Length, size125$digitalAgreement, max), pch = 16, col = 4)
+legend("topleft", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"))
+dev.off()
+
+png("Figures/Fig5_size_agreement_150.png")
+with(size150, plot(slideAgreement, Length, pch = 16))
+lines(names(tapply(size150$Length, size150$slideAgreement, max)), tapply(size150$Length, size150$slideAgreement, max), pch = 16)
+with(size150, points(digitalAgreement, Length, pch = 16, col = "blue"))
+lines(names(tapply(size150$Length, size150$digitalAgreement, max)), tapply(size150$Length, size150$digitalAgreement, max), pch = 16, col = 4)
+legend("topleft", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"))
+dev.off()
+
 # ex. figure 7
+# run a  linear model
+lm_size_125 <- lm(size125$slideAgreement ~ size125$Length)
+par(mfrow = c(2,2))
+plot(lm_size_125)
+par(mfrow = c(1,1))
+
+# try logging to see if that helps
+lm_size_125 <- lm(size125$slideAgreement ~ log(size125$Length))
+par(mfrow = c(2,2))
+plot(lm_size_125)
+par(mfrow = c(1,1))
+
+# slightly better
+with(size125, plot(log(Length), slideAgreement, pch = 16))
+abline(lm_size_125)
+ # however this doesn't really make sense, as it predicts slide agreement above 100%. Given the y-value is bounded between 0 and 100 (or 0 and 1), I think this should be a binomial model. 
+
+glm_size_125 <- glm(slideAgreement/100 ~ log(Length), data = size125, family = "binomial")
+par(mfrow = c(2,2))
+plot(glm_size_125) # still not a good QQ plot
+par(mfrow = c(1,1))
+
+png("Figures/exFig7_sizeAgg125_glm.png")
+with(size125, plot(Length, slideAgreement/100, pch = 16))
+pred <- predict(glm_size_125, newdata = data.frame(Length = 100:600), type = "response")
+points(100:600, pred, type = "l")
+dev.off()
+
+glm_size_150 <- glm(slideAgreement/100 ~ log(Length), data = size150, family = "binomial")
+par(mfrow = c(2,2))
+plot(glm_size_150) # still not a good QQ plot
+par(mfrow = c(1,1))
+
+png("Figures/exFig7_sizeAgg150_glm.png")
+with(size150, plot(Length, slideAgreement/100, pch = 16))
+pred <- predict(glm_size_150, newdata = data.frame(Length = 100:700), type = "response")
+points(100:700, pred, type = "l")
+dev.off()
 
 # 11. Comparison of different tests ---------------------------------------
 # ex. Figure 12

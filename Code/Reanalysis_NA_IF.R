@@ -343,9 +343,14 @@ abline(h = c(c20_mn$IF_PtAc150d - c20_sd$IF_PtAc150d, c20_mn$IF_PtAc150d + c20_s
 par(mfrow = c(1,1))
 
 # recreate figure 3
-err_bar <- function(mean, sd, xpos, length = 0.05) {
+err_bar <- function(mean, sd, xpos, length = 0.05, col = 1) {
   for(i in 1:length(mean)) {
-    arrows(xpos[i], mean[i] - sd[i], xpos[i], mean[i] + sd[i], angle = 90, code = 3, length = length)
+    if (length(col) > 1) {
+      arrows(xpos[i], mean[i] - sd[i], xpos[i], mean[i] + sd[i], angle = 90, code = 3, length = length, col = col[i])
+    } else {
+      arrows(xpos[i], mean[i] - sd[i], xpos[i], mean[i] + sd[i], angle = 90, code = 3, length = length, col = col)
+    }
+    
   }
 }
 
@@ -1222,7 +1227,7 @@ conf_mat(long$s125, "origID", axis.col = "Person", axis1 = "1b", axis2 = "1a", s
 conf_mat(long$s125, "origID", axis.col = "Person", axis1 = "1a", axis2 = "1b", spec.abb = sp.abb, abb.end = c("na", "nc"), key = FALSE)
 # but these only highlight changes, not increasing accuracy, so instead I'm plotting them both against the consensus
 
-sum(slide125$`1a` == slide125$'1b') # 183 or 60% similarity
+sum(slide125$`1a` == slide125$'1b') # 183 or 61% similarity
 sum(slide125$`1a` == slide125$IFcMin) # 198 or 66% accuracy
 sum(slide125$`1b` == slide125$IFcMin) # 228 or 76% accuracy
 
@@ -1254,7 +1259,7 @@ sum(slide150$`1b` == slide150$IFcMin) # 223 or 74% accuracy
 png("Figures/Time/confusion_150_1aCon.png", 1000, 700)
 conf_mat(long$s150[long$s150$Person == "1a", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "1a", ylab = "Consensus")
 dev.off() 
-png("Figures/Time/confusion_150_1aCon.png", 1000, 700)
+png("Figures/Time/confusion_150_1bCon.png", 1000, 700)
 conf_mat(long$s150[long$s150$Person == "1b", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "1b", ylab = "Consensus")
 dev.off() 
 
@@ -1436,6 +1441,17 @@ text(8.75, 21.65, "WOA 1998", cex = 1.3, col = 4)
 par(mfrow = c(1,1))
 dev.off()
 rm(tmp)
+
+png("Figures/Fig6_SST_comb.png", 800, 500)
+with(divTemp[divTemp$Size == 150,], plot(1:26, SST10m[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Person", ylab = "SST", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(20, 24)))
+axis(1, at = 1:26, labels = ord.div)
+with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = c(SST10m - SD, SST10m + SD), col = ((Analysis != "Slide")*3 + 1), lty = 2))
+with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = SST10m, col = ((Analysis != "Slide")*3 + 1)))
+with(divTemp[divTemp$Size == 150,], err_bar(SST10m[match(ord.div, Person)], SD[match(ord.div, Person)], 1:26, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+abline(h = 21.75, col = "green4")
+text(25, 21.65, "WOA 1998", cex = 1.3, col = "green4")
+legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(16, 1, 16, 1), col = c(1, 1, 4, 4))
+dev.off()
 
 # 8. Diversity ------------------------------------------------------------
 
@@ -1744,7 +1760,7 @@ accuracyFull$Analysis <- c(rep("Slide", 17), rep("Digital", 9))
 # 10. Size vs. maximum agreement ------------------------------------------
 # Figure 5
 png("Figures/Fig5_size_agreement_125.png")
-with(size125, plot(slideAgreement, Length, pch = 16))
+with(size125, plot(slideAgreement, Length, pch = 16, main = "125"))
 lines(names(tapply(size125$Length, size125$slideAgreement, max)), tapply(size125$Length, size125$slideAgreement, max), pch = 16)
 with(size125, points(digitalAgreement, Length, pch = 16, col = "blue"))
 lines(names(tapply(size125$Length, size125$digitalAgreement, max)), tapply(size125$Length, size125$digitalAgreement, max), pch = 16, col = 4)
@@ -1752,7 +1768,7 @@ legend("topleft", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"))
 dev.off()
 
 png("Figures/Fig5_size_agreement_150.png")
-with(size150, plot(slideAgreement, Length, pch = 16))
+with(size150, plot(slideAgreement, Length, pch = 16, main = "150"))
 lines(names(tapply(size150$Length, size150$slideAgreement, max)), tapply(size150$Length, size150$slideAgreement, max), pch = 16)
 with(size150, points(digitalAgreement, Length, pch = 16, col = "blue"))
 lines(names(tapply(size150$Length, size150$digitalAgreement, max)), tapply(size150$Length, size150$digitalAgreement, max), pch = 16, col = 4)

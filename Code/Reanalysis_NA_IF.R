@@ -312,7 +312,7 @@ rm(i)
 # 3d. Look at this accuracy as plots ----------------------------
 # compare these as plots
 par(mfrow = c(2, 2))
-# how does Nadia's results compre with mine
+# how does Nadia's results compare with mine
 plot(factor(accuracySlide$PersonID), accuracySlide$NA_PtAc125, main = "Percentage Accuracy 125", ylim = c(45, 90))
 points(factor(accuracySlide$PersonID), accuracySlide$IF_PtAc125, col = "blue", pch = 16)
 abline(h = c20_mn$NA_PtAc125s)
@@ -1147,7 +1147,7 @@ rm(i)
 stressplot(nmds$IF125f)
 # looks like between 2 and 3 dimensions would be reasonable
 
-png("Figures/IF_NMDS_125.png")
+png("Figures/IF_NMDS_125.png", 800, 800)
 plot(nmds$IF125f, type = "n", display = "sites", cex = 1)
 points(nmds$IF125f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
 text(nmds$IF125f, labels = rownames(trsp$IF125f))
@@ -1171,7 +1171,7 @@ stressplot(nmds$IF150f)
 # looks like between 2 and 3 dimensions would be reasonable, although as with Nadia's data, the breakpoint is less obvious for 150 than it is for 125. 
 
 # the full plot
-png("Figures/IF_NMDS_150.png")
+png("Figures/IF_NMDS_150.png", 800, 800)
 plot(nmds$IF150f, type = "n", display = "sites", cex = 1)
 points(nmds$IF150f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
 text(nmds$IF150f, labels = rownames(trsp$IF150f))
@@ -1192,7 +1192,7 @@ stressplot(nmds$IF150z)
 # again between 2 and 3 dimensions is probably reasonable
 
 # the full plot
-png("Figures/IF_NMDS_150_zoom.png")
+png("Figures/IF_NMDS_150_zoom.png", 800, 800)
 plot(nmds$IF150z, type = "n", display = "sites", cex = 1)
 points(nmds$IF150z, pch = 21, cex = 4, col = mds.col$pair[!(mds.col$person %in% c("3", "C", "E", "G"))], bg = brewer.pal(5, "Set2")[mds.col$sch.col[!(mds.col$person %in% c("3", "C", "E", "G"))]], lwd = 2)
 text(nmds$IF150z, labels = rownames(trsp$IF150f[!(rownames(trsp$IF150f) %in% c("3", "C", "E", "G")),]))

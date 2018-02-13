@@ -1833,3 +1833,65 @@ barplot(t(cbind(table(slide125$IFmaxCon), table(slide150$IFmaxCon))), beside = T
 barplot(t(cbind(table(digital125$IFmaxCon), table(digital150$IFmaxCon))), beside = TRUE, xlab = "Maximum consensus", legend.text = c("125", "150"), args.legend = c(x = 4, y = 70))
 par(mfrow = c(1,1))
 dev.off()
+
+
+# 12. Interpreting the diversity metrics ----------------------------------
+
+# 12a. Comparison with MARGO -----------------------------------------------
+# see how the datasets compare with the MARGO values for that latitude
+load("../../../../../../../Dropbox/Documents/PhD/Project/MARGO/Outputs/Diversity_measures.RData")
+
+png("Figures/Div_cf_Margo.png", 550, 600)
+par(mfrow = c(2,2))
+# species richness
+plot(ldg.margo.data$Latitude, ldg.margo.data$sp.rich, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness")
+points(rep(30.2, nrow(divTemp)), divTemp$IF_Richness, col = "blue", pch = 16)
+points(rep(30.2, 4), divTemp$IF_Richness[divTemp$Person == "consensus"], col = "red", pch = 16)
+
+# check the metrics are the same
+sum(ldg.margo.data$sp.rich != specnumber(ldg.margo.data[,14:44])) # should be 0, so yes
+
+# ShannonWiener
+tmp.sw <- diversity(ldg.margo.data[,14:44])
+plot(ldg.margo.data$Latitude, tmp.sw, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener")
+points(rep(30.2, nrow(divTemp)), divTemp$IF_ShannonWiener, col = "blue", pch = 16)
+points(rep(30.2, 4), divTemp$IF_ShannonWiener[divTemp$Person == "consensus"], col = "red", pch = 16)
+
+# Dominance
+tmp.dom <- (1 - diversity(ldg.margo.data[,14:44], index = "simpson"))
+plot(ldg.margo.data$Latitude, tmp.dom, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance")
+points(rep(30.2, nrow(divTemp)), divTemp$IF_Dominance, col = "blue", pch = 16)
+points(rep(30.2, 4), divTemp$IF_Dominance[divTemp$Person == "consensus"], col = "red", pch = 16)
+
+
+# Evenness
+tmp.eve <- (exp(diversity(ldg.margo.data[,14:44])) / specnumber(ldg.margo.data[,14:44]))
+plot(ldg.margo.data$Latitude, tmp.eve, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Evenness")
+points(rep(30.2, nrow(divTemp)), divTemp$IF_Evenness, col = "blue", pch = 16)
+points(rep(30.2, 4), divTemp$IF_Evenness[divTemp$Person == "consensus"], col = "red", pch = 16)
+par(mfrow = c(1,1))
+dev.off()
+rm(tmp.sw, tmp.dom, tmp.eve)
+
+
+# 12b. Simulations for studying changes -----------------------------------
+tmp <- data.frame("a" = c(10, 10, 0, 20, 12, 10, 10, 5, 9, 10, 8, 8, 10, 11), "b" = c(10, 10, 10, 0, 10, 0, 10, 10, 10, 10, 12, 10, 10, 10), "c" = c(2, 2, 2, 2, 0, 12, 4, 2, 2, 1, 2, 4, 3, 1), "d" = c(2, 0, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 1, 2), "e" = c(0, 2, 10, 0, 0, 0, 0, 5, 1, 1, 0, 0, 0, 0))
+rownames(tmp) <- c("Orig", "ChangeSpListR", "ChangeSpListC", "LumpCc", "LumpCr", "LumpRc", "LumpRr", "SplitCe", "SplitCu", "SplitR", "BoundShiftCc", "BoundShift2Rc", "BoundShift3Rr", "BoundShift4Cr")
+tmp$Rich <- specnumber(tmp[, 1:5]) # richness
+tmp$SW <- diversity(tmp[, 1:5]) # Shannon-Wiener
+tmp$Dom <- (1 - diversity(tmp[, 1:5], index = "simpson")) # dominance
+tmp$Eve <- exp(diversity(tmp[, 1:5])) / specnumber(tmp[, 1:5]) # evenness
+tmp
+rm(tmp)
+
+
+# 12c. Direction of change ------------------------------------------------
+# add some columns to the diversity dataframe to investigate the direction of the change. 
+divTemp$Dir_IFE <- divTemp$Dir_IFD <- divTemp$Dir_IFSW <- divTemp$Dir_IFR <- divTemp$Dir_SST <- NA
+divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person != "consensus", grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus", c(8, 10:13)])) > 0, 1, -1)
+
+divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person != "consensus", grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus", c(8, 10:13)])) > 0, 1, -1)
+
+divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person != "consensus", grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus", c(8, 10:13)])) > 0, 1, -1)
+
+divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person != "consensus", grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus", c(8, 10:13)])) > 0, 1, -1)

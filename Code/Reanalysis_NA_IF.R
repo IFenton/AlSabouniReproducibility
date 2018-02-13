@@ -1424,7 +1424,7 @@ with(tmp[match(accuracySlide$PersonID, tmp$Person), ], err_bar(SST10m, SD, 1:17)
 with(tmp, lines(c(1:2), c(SST10m[Person == "1a"], SST10m[Person == "1b"])))
 with(tmp, lines(c(3:4), c(SST10m[Person == "2a"], SST10m[Person == "2b"])))
 text(16.5, 20, "Slide 150", cex = 1.5)
-abline(h = 21.75, col = 4)
+abline(h = 21.76, col = 4)
 text(16.5, 21.65, "WOA 1998", cex = 1.3, col = 4)
 
 tmp <- divTemp[row.nam$dSST,]
@@ -1435,7 +1435,7 @@ abline(h = tmp$SST10m[tmp$Person == "consensus"], lty = 4)
 points(1:9, tmp$SST10m[tmp$Person != "consensus"], pch = 16)
 with(tmp[tmp$Person != "consensus", ], err_bar(SST10m, SD, 1:9))
 text(8.75, 20, "Digital 150", cex = 1.5)
-abline(h = 21.75, col = 4)
+abline(h = 21.76, col = 4)
 text(8.75, 21.65, "WOA 1998", cex = 1.3, col = 4)
 
 par(mfrow = c(1,1))
@@ -1448,7 +1448,7 @@ axis(1, at = 1:26, labels = ord.div)
 with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = c(SST10m - SD, SST10m + SD), col = ((Analysis != "Slide")*3 + 1), lty = 2))
 with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = SST10m, col = ((Analysis != "Slide")*3 + 1)))
 with(divTemp[divTemp$Size == 150,], err_bar(SST10m[match(ord.div, Person)], SD[match(ord.div, Person)], 1:26, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
-abline(h = 21.75, col = "green4")
+abline(h = 21.76, col = "green4")
 text(25, 21.65, "WOA 1998", cex = 1.3, col = "green4")
 legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(16, 1, 16, 1), col = c(1, 1, 4, 4))
 dev.off()
@@ -1652,10 +1652,10 @@ outliers$mnPA150[outliers$Analysis == "Digital"][order(100-accuracyDigital$mnPA1
 
 # SST
 outliers$SST <- NA
-tmp.pt <- abs(divTemp$SST10m[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - 21.75)
+tmp.pt <- abs(divTemp$SST10m[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - 21.76)
 names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
 outliers$SST[outliers$Analysis == "Slide"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
-tmp.pt <- abs(divTemp$SST10m[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - 21.75)
+tmp.pt <- abs(divTemp$SST10m[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - 21.76)
 names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
 outliers$SST[outliers$Analysis == "Digital"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
@@ -1755,6 +1755,12 @@ accuracyDigital$ptID125 <- apply(digital125[,col.nam$d125], 2, function(x) sum(x
 accuracyDigital$ptID150 <- apply(digital150[,col.nam$d150], 2, function(x) sum(x != "na") / 300 * 100)[accuracyDigital$PersonID]
 accuracyFull <- rbind(accuracySlide, accuracyDigital)
 accuracyFull$Analysis <- c(rep("Slide", 17), rep("Digital", 9))
+
+# looking for correlations
+pairs(outliers[, 3:ncol(outliers)])
+pairs(outliers[, grep("125", names(outliers))])
+pairs(outliers[, grep("150", names(outliers))])
+
 
 
 # 10. Size vs. maximum agreement ------------------------------------------

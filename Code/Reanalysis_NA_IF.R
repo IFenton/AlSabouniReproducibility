@@ -1208,7 +1208,7 @@ dev.off()
 # for 150
 full.150 <- merge(slide150, digital150, by = "Specimen")
 trsp$IF150f <- data.frame(t(full.150[, !(names(full.150) %in% c("Specimen", "consensus50.x", "consensus20.x", "consensus50.y", "consensus20.y", "IFmaxCon.x", "IFmaxCon.y"))]))
-rownames(trsp$IF150f)[nchar(rownames(trsp$IF150f)) >= 5] <- c("Sc50", "ScMin", "Dc50", "DcMin")
+rownames(trsp$IF150f)[nchar(rownames(trsp$IF150f)) >= 5] <- c("SsC", "SCID", "DsC", "DCID")
 
 # consider the stress of the NMDS
 stress$IF150f <- rep(NA, 10)
@@ -1244,8 +1244,9 @@ plot(nmds$IF150f, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab 
 points(nmds$IF150f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
 text(nmds$IF150f$points[nchar(rownames(trsp$IF150f)) <3, ], labels = rownames(trsp$IF150f)[nchar(rownames(trsp$IF150f)) <3])
 points(nmds$IF150f$points[nchar(rownames(trsp$IF150f)) >2, ], pch = "+")
-text(sweep(data.matrix(nmds$IF150f$points[nchar(rownames(trsp$IF150f)) >2, ]), 2, c(-0.025, 0)), labels = rownames(trsp$IF150f)[nchar(rownames(trsp$IF150f)) >2])
-legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16)
+text(sweep(data.matrix(nmds$IF150f$points[nchar(rownames(trsp$IF150f)) >2 & rownames(trsp$IF125) != "DsC", ]), 2, c(-0.025, 0)), labels = rownames(trsp$IF150f)[nchar(rownames(trsp$IF150f)) >2 & rownames(trsp$IF125) != "DsC"])
+text(nmds$IF150f$points[rownames(trsp$IF125) == "DsC", 1], nmds$IF150f$points[rownames(trsp$IF125) == "DsC", 2]-0.02, labels = "DsC")
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16, cex = 1.3)
 dev.off()
 
 # focussing on the main section. As noted above, it is better to run this as a new analysis rather than just zoom in, as the influence of the outliers means that the stability of the central points hasn't been tested
@@ -1287,8 +1288,9 @@ plot(nmds$IF150z, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab 
 points(nmds$IF150z, pch = 21, cex = 4, col = mds.col$pair[!(mds.col$person %in% c("3", "C", "E", "G"))], bg = brewer.pal(5, "Set2")[mds.col$sch.col[!(mds.col$person %in% c("3", "C", "E", "G"))]], lwd = 2)
 text(nmds$IF150z$points[nchar(rownames(nmds$IF150z$points)) <3, ], labels = rownames(nmds$IF150z$points)[nchar(rownames(nmds$IF150z$points)) <3])
 points(nmds$IF150z$points[nchar(rownames(nmds$IF150z$points)) >2, ], pch = "+")
-text(sweep(data.matrix(nmds$IF150z$points[nchar(rownames(nmds$IF150z$points)) >2, ]), 2, c(-0.025, 0)), labels = rownames(nmds$IF150z$points)[nchar(rownames(nmds$IF150z$points)) >2])
-legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16)
+text(sweep(data.matrix(nmds$IF150z$points[nchar(rownames(nmds$IF150z$points)) >2 & rownames(nmds$IF150z$points) != "DsC", ]), 2, c(-0.005, -0.01)), labels = rownames(nmds$IF150z$points)[nchar(rownames(nmds$IF150z$points)) >2 & rownames(nmds$IF150z$points) != "DsC"])
+text(nmds$IF150f$points[rownames(trsp$IF125) == "DsC", 1], nmds$IF150f$points[rownames(trsp$IF125) == "DsC", 2]-0.02, labels = "DsC")
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16, cex = 1.3)
 dev.off()
 
 # output te scree plots

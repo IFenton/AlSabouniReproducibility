@@ -218,6 +218,24 @@ size150$slideAgreement <- slide150$IFmaxCon/17*100
 size125$digitalAgreement <- digital125$IFmaxCon/9*100
 size150$digitalAgreement <- digital150$IFmaxCon/9*100
 
+# what fraction of specimens don't have a single consensus
+sum(!is.na(size125$slideCon2)) # 16
+sum(!is.na(size125$digitalCon2)) # 34
+sum(!is.na(size150$slideCon2)) # 11
+sum(!is.na(size150$digitalCon2)) # 18
+
+# have three possibilities
+sum(!is.na(size125$slideCon3)) # 1
+sum(!is.na(size125$digitalCon3)) # 4
+# slide 150 0
+sum(!is.na(size150$digitalCon3)) # 0
+
+# have four possibilities
+sum(!is.na(size125$slideCon4)) # 1
+sum(!is.na(size125$digitalCon4)) # 1
+# slide 150 0
+# digital 150 0
+
 # save it to compare with Nadia's
 write.csv(size125, file = "Outputs/Supp3_125.csv", row.names = FALSE)
 write.csv(size150, file = "Outputs/Supp3_150.csv", row.names = FALSE)
@@ -515,30 +533,35 @@ accuracyFull$Analysis <- c(rep("Slide", 17), rep("Digital", 9))
 
 png("Figures/Fig3_Consensus_agreement_fullID.png", 800, 1000)
 par(mfrow = c(2, 1))
-with(accuracyFull, plot(IF_PtAc125[match(ord.div, PersonID)], ylim = c(43, 90), type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Person"))
-axis(1, at = 1:26, labels = accuracyFull$PersonID[match(ord.div, accuracyFull$PersonID)])
+with(accuracyFull, plot(IF_PtAc125[match(ord.div, PersonID)], ylim = c(43, 90), type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Person", cex.lab = 1.5, las = 2, cex.axis = 1.1))
+axis(1, at = 1:26, labels = accuracyFull$PersonID[match(ord.div, accuracyFull$PersonID)], cex.axis = 1.1)
 abline(h = c20_mn$IF_PtAc125s, lty = 1)
 abline(h = c(c20_mn$IF_PtAc125s - c20_sd$IF_PtAc125s, c20_mn$IF_PtAc125s + c20_sd$IF_PtAc125s), lty = 4)
 abline(h = c20_mn$IF_PtAc125d, lty = 1, col = "blue")
 abline(h = c(c20_mn$IF_PtAc125d - c20_sd$IF_PtAc125d, c20_mn$IF_PtAc125d + c20_sd$IF_PtAc125d), lty = 4, col = "blue")
 with(accuracyFull, points(1:26, IF_PtAc125[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
-with(accuracyFull, lines(c(1:2), c(IF_PtAc125[PersonID == "1a"], IF_PtAc125[PersonID == "1b"])))
-with(accuracyFull, lines(c(3:4), c(IF_PtAc125[PersonID == "2a"], IF_PtAc125[PersonID == "2b"])))
+with(accuracyFull, arrows(1, IF_PtAc125[PersonID == "1a"], 2, IF_PtAc125[PersonID == "1b"], length = 0.14))
+with(accuracyFull, arrows(3, IF_PtAc125[PersonID == "2a"], 4, IF_PtAc125[PersonID == "2b"], length = 0.14))
 text(26, 90, "125", cex = 1.5)
 
-with(accuracyFull, plot(IF_PtAc150[match(ord.div, PersonID)], ylim = c(43, 90), type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Person"))
-axis(1, at = 1:26, labels = accuracyFull$PersonID[match(ord.div, accuracyFull$PersonID)])
+with(accuracyFull, plot(IF_PtAc150[match(ord.div, PersonID)], ylim = c(43, 90), type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Person", cex.lab = 1.5, las = 2, cex.axis = 1.1))
+axis(1, at = 1:26, labels = accuracyFull$PersonID[match(ord.div, accuracyFull$PersonID)], cex.axis = 1.1)
 abline(h = c20_mn$IF_PtAc150s, lty = 1)
 abline(h = c(c20_mn$IF_PtAc150s - c20_sd$IF_PtAc150s, c20_mn$IF_PtAc150s + c20_sd$IF_PtAc150s), lty = 4)
 abline(h = c20_mn$IF_PtAc150d, lty = 1, col = "blue")
 abline(h = c(c20_mn$IF_PtAc150d - c20_sd$IF_PtAc150d, c20_mn$IF_PtAc150d + c20_sd$IF_PtAc150d), lty = 4, col = "blue")
 with(accuracyFull, points(1:26, IF_PtAc150[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
-with(accuracyFull, lines(c(1:2), c(IF_PtAc150[PersonID == "1a"], IF_PtAc150[PersonID == "1b"])))
-with(accuracyFull, lines(c(3:4), c(IF_PtAc150[PersonID == "2a"], IF_PtAc150[PersonID == "2b"])))
+with(accuracyFull, arrows(1, IF_PtAc150[PersonID == "1a"], 2, IF_PtAc150[PersonID == "1b"], length = 0.14))
+with(accuracyFull, arrows(3, IF_PtAc150[PersonID == "2a"], 4, IF_PtAc150[PersonID == "2b"], length = 0.14))
 text(26, 90, "150", cex = 1.5)
 
 par(mfrow = c(1,1))
 dev.off()
+
+# looking at the summary of this data
+tapply(accuracyFull$IF_PtAc125, accuracyFull$Analysis, summary)
+tapply(accuracyFull$IF_PtAc150, accuracyFull$Analysis, summary)
+
 
 # 3e. Lumped pairwise agreement scores ------------------------------------
 # Table 4
@@ -965,6 +988,7 @@ tail(long$s125)
 
 png("Figures/confusion_slide125.png", 1000, 700)
 conf_mat(long$s125, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Individual ID", ylab = "Consensus ID")
+mtext("Slide 125", 1, cex = 2, adj = -0.8,  line = -5)
 dev.off() 
 
 # same for the other datasets
@@ -976,8 +1000,9 @@ names(long$s150)[names(long$s150) == "1a"] <- "origID"
 head(long$s150)
 tail(long$s150)
 
-png("Figures/confusion_slide150.png", 1000, 700)
+png("Figures/confusion_slide150.png", 1000, 600)
 conf_mat(long$s150, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Individual ID", ylab = "Consensus ID")
+mtext("Slide 150", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 
 
 
@@ -991,6 +1016,7 @@ tail(long$d125)
 
 png("Figures/confusion_digital125.png", 1000, 700)
 conf_mat(long$d125, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Individual ID", ylab = "Consensus ID")
+mtext("Digital 125", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 
 
 
@@ -1002,8 +1028,9 @@ names(long$d150)[names(long$d150) == "A"] <- "origID"
 head(long$d150)
 tail(long$d150)
 
-png("Figures/confusion_digital150.png", 1000, 700)
+png("Figures/confusion_digital150.png", 1000, 600)
 conf_mat(long$d150, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Individual ID", ylab = "Consensus ID")
+mtext("Digital 150", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 
 
 
@@ -1139,8 +1166,7 @@ legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:
 # 4c. plotting using my consensus estimates -------------------------------
 # for 125
 trsp$IF125f <- data.frame(t(full.125[, !(names(full.125) %in% c("Specimen", "consensus50.x", "consensus20.x", "consensus50.y", "consensus20.y", "IFmaxCon.x", "IFmaxCon.y"))]))
-rownames(trsp$IF125f)[nchar(rownames(trsp$IF125f)) >= 5] <- c("Sc50", "ScMin", "Dc50", "DcMin")
-nmds$IF125f <- metaMDS(daisy(trsp$IF125f))
+rownames(trsp$IF125f)[nchar(rownames(trsp$IF125f)) >= 5] <- c("SsC", "SCID", "DsC", "DCID")
 
 # consider the stress of the NMDS
 stress$IF125f <- rep(NA, 10)
@@ -1149,21 +1175,40 @@ for (i in 1:10) {
 }
 plot(stress$IF125f, type = "b")  
 rm(i)
-stressplot(nmds$IF125f)
 # looks like between 2 and 3 dimensions would be reasonable
 
-png("Figures/IF_NMDS_125.png", 800, 800)
-plot(nmds$IF125f, type = "n", display = "sites", cex = 1)
+# check for variation
+tmp <- metaMDS(daisy(trsp$IF125f))
+tmp$stress
+plot(tmp, display = "sites", type = "t", cex = 1.5)
+# some variation, so optimise
+
+stress$IFop125f <- 1
+# find the nmds plot with the lowest stress out of 20000 runs
+for (i in 1:1000) {
+  tmp <- metaMDS(daisy(trsp$IF125f))
+  if (stress$IFop125f > tmp$stress) {
+    nmds$IF125f <- tmp
+    stress$IFop125f <- tmp$stress
+  }
+}
+rm(i, tmp)
+
+stressplot(nmds$IF125f)
+
+png("Figures/IF_NMDS_125.png", 600, 600)
+plot(nmds$IF125f, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab = "Axis 2", las = 1, cex.lab = 1.5, cex.axis = 1.2, main = "NMDS 125")
 points(nmds$IF125f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
-text(nmds$IF125f, labels = rownames(trsp$IF125f))
-legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16)
+text(nmds$IF125f$points[nchar(rownames(trsp$IF125f)) <3, ], labels = rownames(trsp$IF125f)[nchar(rownames(trsp$IF125f)) <3])
+points(nmds$IF125f$points[nchar(rownames(trsp$IF125f)) >2, ], pch = "+")
+text(sweep(data.matrix(nmds$IF125f$points[nchar(rownames(trsp$IF125f)) >2, ]), 2, c(-0.025, 0)), labels = rownames(trsp$IF125f)[nchar(rownames(trsp$IF125f)) >2])
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16, cex = 1.3)
 dev.off()
 
 # for 150
 full.150 <- merge(slide150, digital150, by = "Specimen")
 trsp$IF150f <- data.frame(t(full.150[, !(names(full.150) %in% c("Specimen", "consensus50.x", "consensus20.x", "consensus50.y", "consensus20.y", "IFmaxCon.x", "IFmaxCon.y"))]))
 rownames(trsp$IF150f)[nchar(rownames(trsp$IF150f)) >= 5] <- c("Sc50", "ScMin", "Dc50", "DcMin")
-nmds$IF150f <- metaMDS(daisy(trsp$IF150f))
 
 # consider the stress of the NMDS
 stress$IF150f <- rep(NA, 10)
@@ -1172,14 +1217,34 @@ for (i in 1:10) {
 }
 plot(stress$IF150f, type = "b")
 rm(i)
-stressplot(nmds$IF150f)
 # looks like between 2 and 3 dimensions would be reasonable, although as with Nadia's data, the breakpoint is less obvious for 150 than it is for 125. 
 
+# check for variation
+tmp <- metaMDS(daisy(trsp$IF150f))
+tmp$stress
+plot(tmp, display = "sites", type = "t", cex = 1.5)
+# some variation, so optimise
+
+stress$IFop150f <- 1
+# find the nmds plot with the lowest stress out of 1000 runs
+for (i in 1:1000) {
+  tmp <- metaMDS(daisy(trsp$IF150f))
+  if (stress$IFop150f > tmp$stress) {
+    nmds$IF150f <- tmp
+    stress$IFop150f <- tmp$stress
+  }
+}
+rm(i, tmp)
+
+stressplot(nmds$IF150f)
+
 # the full plot
-png("Figures/IF_NMDS_150.png", 800, 800)
-plot(nmds$IF150f, type = "n", display = "sites", cex = 1)
+png("Figures/IF_NMDS_150.png", 600, 600)
+plot(nmds$IF150f, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab = "Axis 2", las = 1, cex.lab = 1.5, cex.axis = 1.2, main = "NMDS 150")
 points(nmds$IF150f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
-text(nmds$IF150f, labels = rownames(trsp$IF150f))
+text(nmds$IF150f$points[nchar(rownames(trsp$IF150f)) <3, ], labels = rownames(trsp$IF150f)[nchar(rownames(trsp$IF150f)) <3])
+points(nmds$IF150f$points[nchar(rownames(trsp$IF150f)) >2, ], pch = "+")
+text(sweep(data.matrix(nmds$IF150f$points[nchar(rownames(trsp$IF150f)) >2, ]), 2, c(-0.025, 0)), labels = rownames(trsp$IF150f)[nchar(rownames(trsp$IF150f)) >2])
 legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16)
 dev.off()
 
@@ -1196,12 +1261,43 @@ rm(i)
 stressplot(nmds$IF150z)
 # again between 2 and 3 dimensions is probably reasonable
 
-# the full plot
-png("Figures/IF_NMDS_150_zoom.png", 800, 800)
-plot(nmds$IF150z, type = "n", display = "sites", cex = 1)
+# check for variation
+tmp <- metaMDS(daisy(trsp$IF150f[!(rownames(trsp$IF150f) %in% c("3", "C", "E", "G")),]))
+tmp$stress
+plot(tmp, display = "sites", type = "t", cex = 1.5)
+# some variation, so optimise
+
+stress$IFop150z <- 1
+# find the nmds plot with the lowest stress out of 1000 runs
+for (i in 1:1000) {
+  tmp <- metaMDS(daisy(trsp$IF150f[!(rownames(trsp$IF150f) %in% c("3", "C", "E", "G")),]))
+  if (stress$IFop150z > tmp$stress) {
+    nmds$IF150z <- tmp
+    stress$IFop150z <- tmp$stress
+  }
+}
+rm(i, tmp)
+
+stress$IFop150z
+stressplot(nmds$IF150z)
+
+# the zoomed plot
+png("Figures/IF_NMDS_150_zoom.png", 600, 600)
+plot(nmds$IF150z, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab = "Axis 2", las = 1, cex.lab = 1.5, cex.axis = 1.2, main = "NMDS 150 zoomed")
 points(nmds$IF150z, pch = 21, cex = 4, col = mds.col$pair[!(mds.col$person %in% c("3", "C", "E", "G"))], bg = brewer.pal(5, "Set2")[mds.col$sch.col[!(mds.col$person %in% c("3", "C", "E", "G"))]], lwd = 2)
-text(nmds$IF150z, labels = rownames(trsp$IF150f[!(rownames(trsp$IF150f) %in% c("3", "C", "E", "G")),]))
+text(nmds$IF150z$points[nchar(rownames(nmds$IF150z$points)) <3, ], labels = rownames(nmds$IF150z$points)[nchar(rownames(nmds$IF150z$points)) <3])
+points(nmds$IF150z$points[nchar(rownames(nmds$IF150z$points)) >2, ], pch = "+")
+text(sweep(data.matrix(nmds$IF150z$points[nchar(rownames(nmds$IF150z$points)) >2, ]), 2, c(-0.025, 0)), labels = rownames(nmds$IF150z$points)[nchar(rownames(nmds$IF150z$points)) >2])
 legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16)
+dev.off()
+
+# output te scree plots
+png("Figures/Scree plots.png")
+par(mfrow = c(2, 2))
+plot(stress$IF125f, type = "b")
+plot(stress$IF150f, type = "b")
+plot(stress$IF150z, type = "b")
+par(mfrow = c(1,1))
 dev.off()
 
 # 4b. Dendrogram ----------------------------------------------------------
@@ -1823,17 +1919,35 @@ dev.off()
 
 # 11. Comparison of different tests ---------------------------------------
 # ex. Figure 12
-png("Figures/exFig12_Consensus frequency.png", 500, 800)
-par(mfrow = c(2,1))
+png("Figures/exFig12_Consensus frequency.png", 500, 700)
+par(mfrow = c(2, 1))
 # for slide
-barplot(t(cbind(table(slide125$IFmaxCon), table(slide150$IFmaxCon))), beside = TRUE, xlab = "Maximum consensus", legend.text = c("125", "150"), args.legend = c(x = 6, y = 70))
-
+barplot(t(cbind(table(slide125$IFmaxCon), table(slide150$IFmaxCon))), beside = TRUE, xlab = "Maximum consensus", legend.text = c("125", "150"), args.legend = c(x = 7, y = 70), main = "Slide")
+abline(v = 18.5, lty = 2)
 
 # for digital
-barplot(t(cbind(table(digital125$IFmaxCon), table(digital150$IFmaxCon))), beside = TRUE, xlab = "Maximum consensus", legend.text = c("125", "150"), args.legend = c(x = 4, y = 70))
-par(mfrow = c(1,1))
+barplot(t(cbind(table(digital125$IFmaxCon), table(digital150$IFmaxCon))), beside = TRUE, xlab = "Maximum consensus", legend.text = c("125", "150"), args.legend = c(x = 4.25, y = 70), main = "Digital")
+abline(v = 9.5, lty = 2)
+par(mfrow = c(1, 1))
 dev.off()
 
+# accuracy as percentage
+table(slide125$IFmaxCon)/300 * 100
+table(slide150$IFmaxCon)/300 * 100
+table(digital125$IFmaxCon)/300 * 100
+table(digital150$IFmaxCon)/300 * 100
+
+# fraction with > 50% aggreement
+sum(slide125$IFmaxCon > c50_cutoff$slide)/300 * 100 # 72.3%
+sum(slide150$IFmaxCon > c50_cutoff$slide)/300 * 100 # 85.3%
+sum(digital125$IFmaxCon > c50_cutoff$digital)/300 * 100 # 66.3%
+sum(digital150$IFmaxCon > c50_cutoff$digital)/300 * 100 # 76.0%
+
+# sum of unidentified
+sum(slide125$IFmaxCon <= c50_cutoff$slide) # 83
+sum(slide150$IFmaxCon <= c50_cutoff$slide) # 44
+sum(digital125$IFmaxCon <= c50_cutoff$digital) # 101
+sum(digital150$IFmaxCon <= c50_cutoff$digital) # 72
 
 # 12. Interpreting the diversity metrics ----------------------------------
 

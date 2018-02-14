@@ -1886,6 +1886,18 @@ rm(tmp)
 
 
 # 12c. Direction of change ------------------------------------------------
+# add some columns to the diversity dataframe to investigate the magnitude of the change. 
+divTemp$Cen_IFE <- divTemp$Cen_IFD <- divTemp$Cen_IFSW <- divTemp$Cen_IFR <- divTemp$Cen_SST <- NA
+divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person != "consensus", grep("Cen", names(divTemp))] <- sweep(data.matrix(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus", c(8, 10:13)]))
+
+divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person != "consensus", grep("Cen", names(divTemp))] <- sweep(data.matrix(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus", c(8, 10:13)]))
+
+divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person != "consensus", grep("Cen", names(divTemp))] <- sweep(data.matrix(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus", c(8, 10:13)]))
+
+divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person != "consensus", grep("Cen", names(divTemp))] <- sweep(data.matrix(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus", c(8, 10:13)]))
+
+pairs(divTemp[, grep("Cen_", names(divTemp))], col = factor(paste(divTemp$Analysis, divTemp$Size, sep = "_")), pch = 16)
+
 # add some columns to the diversity dataframe to investigate the direction of the change. 
 divTemp$Dir_IFE <- divTemp$Dir_IFD <- divTemp$Dir_IFSW <- divTemp$Dir_IFR <- divTemp$Dir_SST <- NA
 divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person != "consensus", grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus", c(8, 10:13)])) > 0, 1, -1)
@@ -1895,3 +1907,10 @@ divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person != "c
 divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person != "consensus", grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus", c(8, 10:13)])) > 0, 1, -1)
 
 divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person != "consensus", grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus", c(8, 10:13)])) > 0, 1, -1)
+
+table(divTemp$Dir_SST, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
+table(divTemp$Dir_IFR, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
+table(divTemp$Dir_IFSW, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
+table(divTemp$Dir_IFD, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
+table(divTemp$Dir_IFE, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
+

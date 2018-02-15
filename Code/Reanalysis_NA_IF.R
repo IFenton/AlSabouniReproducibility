@@ -533,7 +533,7 @@ accuracyFull$Analysis <- c(rep("Slide", 17), rep("Digital", 9))
 
 png("Figures/Fig3_Consensus_agreement_fullID.png", 800, 1000)
 par(mfrow = c(2, 1))
-with(accuracyFull, plot(IF_PtAc125[match(ord.div, PersonID)], ylim = c(43, 90), type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Person", cex.lab = 1.5, las = 2, cex.axis = 1.1))
+with(accuracyFull, plot(IF_PtAc125[match(ord.div, PersonID)], ylim = c(43, 90), type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Participant", cex.lab = 1.5, las = 2, cex.axis = 1.1))
 axis(1, at = 1:26, labels = accuracyFull$PersonID[match(ord.div, accuracyFull$PersonID)], cex.axis = 1.1)
 abline(h = c20_mn$IF_PtAc125s, lty = 1)
 abline(h = c(c20_mn$IF_PtAc125s - c20_sd$IF_PtAc125s, c20_mn$IF_PtAc125s + c20_sd$IF_PtAc125s), lty = 4)
@@ -544,7 +544,7 @@ with(accuracyFull, arrows(1, IF_PtAc125[PersonID == "1a"], 2, IF_PtAc125[PersonI
 with(accuracyFull, arrows(3, IF_PtAc125[PersonID == "2a"], 4, IF_PtAc125[PersonID == "2b"], length = 0.14))
 text(26, 90, "125", cex = 1.5)
 
-with(accuracyFull, plot(IF_PtAc150[match(ord.div, PersonID)], ylim = c(43, 90), type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Person", cex.lab = 1.5, las = 2, cex.axis = 1.1))
+with(accuracyFull, plot(IF_PtAc150[match(ord.div, PersonID)], ylim = c(43, 90), type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Participant", cex.lab = 1.5, las = 2, cex.axis = 1.1))
 axis(1, at = 1:26, labels = accuracyFull$PersonID[match(ord.div, accuracyFull$PersonID)], cex.axis = 1.1)
 abline(h = c20_mn$IF_PtAc150s, lty = 1)
 abline(h = c(c20_mn$IF_PtAc150s - c20_sd$IF_PtAc150s, c20_mn$IF_PtAc150s + c20_sd$IF_PtAc150s), lty = 4)
@@ -987,7 +987,7 @@ head(long$s125)
 tail(long$s125)
 
 png("Figures/confusion_slide125.png", 1000, 700)
-conf_mat(long$s125, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Individual ID", ylab = "Consensus ID")
+conf_mat(long$s125, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
 mtext("Slide 125", 1, cex = 2, adj = -0.8,  line = -5)
 dev.off() 
 
@@ -1001,7 +1001,7 @@ head(long$s150)
 tail(long$s150)
 
 png("Figures/confusion_slide150.png", 1000, 600)
-conf_mat(long$s150, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Individual ID", ylab = "Consensus ID")
+conf_mat(long$s150, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
 mtext("Slide 150", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 
 
@@ -1015,7 +1015,7 @@ head(long$d125)
 tail(long$d125)
 
 png("Figures/confusion_digital125.png", 1000, 700)
-conf_mat(long$d125, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Individual ID", ylab = "Consensus ID")
+conf_mat(long$d125, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
 mtext("Digital 125", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 
 
@@ -1029,7 +1029,7 @@ head(long$d150)
 tail(long$d150)
 
 png("Figures/confusion_digital150.png", 1000, 600)
-conf_mat(long$d150, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Individual ID", ylab = "Consensus ID")
+conf_mat(long$d150, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
 mtext("Digital 150", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 
 
@@ -1542,14 +1542,16 @@ dev.off()
 rm(tmp)
 
 png("Figures/Fig6_SST_comb.png", 800, 500)
-with(divTemp[divTemp$Size == 150,], plot(1:26, SST10m[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Person", ylab = "SST", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(20, 24)))
-axis(1, at = 1:26, labels = ord.div)
+par(mar = c(5.1, 5.1, 4.1, 2.1))
+with(divTemp[divTemp$Size == 150,], plot(1:26, SST10m[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Participant", ylab = expression(paste("SST / ", degree, "C")), col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(20, 24), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
 with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = c(SST10m - SD, SST10m + SD), col = ((Analysis != "Slide")*3 + 1), lty = 2))
 with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = SST10m, col = ((Analysis != "Slide")*3 + 1)))
 with(divTemp[divTemp$Size == 150,], err_bar(SST10m[match(ord.div, Person)], SD[match(ord.div, Person)], 1:26, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
 abline(h = 21.76, col = "green4")
 text(25, 21.65, "WOA 1998", cex = 1.3, col = "green4")
 legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(16, 1, 16, 1), col = c(1, 1, 4, 4))
+par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
 # 8. Diversity ------------------------------------------------------------
@@ -1639,46 +1641,54 @@ ord.div <- c("1a", "1b", "2a", "2b", "A", 3:6, "F", 7:9, "G", 10:15, LETTERS[2:5
 # Figure 7
 png("Figures/Fig7_richness.png", 800, 500)
 # 125
-with(divTemp[divTemp$Size == 125,], plot(1:26, IF_Richness[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Person", ylab = "Richness", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(14, 30)))
-axis(1, at = 1:26, labels = ord.div)
+par(mar = c(5.1, 5.1, 4.1, 2.1))
+with(divTemp[divTemp$Size == 125,], plot(1:26, IF_Richness[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Participant", ylab = "Richness", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(14, 30), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
 with(divTemp[c(row.nam$s125c, row.nam$d125c),], abline(h = IF_Richness, col = ((Analysis != "Slide")*3 + 1)))
 # 150
 with(divTemp[divTemp$Size == 150,], points(1:26, IF_Richness[match(ord.div, Person)], pch = 1, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
 with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = IF_Richness, lty = 4, col = ((Analysis != "Slide")*3 + 1)))
 legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(16, 1, 16, 1), col = c(1, 1, 4, 4))
+par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
 png("Figures/Fig7_Dominance.png", 800, 500)
 # 125
-with(divTemp[divTemp$Size == 125,], plot(1:26, IF_Dominance[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Person", ylab = "Dominance", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(0.1, 0.22)))
-axis(1, at = 1:26, labels = ord.div)
+par(mar = c(5.1, 5.1, 4.1, 2.1))
+with(divTemp[divTemp$Size == 125,], plot(1:26, IF_Dominance[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Participant", ylab = "Dominance", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(0.1, 0.22), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
 with(divTemp[c(row.nam$s125c, row.nam$d125c),], abline(h = IF_Dominance, col = ((Analysis != "Slide")*3 + 1)))
 # 150
 with(divTemp[divTemp$Size == 150,], points(1:26, IF_Dominance[match(ord.div, Person)], pch = 1, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
 with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = IF_Dominance, lty = 4, col = ((Analysis != "Slide")*3 + 1)))
 legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(16, 1, 16, 1), col = c(1, 1, 4, 4))
+par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
 png("Figures/Fig7_ShannonWiener.png", 800, 500)
 # 125
-with(divTemp[divTemp$Size == 125,], plot(1:26, IF_ShannonWiener[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Person", ylab = "ShannonWiener", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(1.95, 2.6)))
-axis(1, at = 1:26, labels = ord.div)
+par(mar = c(5.1, 5.1, 4.1, 2.1))
+with(divTemp[divTemp$Size == 125,], plot(1:26, IF_ShannonWiener[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Participant", ylab = "ShannonWiener", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(1.95, 2.6), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
 with(divTemp[c(row.nam$s125c, row.nam$d125c),], abline(h = IF_ShannonWiener, col = ((Analysis != "Slide")*3 + 1)))
 # 150
 with(divTemp[divTemp$Size == 150,], points(1:26, IF_ShannonWiener[match(ord.div, Person)], pch = 1, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
 with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = IF_ShannonWiener, lty = 4, col = ((Analysis != "Slide")*3 + 1)))
 legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(16, 1, 16, 1), col = c(1, 1, 4, 4))
+par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
 png("Figures/Fig7_Evenness.png", 800, 500)
 # 125
-with(divTemp[divTemp$Size == 125,], plot(1:26, IF_Evenness[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Person", ylab = "Evenness", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(0.35, 0.6)))
-axis(1, at = 1:26, labels = ord.div)
+par(mar = c(5.1, 5.1, 4.1, 2.1))
+with(divTemp[divTemp$Size == 125,], plot(1:26, IF_Evenness[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Participant", ylab = "Evenness", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(0.35, 0.6), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
 with(divTemp[c(row.nam$s125c, row.nam$d125c),], abline(h = IF_Evenness, col = ((Analysis != "Slide")*3 + 1)))
 # 150
 with(divTemp[divTemp$Size == 150,], points(1:26, IF_Evenness[match(ord.div, Person)], pch = 1, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
 with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = IF_Evenness, lty = 4, col = ((Analysis != "Slide")*3 + 1)))
 legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(16, 1, 16, 1), col = c(1, 1, 4, 4))
+par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
 # # 8c. Shannon Wiener comparison -----------------------------------------

@@ -1199,9 +1199,10 @@ stressplot(nmds$IF125f)
 png("Figures/IF_NMDS_125.png", 600, 600)
 plot(nmds$IF125f, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab = "Axis 2", las = 1, cex.lab = 1.5, cex.axis = 1.2, main = "NMDS 125")
 points(nmds$IF125f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
-text(nmds$IF125f$points[nchar(rownames(trsp$IF125f)) <3, ], labels = rownames(trsp$IF125f)[nchar(rownames(trsp$IF125f)) <3])
-points(nmds$IF125f$points[nchar(rownames(trsp$IF125f)) >2, ], pch = "+")
-text(sweep(data.matrix(nmds$IF125f$points[nchar(rownames(trsp$IF125f)) >2, ]), 2, c(-0.025, 0)), labels = rownames(trsp$IF125f)[nchar(rownames(trsp$IF125f)) >2])
+text(nmds$IF125f$points[nchar(rownames(nmds$IF125f$points)) <3, ], labels = rownames(nmds$IF125f$points)[nchar(rownames(nmds$IF125f$points)) <3])
+points(nmds$IF125f$points[nchar(rownames(nmds$IF125f$points)) >2, ], pch = "+")
+text(sweep(data.matrix(nmds$IF125f$points[nchar(rownames(nmds$IF125f$points)) >2 & rownames(nmds$IF125f$points) != "SCID", ]), 2, c(-0.03, 0)), labels = rownames(nmds$IF125f$points)[nchar(rownames(nmds$IF125f$points)) >2 & rownames(nmds$IF125f$points) != "SCID"])
+text(nmds$IF125f$points[rownames(nmds$IF125f$points) == "SCID", 1]+0.04, nmds$IF125f$points[rownames(nmds$IF125f$points) == "SCID", 2]+0.01, labels = "SCID")
 legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16, cex = 1.3)
 dev.off()
 
@@ -1242,10 +1243,10 @@ stressplot(nmds$IF150f)
 png("Figures/IF_NMDS_150.png", 600, 600)
 plot(nmds$IF150f, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab = "Axis 2", las = 1, cex.lab = 1.5, cex.axis = 1.2, main = "NMDS 150")
 points(nmds$IF150f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
-text(nmds$IF150f$points[nchar(rownames(trsp$IF150f)) <3, ], labels = rownames(trsp$IF150f)[nchar(rownames(trsp$IF150f)) <3])
-points(nmds$IF150f$points[nchar(rownames(trsp$IF150f)) >2, ], pch = "+")
-text(sweep(data.matrix(nmds$IF150f$points[nchar(rownames(trsp$IF150f)) >2 & rownames(trsp$IF125) != "DsC", ]), 2, c(-0.025, 0)), labels = rownames(trsp$IF150f)[nchar(rownames(trsp$IF150f)) >2 & rownames(trsp$IF125) != "DsC"])
-text(nmds$IF150f$points[rownames(trsp$IF125) == "DsC", 1], nmds$IF150f$points[rownames(trsp$IF125) == "DsC", 2]-0.02, labels = "DsC")
+text(nmds$IF150f$points[nchar(rownames(nmds$IF150f$points)) <3, ], labels = rownames(nmds$IF150f$points)[nchar(rownames(nmds$IF150f$points)) <3])
+points(nmds$IF150f$points[nchar(rownames(nmds$IF150f$points)) >2, ], pch = "+")
+text(sweep(data.matrix(nmds$IF150f$points[nchar(rownames(nmds$IF150f$points)) >2 & rownames(nmds$IF150f$points) != "DsC", ]), 2, c(-0.025, 0)), labels = rownames(nmds$IF150f$points)[nchar(rownames(nmds$IF150f$points)) >2 & rownames(nmds$IF150f$points) != "DsC"])
+text(nmds$IF150f$points[rownames(nmds$IF150f$points) == "DsC", 1], nmds$IF150f$points[rownames(nmds$IF150f$points) == "DsC", 2]-0.02, labels = "DsC")
 legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16, cex = 1.3)
 dev.off()
 
@@ -1288,17 +1289,17 @@ plot(nmds$IF150z, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab 
 points(nmds$IF150z, pch = 21, cex = 4, col = mds.col$pair[!(mds.col$person %in% c("3", "C", "E", "G"))], bg = brewer.pal(5, "Set2")[mds.col$sch.col[!(mds.col$person %in% c("3", "C", "E", "G"))]], lwd = 2)
 text(nmds$IF150z$points[nchar(rownames(nmds$IF150z$points)) <3, ], labels = rownames(nmds$IF150z$points)[nchar(rownames(nmds$IF150z$points)) <3])
 points(nmds$IF150z$points[nchar(rownames(nmds$IF150z$points)) >2, ], pch = "+")
-text(sweep(data.matrix(nmds$IF150z$points[nchar(rownames(nmds$IF150z$points)) >2 & rownames(nmds$IF150z$points) != "DsC", ]), 2, c(-0.005, -0.01)), labels = rownames(nmds$IF150z$points)[nchar(rownames(nmds$IF150z$points)) >2 & rownames(nmds$IF150z$points) != "DsC"])
-text(nmds$IF150f$points[rownames(trsp$IF125) == "DsC", 1], nmds$IF150f$points[rownames(trsp$IF125) == "DsC", 2]-0.02, labels = "DsC")
+text(sweep(data.matrix(nmds$IF150z$points[nchar(rownames(nmds$IF150z$points)) >2 & rownames(nmds$IF150z$points) != "SsC", ]), 2, c(-0.012, -0.008)), labels = rownames(nmds$IF150z$points)[nchar(rownames(nmds$IF150z$points)) >2 & rownames(nmds$IF150z$points) != "SsC"])
+text(nmds$IF150z$points[rownames(nmds$IF150z$points) == "SsC", 1]-0.012, nmds$IF150z$points[rownames(nmds$IF150z$points) == "SsC", 2]-0.008, labels = "SsC")
 legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16, cex = 1.3)
 dev.off()
 
-# output te scree plots
+# output the scree plots
 png("Figures/Scree plots.png")
 par(mfrow = c(2, 2))
-plot(stress$IF125f, type = "b")
-plot(stress$IF150f, type = "b")
-plot(stress$IF150z, type = "b")
+plot(stress$IF125f, type = "b", bty = "l", las = 1, xlab = "Dimensions", ylab = "Stress", main = "NMDS 125")
+plot(stress$IF150f, type = "b", bty = "l", las = 1, xlab = "Dimensions", ylab = "Stress", main = "NMDS 150")
+plot(stress$IF150z, type = "b", bty = "l", las = 1, xlab = "Dimensions", ylab = "Stress", main = "NMDS 150 zoomed")
 par(mfrow = c(1,1))
 dev.off()
 
@@ -1859,12 +1860,17 @@ pairs(outliers[, 3:ncol(outliers)])
 pairs(outliers[, grep("125", names(outliers))])
 pairs(outliers[, grep("150", names(outliers))])
 
-
+# Create a .csv file for the accuracy data
+# create a subset of the data for this
+tmp.sub <- accuracyFull[, c("PersonID", "Analysis", "Experience", "IF_PtAc125", "IF_PtAc150", "l.IF_PtAc125", "l.IF_PtAc150", "ptID125", "ptID150")]
+tmp.sub[, grep("125|150", names(tmp.sub))] <- round(tmp.sub[, grep("125|150", names(tmp.sub))], 2)
+write.csv(tmp.sub, "Outputs/Accuracy.csv", row.names = FALSE)
+rm(tmp.sub)
 
 # 10. Size vs. maximum agreement ------------------------------------------
 # Figure 5
 png("Figures/Fig5_size_agreement_125.png")
-with(size125, plot(slideAgreement, Length, pch = 16, main = "125"))
+with(size125, plot(slideAgreement, Length, pch = 16, main = "> 125", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diamter / ", mu, "m"))))
 lines(names(tapply(size125$Length, size125$slideAgreement, max)), tapply(size125$Length, size125$slideAgreement, max), pch = 16)
 with(size125, points(digitalAgreement, Length, pch = 16, col = "blue"))
 lines(names(tapply(size125$Length, size125$digitalAgreement, max)), tapply(size125$Length, size125$digitalAgreement, max), pch = 16, col = 4)
@@ -1872,7 +1878,7 @@ legend("topleft", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"))
 dev.off()
 
 png("Figures/Fig5_size_agreement_150.png")
-with(size150, plot(slideAgreement, Length, pch = 16, main = "150"))
+with(size150, plot(slideAgreement, Length, pch = 16, main = "> 150", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diamter / ", mu, "m"))))
 lines(names(tapply(size150$Length, size150$slideAgreement, max)), tapply(size150$Length, size150$slideAgreement, max), pch = 16)
 with(size150, points(digitalAgreement, Length, pch = 16, col = "blue"))
 lines(names(tapply(size150$Length, size150$digitalAgreement, max)), tapply(size150$Length, size150$digitalAgreement, max), pch = 16, col = 4)
@@ -2030,3 +2036,10 @@ table(divTemp$Dir_IFSW, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
 table(divTemp$Dir_IFD, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
 table(divTemp$Dir_IFE, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
 
+tmp.div <- divTemp[, grep("Analysis|Size|Person|SST10m|SD|IF_", names(divTemp))]
+tmp.div$ID <- paste(tmp.div$Analysis, tmp.div$Person)
+head(tmp.div)
+tmp.div <- reshape(tmp.div, direction = "wide", v.names = grep("SST10m|SD|IF_", names(tmp.div), value = TRUE), timevar = "Size", idvar = "ID")
+tmp.div <- tmp.div[, names(tmp.div) != "ID"]
+tmp.div[, grepl("1", names(tmp.div)) & !grepl("Rich", names(tmp.div))] <- round(tmp.div[, grepl("1", names(tmp.div)) & !grepl("Rich", names(tmp.div))], 2)
+write.csv(tmp.div, file = "Outputs/Diversity_temperature.csv", row.names = FALSE)

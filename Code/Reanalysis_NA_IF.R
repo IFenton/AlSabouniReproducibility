@@ -299,7 +299,7 @@ c20_mn$IF_PtAc150d
 
 # 3c. Average pairwise agreement scores -----------------------------------
 # mean
-# this is the mean similarlity between all the columns
+# this is the mean similarity between all the columns
 # the -300 and -1 come because the column shouldn't be compared with itself (it will be 100% similar)
 accuracySlide$mnPA125 <- apply(slide125[,col.nam$s125], 2, function(x) (sum(x == slide125[,col.nam$s125]) - 300) / (300*(length(col.nam$s125) - 1)) * 100)[accuracySlide$PersonID]
 accuracySlide$mnPA150 <- apply(slide150[,col.nam$s150], 2, function(x) (sum(x == slide150[,col.nam$s150]) - 300) / (300*(length(col.nam$s150) - 1)) * 100)[accuracySlide$PersonID]
@@ -326,6 +326,28 @@ for (i in accuracyDigital$PersonID) {
   accuracyDigital$sdPA150[accuracyDigital$PersonID == i] <- sd(apply(digital150[,col.nam$d150][, i] == digital150[,col.nam$d150], 2, sum)[which(names(digital150[,col.nam$d150]) != i)])/300*100
 }
 rm(i)
+
+# How does this depend on whether workers routinely count specimens? 
+# add in routine to the accuracy info
+accuracySlide$Routine <- people$Routine[match(accuracySlide$PersonID, people$SlideID)]
+accuracySlide$Routine[accuracySlide$PersonID %in% c("1a", "2a")] <- people$Routine[1:2]
+accuracySlide$Routine[accuracySlide$PersonID %in% c("1b", "2b")] <- people$Routine[1:2]
+accuracyDigital$Routine <- people$Routine[match(accuracyDigital$PersonID, people$DigitalID)]
+
+tapply(accuracySlide$IF_PtAc125, accuracySlide$Routine, summary)
+tapply(accuracySlide$IF_PtAc150, accuracySlide$Routine, summary)
+
+tapply(accuracyDigital$IF_PtAc125, accuracyDigital$Routine, summary)
+tapply(accuracyDigital$IF_PtAc150, accuracyDigital$Routine, summary)
+
+png("Figures/Routine_accuracy.png")
+par(mfrow = c(2,2))
+boxplot(accuracySlide$IF_PtAc125 ~ accuracySlide$Routine, main = "Slide 125")
+boxplot(accuracySlide$IF_PtAc150 ~ accuracySlide$Routine, main = "Slide 150")
+boxplot(accuracyDigital$IF_PtAc125 ~ accuracyDigital$Routine, main = "Digital 125")
+boxplot(accuracyDigital$IF_PtAc150 ~ accuracyDigital$Routine, main = "Digital 150")
+par(mfrow = c(1,1))
+dev.off()
 
 # 3d. Look at this accuracy as plots ----------------------------
 # compare these as plots
@@ -1185,14 +1207,16 @@ plot(tmp, display = "sites", type = "t", cex = 1.5)
 
 stress$IFop125f <- 1
 # find the nmds plot with the lowest stress out of 20000 runs
-for (i in 1:1000) {
-  tmp <- metaMDS(daisy(trsp$IF125f))
-  if (stress$IFop125f > tmp$stress) {
-    nmds$IF125f <- tmp
-    stress$IFop125f <- tmp$stress
-  }
-}
-rm(i, tmp)
+# for (i in 1:1000) {
+#   tmp <- metaMDS(daisy(trsp$IF125f))
+#   if (stress$IFop125f > tmp$stress) {
+#     nmds$IF125f <- tmp
+#     stress$IFop125f <- tmp$stress
+#   }
+# }
+# rm(i, tmp)
+# save(stress, nmds, file = "Outputs/NMDS_125.RData")
+load("Outputs/NMDS_125.RData")
 
 stressplot(nmds$IF125f)
 
@@ -1228,14 +1252,18 @@ plot(tmp, display = "sites", type = "t", cex = 1.5)
 
 stress$IFop150f <- 1
 # find the nmds plot with the lowest stress out of 1000 runs
-for (i in 1:1000) {
-  tmp <- metaMDS(daisy(trsp$IF150f))
-  if (stress$IFop150f > tmp$stress) {
-    nmds$IF150f <- tmp
-    stress$IFop150f <- tmp$stress
-  }
-}
-rm(i, tmp)
+# for (i in 1:1000) {
+#   tmp <- metaMDS(daisy(trsp$IF150f))
+#   if (stress$IFop150f > tmp$stress) {
+#     nmds$IF150f <- tmp
+#     stress$IFop150f <- tmp$stress
+#   }
+# }
+# rm(i, tmp)
+# save(stress, nmds, file = "Outputs/NMDS_150f.RData")
+load("Outputs/NMDS_150f.RData")
+
+
 
 stressplot(nmds$IF150f)
 
@@ -1271,14 +1299,16 @@ plot(tmp, display = "sites", type = "t", cex = 1.5)
 
 stress$IFop150z <- 1
 # find the nmds plot with the lowest stress out of 1000 runs
-for (i in 1:1000) {
-  tmp <- metaMDS(daisy(trsp$IF150f[!(rownames(trsp$IF150f) %in% c("3", "C", "E", "G")),]))
-  if (stress$IFop150z > tmp$stress) {
-    nmds$IF150z <- tmp
-    stress$IFop150z <- tmp$stress
-  }
-}
-rm(i, tmp)
+# for (i in 1:1000) {
+#   tmp <- metaMDS(daisy(trsp$IF150f[!(rownames(trsp$IF150f) %in% c("3", "C", "E", "G")),]))
+#   if (stress$IFop150z > tmp$stress) {
+#     nmds$IF150z <- tmp
+#     stress$IFop150z <- tmp$stress
+#   }
+# }
+# rm(i, tmp)
+# save(stress, nmds, file = "Outputs/NMDS_150z.RData")
+load("Outputs/NMDS_150z.RData")
 
 stress$IFop150z
 stressplot(nmds$IF150z)
@@ -1545,12 +1575,12 @@ png("Figures/Fig6_SST_comb.png", 800, 500)
 par(mar = c(5.1, 5.1, 4.1, 2.1))
 with(divTemp[divTemp$Size == 150,], plot(1:26, SST10m[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Participant", ylab = expression(paste("SST / ", degree, "C")), col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(20, 24), cex.lab = 1.5, las = 1, cex.axis = 1.1))
 axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
-with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = c(SST10m - SD, SST10m + SD), col = ((Analysis != "Slide")*3 + 1), lty = 2))
+with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = c(SST10m - SD, SST10m + SD), col = ((Analysis != "Slide")*3 + 1), lty = 4))
 with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = SST10m, col = ((Analysis != "Slide")*3 + 1)))
 with(divTemp[divTemp$Size == 150,], err_bar(SST10m[match(ord.div, Person)], SD[match(ord.div, Person)], 1:26, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
 abline(h = 21.76, col = "green4")
 text(25, 21.65, "WOA 1998", cex = 1.3, col = "green4")
-legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(16, 1, 16, 1), col = c(1, 1, 4, 4))
+legend("topleft", legend = c("Slide 150", "Digital 150"), pch = 16, col = c(1, 4))
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
@@ -1642,52 +1672,52 @@ ord.div <- c("1a", "1b", "2a", "2b", "A", 3:6, "F", 7:9, "G", 10:15, LETTERS[2:5
 png("Figures/Fig7_richness.png", 800, 500)
 # 125
 par(mar = c(5.1, 5.1, 4.1, 2.1))
-with(divTemp[divTemp$Size == 125,], plot(1:26, IF_Richness[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Participant", ylab = "Richness", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(14, 30), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+with(divTemp[divTemp$Size == 125,], plot(1:26, IF_Richness[match(ord.div, Person)], pch = 1, xaxt = "n", xlab = "Participant", ylab = "Richness", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(14, 30), cex.lab = 1.5, las = 1, cex.axis = 1.1))
 axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
-with(divTemp[c(row.nam$s125c, row.nam$d125c),], abline(h = IF_Richness, col = ((Analysis != "Slide")*3 + 1)))
+with(divTemp[c(row.nam$s125c, row.nam$d125c),], abline(h = IF_Richness, lty = 2, col = ((Analysis != "Slide")*3 + 1)))
 # 150
-with(divTemp[divTemp$Size == 150,], points(1:26, IF_Richness[match(ord.div, Person)], pch = 1, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
-with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = IF_Richness, lty = 4, col = ((Analysis != "Slide")*3 + 1)))
-legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(16, 1, 16, 1), col = c(1, 1, 4, 4))
+with(divTemp[divTemp$Size == 150,], points(1:26, IF_Richness[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = IF_Richness, col = ((Analysis != "Slide")*3 + 1)))
+legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
 png("Figures/Fig7_Dominance.png", 800, 500)
 # 125
 par(mar = c(5.1, 5.1, 4.1, 2.1))
-with(divTemp[divTemp$Size == 125,], plot(1:26, IF_Dominance[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Participant", ylab = "Dominance", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(0.1, 0.22), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+with(divTemp[divTemp$Size == 125,], plot(1:26, IF_Dominance[match(ord.div, Person)], pch = 1, xaxt = "n", xlab = "Participant", ylab = "Dominance", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(0.1, 0.22), cex.lab = 1.5, las = 1, cex.axis = 1.1))
 axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
-with(divTemp[c(row.nam$s125c, row.nam$d125c),], abline(h = IF_Dominance, col = ((Analysis != "Slide")*3 + 1)))
+with(divTemp[c(row.nam$s125c, row.nam$d125c),], abline(h = IF_Dominance, lty = 2, col = ((Analysis != "Slide")*3 + 1)))
 # 150
-with(divTemp[divTemp$Size == 150,], points(1:26, IF_Dominance[match(ord.div, Person)], pch = 1, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
-with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = IF_Dominance, lty = 4, col = ((Analysis != "Slide")*3 + 1)))
-legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(16, 1, 16, 1), col = c(1, 1, 4, 4))
+with(divTemp[divTemp$Size == 150,], points(1:26, IF_Dominance[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = IF_Dominance, col = ((Analysis != "Slide")*3 + 1)))
+legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
 png("Figures/Fig7_ShannonWiener.png", 800, 500)
 # 125
 par(mar = c(5.1, 5.1, 4.1, 2.1))
-with(divTemp[divTemp$Size == 125,], plot(1:26, IF_ShannonWiener[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Participant", ylab = "ShannonWiener", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(1.95, 2.6), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+with(divTemp[divTemp$Size == 125,], plot(1:26, IF_ShannonWiener[match(ord.div, Person)], pch = 1, xaxt = "n", xlab = "Participant", ylab = "Shannon-Wiener Diversity", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(1.95, 2.6), cex.lab = 1.5, las = 1, cex.axis = 1.1))
 axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
-with(divTemp[c(row.nam$s125c, row.nam$d125c),], abline(h = IF_ShannonWiener, col = ((Analysis != "Slide")*3 + 1)))
+with(divTemp[c(row.nam$s125c, row.nam$d125c),], abline(h = IF_ShannonWiener, lty = 2, col = ((Analysis != "Slide")*3 + 1)))
 # 150
-with(divTemp[divTemp$Size == 150,], points(1:26, IF_ShannonWiener[match(ord.div, Person)], pch = 1, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
-with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = IF_ShannonWiener, lty = 4, col = ((Analysis != "Slide")*3 + 1)))
-legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(16, 1, 16, 1), col = c(1, 1, 4, 4))
+with(divTemp[divTemp$Size == 150,], points(1:26, IF_ShannonWiener[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = IF_ShannonWiener, col = ((Analysis != "Slide")*3 + 1)))
+legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
 png("Figures/Fig7_Evenness.png", 800, 500)
 # 125
 par(mar = c(5.1, 5.1, 4.1, 2.1))
-with(divTemp[divTemp$Size == 125,], plot(1:26, IF_Evenness[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Participant", ylab = "Evenness", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(0.35, 0.6), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+with(divTemp[divTemp$Size == 125,], plot(1:26, IF_Evenness[match(ord.div, Person)], pch = 1, xaxt = "n", xlab = "Participant", ylab = "Evenness", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(0.35, 0.6), cex.lab = 1.5, las = 1, cex.axis = 1.1))
 axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
-with(divTemp[c(row.nam$s125c, row.nam$d125c),], abline(h = IF_Evenness, col = ((Analysis != "Slide")*3 + 1)))
+with(divTemp[c(row.nam$s125c, row.nam$d125c),], abline(h = IF_Evenness, lty = 2, col = ((Analysis != "Slide")*3 + 1)))
 # 150
-with(divTemp[divTemp$Size == 150,], points(1:26, IF_Evenness[match(ord.div, Person)], pch = 1, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
-with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = IF_Evenness, lty = 4, col = ((Analysis != "Slide")*3 + 1)))
-legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(16, 1, 16, 1), col = c(1, 1, 4, 4))
+with(divTemp[divTemp$Size == 150,], points(1:26, IF_Evenness[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+with(divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = IF_Evenness, col = ((Analysis != "Slide")*3 + 1)))
+legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
@@ -1722,20 +1752,20 @@ outliers <- data.frame(PersonID = accuracyFull$PersonID, Analysis = accuracyFull
 
 # rank for MDS 125
 outliers$MDS125 <- NA
-tmp.pt <- nmds$IF125f$points["ScMin", ]
+tmp.pt <- nmds$IF125f$points["SCID", ]
 tmp.tab <- sqrt((nmds$IF125f$points[,1] - tmp.pt[1])^2 + (nmds$IF125f$points[,2] - tmp.pt[2])^2)
 outliers$MDS125[outliers$Analysis == "Slide"][order(tmp.tab[match(outliers$PersonID[outliers$Analysis == "Slide"], names(tmp.tab))])] <- sort(rank(tmp.tab[match(outliers$PersonID[outliers$Analysis == "Slide"], names(tmp.tab))]))
-tmp.pt <- nmds$IF125f$points["DcMin", ]
+tmp.pt <- nmds$IF125f$points["DCID", ]
 tmp.tab <- sqrt((nmds$IF125f$points[,1] - tmp.pt[1])^2 + (nmds$IF125f$points[,2] - tmp.pt[2])^2)
 outliers$MDS125[outliers$Analysis == "Digital"][order(tmp.tab[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.tab))])] <- sort(rank(tmp.tab[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.tab))]))
 rm(tmp.pt, tmp.tab)
 
 # and mds 150
 outliers$MDS150 <- NA
-tmp.pt <- nmds$IF150f$points["ScMin", ]
+tmp.pt <- nmds$IF150f$points["SCID", ]
 tmp.tab <- sqrt((nmds$IF150f$points[,1] - tmp.pt[1])^2 + (nmds$IF150f$points[,2] - tmp.pt[2])^2)
 outliers$MDS150[outliers$Analysis == "Slide"][order(tmp.tab[match(outliers$PersonID[outliers$Analysis == "Slide"], names(tmp.tab))])] <- sort(rank(tmp.tab[match(outliers$PersonID[outliers$Analysis == "Slide"], names(tmp.tab))]))
-tmp.pt <- nmds$IF150f$points["DcMin", ]
+tmp.pt <- nmds$IF150f$points["DCID", ]
 tmp.tab <- sqrt((nmds$IF150f$points[,1] - tmp.pt[1])^2 + (nmds$IF150f$points[,2] - tmp.pt[2])^2)
 outliers$MDS150[outliers$Analysis == "Digital"][order(tmp.tab[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.tab))])] <- sort(rank(tmp.tab[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.tab))]))
 rm(tmp.pt, tmp.tab)

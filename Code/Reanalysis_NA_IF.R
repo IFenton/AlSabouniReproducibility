@@ -1682,6 +1682,16 @@ legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 1
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
+# comparing the values
+plot(seq(2, 18, by = 2), sort(divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person != "consensus"]), type = "b", col = "blue", lty = 2, ylim = c(14, 30))
+points(seq(2, 18, by = 2), sort(divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person != "consensus"]), type = "b", col = "blue")
+points(1:17, sort(divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person != "consensus"]), type = "b")
+points(1:17, sort(divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person != "consensus"]), type = "b", lty = 2)
+abline(h = divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"], lty = 2, col = "blue")
+abline(h = divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"], col = "blue")
+abline(h = divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"], lty = 2)
+abline(h = divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+
 png("Figures/Fig7_Dominance.png", 800, 500)
 # 125
 par(mar = c(5.1, 5.1, 4.1, 2.1))
@@ -1721,7 +1731,7 @@ legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 1
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
-# # 8c. Shannon Wiener comparison -----------------------------------------
+# 8c. Shannon Wiener comparison -----------------------------------------
 png("Figures/Fig8_SWcomp.png")
 # if I run this using Nadia's data, I get similar results, however, this should be plotted with my data.
 plot(divTemp$IF_ShannonWiener[c(row.nam$s125, row.nam$d125)], divTemp$IF_ShannonWiener[c(row.nam$s150, row.nam$d150)], pch = 16, xlab = "Shannon-Wiener 125", ylab = "Shannon-Wiener 150")
@@ -1773,20 +1783,20 @@ rm(tmp.pt, tmp.tab)
 # for percentage accuracy
 outliers$IF_PtAc125 <- NA
 outliers$IF_PtAc125[outliers$Analysis == "Slide"][order(100-accuracySlide$IF_PtAc125[match(outliers$PersonID[outliers$Analysis == "Slide"], accuracySlide$PersonID)])] <- sort(rank(100-accuracySlide$IF_PtAc125))
-outliers$IF_PtAc125[outliers$Analysis == "Digital"][order(100-accuracyDigital$IF_PtAc125[match(outliers$PersonID[outliers$Analysis == "Digital"], accuracySlide$PersonID)])] <- sort(rank(100-accuracyDigital$IF_PtAc125))
+outliers$IF_PtAc125[outliers$Analysis == "Digital"][order(100-accuracyDigital$IF_PtAc125[match(outliers$PersonID[outliers$Analysis == "Digital"], accuracyDigital$PersonID)])] <- sort(rank(100-accuracyDigital$IF_PtAc125))
 
 outliers$IF_PtAc150 <- NA
-outliers$IF_PtAc150[outliers$Analysis == "Slide"][order(100-accuracySlide$IF_PtAc150[match(outliers$PersonID[outliers$Analysis == "Slide"], accuracyDigital$PersonID)])] <- sort(rank(100-accuracySlide$IF_PtAc150))
+outliers$IF_PtAc150[outliers$Analysis == "Slide"][order(100-accuracySlide$IF_PtAc150[match(outliers$PersonID[outliers$Analysis == "Slide"], accuracySlide$PersonID)])] <- sort(rank(100-accuracySlide$IF_PtAc150))
 outliers$IF_PtAc150[outliers$Analysis == "Digital"][order(100-accuracyDigital$IF_PtAc150[match(outliers$PersonID[outliers$Analysis == "Digital"], accuracyDigital$PersonID)])] <- sort(rank(100-accuracyDigital$IF_PtAc150))
 
 # for mean pairwise agreement
 # for percentage accuracy
 outliers$mnPA125 <- NA
 outliers$mnPA125[outliers$Analysis == "Slide"][order(100-accuracySlide$mnPA125[match(outliers$PersonID[outliers$Analysis == "Slide"], accuracySlide$PersonID)])] <- sort(rank(100-accuracySlide$mnPA125))
-outliers$mnPA125[outliers$Analysis == "Digital"][order(100-accuracyDigital$mnPA125[match(outliers$PersonID[outliers$Analysis == "Digital"], accuracySlide$PersonID)])] <- sort(rank(100-accuracyDigital$mnPA125))
+outliers$mnPA125[outliers$Analysis == "Digital"][order(100-accuracyDigital$mnPA125[match(outliers$PersonID[outliers$Analysis == "Digital"], accuracyDigital$PersonID)])] <- sort(rank(100-accuracyDigital$mnPA125))
 
 outliers$mnPA150 <- NA
-outliers$mnPA150[outliers$Analysis == "Slide"][order(100-accuracySlide$mnPA150[match(outliers$PersonID[outliers$Analysis == "Slide"], accuracyDigital$PersonID)])] <- sort(rank(100-accuracySlide$mnPA150))
+outliers$mnPA150[outliers$Analysis == "Slide"][order(100-accuracySlide$mnPA150[match(outliers$PersonID[outliers$Analysis == "Slide"], accuracySlide$PersonID)])] <- sort(rank(100-accuracySlide$mnPA150))
 outliers$mnPA150[outliers$Analysis == "Digital"][order(100-accuracyDigital$mnPA150[match(outliers$PersonID[outliers$Analysis == "Digital"], accuracyDigital$PersonID)])] <- sort(rank(100-accuracyDigital$mnPA150))
 
 # SST
@@ -1902,10 +1912,37 @@ pairs(outliers[, grep("150", names(outliers))])
 
 # Create a .csv file for the accuracy data
 # create a subset of the data for this
-tmp.sub <- accuracyFull[, c("PersonID", "Analysis", "Experience", "IF_PtAc125", "IF_PtAc150", "l.IF_PtAc125", "l.IF_PtAc150", "ptID125", "ptID150")]
+tmp.sub <- accuracyFull[, c("PersonID", "Analysis", "Experience", "Routine", "IF_PtAc125", "IF_PtAc150", "l.IF_PtAc125", "l.IF_PtAc150", "ptID125", "ptID150")]
 tmp.sub[, grep("125|150", names(tmp.sub))] <- round(tmp.sub[, grep("125|150", names(tmp.sub))], 2)
 write.csv(tmp.sub, "Outputs/Accuracy.csv", row.names = FALSE)
 rm(tmp.sub)
+
+# add the person level info to this
+tmp.s <- people[!is.na(people$SlideID), !grepl("Digital", names(people))]
+tmp.d <- people[!is.na(people$DigitalID), !grepl("Slide", names(people))]
+names(tmp.s)[1] <- names(tmp.d)[1] <- "PersonID"
+tmp.s <- rbind(tmp.s, tmp.s[!is.na(tmp.s$ExperienceSlideB), ])
+tmp.s$PersonID[tmp.s$PersonID %in% tmp.s$PersonID[duplicated(tmp.s$PersonID)]] <- paste(tmp.s$PersonID[tmp.s$PersonID %in% tmp.s$PersonID[duplicated(tmp.s$PersonID)]], rep(c("a", "b"), each = 2), sep = "")
+tmp.s$ExperienceSlideA[grep("b", tmp.s$PersonID)] <- tmp.s$ExperienceSlideB[grep("b", tmp.s$PersonID)]
+tmp.s <- tmp.s[, names(tmp.s) != "ExperienceSlideB"]
+names(tmp.d) <- names(tmp.s) <- gsub("SlideA", "", names(tmp.s))
+tmp <- rbind(tmp.s, tmp.d)
+tmp.out <- merge(outliers, tmp)
+tmp.out <- merge(tmp.out, accuracyFull[, c("PersonID", "ptID125", "ptID150")])
+
+par(ask = TRUE)
+par(mfrow = c(6, 3))
+par(mar = c(2,2,1,1))
+for (i in names(tmp.out)[c(21:25, 27:28)]) {
+  for (j in names(tmp.out)[3:20]) 
+    plot(factor(tmp.out[tmp.out$Analysis == "Slide",i]), tmp.out[tmp.out$Analysis == "Slide",j], main = j, col = "red")
+  for (j in names(tmp.out)[3:20]) 
+    plot(factor(tmp.out[tmp.out$Analysis == "Digital",i]), tmp.out[tmp.out$Analysis == "Digital",j], main = j, col = "blue")
+}
+par(ask = FALSE)
+par(mfrow = c(1,1))
+par(mar = c(5.1, 4.1, 4.1, 2.1))
+
 
 # 10. Size vs. maximum agreement ------------------------------------------
 # Figure 5
@@ -1953,6 +1990,7 @@ with(size125, plot(Length, slideAgreement/100, pch = 16))
 pred <- predict(glm_size_125, newdata = data.frame(Length = 100:600), type = "response")
 points(100:600, pred, type = "l")
 dev.off()
+rm(pred)
 
 glm_size_150 <- glm(slideAgreement/100 ~ log(Length), data = size150, family = "binomial")
 par(mfrow = c(2,2))
@@ -1964,6 +2002,7 @@ with(size150, plot(Length, slideAgreement/100, pch = 16))
 pred <- predict(glm_size_150, newdata = data.frame(Length = 100:700), type = "response")
 points(100:700, pred, type = "l")
 dev.off()
+rm(pred)
 
 # 11. Comparison of different tests ---------------------------------------
 # ex. Figure 12
@@ -2033,7 +2072,7 @@ points(rep(30.2, nrow(divTemp)), divTemp$IF_Evenness, col = "blue", pch = 16)
 points(rep(30.2, 4), divTemp$IF_Evenness[divTemp$Person == "consensus"], col = "red", pch = 16)
 par(mfrow = c(1,1))
 dev.off()
-rm(tmp.sw, tmp.dom, tmp.eve)
+rm(tmp.sw, tmp.dom, tmp.eve, margo.all.species, margo.cons, margo.macro, ldg.margo.data, margo.traits, margo.traits.cons)
 
 
 # 12b. Simulations for studying changes -----------------------------------
@@ -2083,3 +2122,16 @@ tmp.div <- reshape(tmp.div, direction = "wide", v.names = grep("SST10m|SD|IF_", 
 tmp.div <- tmp.div[, names(tmp.div) != "ID"]
 tmp.div[, grepl("1", names(tmp.div)) & !grepl("Rich", names(tmp.div))] <- round(tmp.div[, grepl("1", names(tmp.div)) & !grepl("Rich", names(tmp.div))], 2)
 write.csv(tmp.div, file = "Outputs/Diversity_temperature.csv", row.names = FALSE)
+rm(tmp.div)
+
+# 12d. Without incomplete data --------------------------------------------
+summary(divTemp$IF_Richness[divTemp$Person %in% accuracySlide$PersonID[accuracySlide$ptID125 == 100] & divTemp$Analysis == "Slide"& divTemp$Size == 125])
+summary(divTemp$IF_Richness[divTemp$Person %in% accuracySlide$PersonID[accuracySlide$ptID150 == 100] & divTemp$Analysis == "Slide"& divTemp$Size == 150])
+summary(divTemp$IF_Richness[divTemp$Person %in% accuracyDigital$PersonID[accuracyDigital$ptID125 == 100] & divTemp$Analysis == "Digital"& divTemp$Size == 125])
+summary(divTemp$IF_Richness[divTemp$Person %in% accuracyDigital$PersonID[accuracyDigital$ptID150 == 100] & divTemp$Analysis == "Digital"& divTemp$Size == 150])
+
+
+
+# 13. Save the data -------------------------------------------------------
+save.image("Outputs/Reanalysis_NA_IF.RData")
+

@@ -297,6 +297,29 @@ c20_mn$IF_PtAc125d
 sum(digital150$IFcMin == digital150[,col.nam$d150]) / (300*(length(col.nam$d150))) * 100
 c20_mn$IF_PtAc150d
 
+
+# How does this depend on whether workers routinely count specimens? 
+# add in routine to the accuracy info
+accuracySlide$Routine <- people$Routine[match(accuracySlide$PersonID, people$SlideID)]
+accuracySlide$Routine[accuracySlide$PersonID %in% c("1a", "2a")] <- people$Routine[1:2]
+accuracySlide$Routine[accuracySlide$PersonID %in% c("1b", "2b")] <- people$Routine[1:2]
+accuracyDigital$Routine <- people$Routine[match(accuracyDigital$PersonID, people$DigitalID)]
+
+tapply(accuracySlide$IF_PtAc125, accuracySlide$Routine, summary)
+tapply(accuracySlide$IF_PtAc150, accuracySlide$Routine, summary)
+
+tapply(accuracyDigital$IF_PtAc125, accuracyDigital$Routine, summary)
+tapply(accuracyDigital$IF_PtAc150, accuracyDigital$Routine, summary)
+
+png("Figures/Routine_accuracy.png")
+par(mfrow = c(2,2))
+boxplot(accuracySlide$IF_PtAc125 ~ accuracySlide$Routine, main = "Slide 125")
+boxplot(accuracySlide$IF_PtAc150 ~ accuracySlide$Routine, main = "Slide 150")
+boxplot(accuracyDigital$IF_PtAc125 ~ accuracyDigital$Routine, main = "Digital 125")
+boxplot(accuracyDigital$IF_PtAc150 ~ accuracyDigital$Routine, main = "Digital 150")
+par(mfrow = c(1,1))
+dev.off()
+
 # 3c. Average pairwise agreement scores -----------------------------------
 # mean
 # this is the mean similarity between all the columns
@@ -326,28 +349,6 @@ for (i in accuracyDigital$PersonID) {
   accuracyDigital$sdPA150[accuracyDigital$PersonID == i] <- sd(apply(digital150[,col.nam$d150][, i] == digital150[,col.nam$d150], 2, sum)[which(names(digital150[,col.nam$d150]) != i)])/300*100
 }
 rm(i)
-
-# How does this depend on whether workers routinely count specimens? 
-# add in routine to the accuracy info
-accuracySlide$Routine <- people$Routine[match(accuracySlide$PersonID, people$SlideID)]
-accuracySlide$Routine[accuracySlide$PersonID %in% c("1a", "2a")] <- people$Routine[1:2]
-accuracySlide$Routine[accuracySlide$PersonID %in% c("1b", "2b")] <- people$Routine[1:2]
-accuracyDigital$Routine <- people$Routine[match(accuracyDigital$PersonID, people$DigitalID)]
-
-tapply(accuracySlide$IF_PtAc125, accuracySlide$Routine, summary)
-tapply(accuracySlide$IF_PtAc150, accuracySlide$Routine, summary)
-
-tapply(accuracyDigital$IF_PtAc125, accuracyDigital$Routine, summary)
-tapply(accuracyDigital$IF_PtAc150, accuracyDigital$Routine, summary)
-
-png("Figures/Routine_accuracy.png")
-par(mfrow = c(2,2))
-boxplot(accuracySlide$IF_PtAc125 ~ accuracySlide$Routine, main = "Slide 125")
-boxplot(accuracySlide$IF_PtAc150 ~ accuracySlide$Routine, main = "Slide 150")
-boxplot(accuracyDigital$IF_PtAc125 ~ accuracyDigital$Routine, main = "Digital 125")
-boxplot(accuracyDigital$IF_PtAc150 ~ accuracyDigital$Routine, main = "Digital 150")
-par(mfrow = c(1,1))
-dev.off()
 
 # 3d. Look at this accuracy as plots ----------------------------
 # compare these as plots
@@ -1055,7 +1056,7 @@ mtext("Digital 150", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 
 
 # 3j. Weighting by species ------------------------------------------------
-# What if instead of looking at the overall accuracy, we look at a weighted species version. 
+# What if instead of looking at the overall accuracy, we look at a species level version. 
 acc.sp <- list()
 
 # s125
@@ -1114,9 +1115,38 @@ apply(acc.sp$d150[,col.nam$d150], 2, function(x) sum(x == 1, na.rm = TRUE) / sum
 mean(apply(acc.sp$d150[,col.nam$d150], 2, mean, na.rm = TRUE))
 mean(accuracyDigital$IF_PtAc150)
 
-
 # answer appears to be that it doesn't make things any better
 
+# 3k. Are participants consistent on species? -----------------------------
+# par(ask = TRUE)
+for (i in 2:ncol(acc.sp$s125)) {
+  plot(acc.sp$s125[, i], acc.sp$s150[, i], pch = 16, main = names(acc.sp$s125)[i])
+  abline(lm(acc.sp$s150[, i] ~ acc.sp$s125[, i]))
+}
+
+for (i in 2:ncol(acc.sp$d125)) {
+  plot(acc.sp$d125[, i], acc.sp$d150[, i], pch = 16, main = names(acc.sp$d125)[i])
+  abline(lm(acc.sp$d150[, i] ~ acc.sp$d125[, i]))
+}
+# par(ask = FALSE)
+
+# 3l. Removing <150 from <125 for comparison ------------------------------
+size125[which(size125$Length < 150),]
+summary(size125$slideAgreement[which(size125$Length < 150)])
+summary(size125$slideAgreement[which(size125$Length > 150)])
+summary(size150$slideAgreement)
+
+summary(size125$digitalAgreement[which(size125$Length < 150)])
+summary(size125$digitalAgreement[which(size125$Length > 150)])
+summary(size150$digitalAgreement)
+
+tmp <- data.frame(size = seq(130, 710, by = 10))
+tmp$c125[tmp$size %in% names(table(round(size125$Length, -1)))] <- table(round(size125$Length, -1))
+tmp$c150[tmp$size %in% names(table(round(size150$Length, -1)))] <- table(round(size150$Length, -1))
+
+png("Figures/SizeComparison.png", 800, 500)
+barplot(t(tmp[, 2:3]), beside = TRUE, legend.text = c("125", "150"), names.arg = tmp$size, las = 2)
+dev.off()
 
 # 4. NMDS -----------------------------------------------------------------
 
@@ -1466,8 +1496,6 @@ png("Figures/Time/confusion_150_2bCon.png", 1000, 700)
 conf_mat(long$s150[long$s150$Person == "2b", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2b", ylab = "Consensus")
 dev.off()
 
-
-
 # 6. Digital vs. slides ---------------------------------------------------
 
 # 6a. Individual comparisons ----------------------------------------------
@@ -1815,7 +1843,7 @@ dev.off()
 # evenness r2 = 0.1891, p = 0.0264
 # dominance r2 = 0.0551, p = 0.248
 
-# # 8d. Sensitivity to alphabetical order ---------------------------------
+# 8d. Sensitivity to alphabetical order ---------------------------------
 # checking diversity
 specnumber(table(slide125$IFcMin)) # 22
 specnumber(table(slide125$IFcMinR)) # 22
@@ -2402,6 +2430,1160 @@ summary(divTemp$IF_Richness[divTemp$Person %in% accuracyDigital$PersonID[accurac
 
 
 
-# 13. Save the data -------------------------------------------------------
+
+# 13. What if we use a combined consensus for the analysis? ---------------
+
+# 13a. Calculate consensus values -----------------------------------------
+# for strict consensus
+combcon <- list()
+combcon$slide125 <- slide125
+combcon$slide150 <- slide150
+combcon$digital125 <- digital125
+combcon$digital150 <- digital150
+
+col.nam$c125 <- which(nchar(names(full.125)) < 4)
+col.nam$c150 <- which(nchar(names(full.150)) < 4)
+
+# calculate the consensus values
+combcon$slide125$IFc50 <- apply(full.125[, col.nam$c125], 1, function (x) ifelse(length(which(table(x) > 13)) > 0, names(table(x))[which(table(x) > 13)], "nc")) 
+# if one name has the majority (i.e. the length of the table > 8 is 1), then return that name
+# if the there are no names that have more than 8 (given there are 17 IDs, then consensus-50 needs at least 9 to match), then return "nc"
+combcon$slide150$IFc50 <- apply(full.150[, col.nam$c150], 1, function (x) ifelse(length(which(table(x) > 13)) > 0, names(table(x))[which(table(x) > 13)], "nc")) 
+combcon$digital125$IFc50 <- apply(full.125[, col.nam$c125], 1, function (x) ifelse(length(which(table(x) > 13)) > 0, names(table(x))[which(table(x) > 13)], "nc")) 
+combcon$digital150$IFc50 <- apply(full.150[, col.nam$c150], 1, function (x) ifelse(length(which(table(x) > 13)) > 0, names(table(x))[which(table(x) > 13)], "nc")) 
+
+# for consensus minimum
+# check whether 20% is actually the maximum for the consensus (so what is the highest count per specimen) ignoring na's
+combcon$slide125$IFmaxCon <- apply(full.125[, col.nam$c125], 1, function (x)  max(table(x[x != 'na']))) 
+combcon$slide150$IFmaxCon <- apply(full.150[, col.nam$c150], 1, function (x) max(table(x[x != 'na']))) 
+combcon$digital125$IFmaxCon <- apply(full.125[, col.nam$c125], 1, function (x) max(table(x[x != 'na']))) 
+combcon$digital150$IFmaxCon <- apply(full.150[, col.nam$c150], 1, function (x) max(table(x[x != 'na']))) 
+
+# look at the summaries of these
+table(combcon$slide125$IFmaxCon) # so actually it should be consensus-19 (5/26)
+table(combcon$slide150$IFmaxCon)
+table(combcon$digital125$IFmaxCon) 
+table(combcon$digital150$IFmaxCon)
+
+# calculate consensus-20 
+combcon$slide125$IFcMin <- apply(full.125[, col.nam$c125], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][1]) 
+combcon$slide150$IFcMin <- apply(full.150[, col.nam$c150], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][1])
+combcon$digital125$IFcMin <- apply(full.125[, col.nam$c125], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][1])
+combcon$digital150$IFcMin <- apply(full.150[, col.nam$c150], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][1])
+
+# comparison tables
+combcon$size125 <- size125
+combcon$size150 <- size150
+
+combcon$size125[, c("Con1", "Con2", "Con3", "Con4", "Agreement")] <- NA
+combcon$size150[, c("Con1", "Con2", "Con3", "Con4", "Agreement")] <- NA
+
+
+for (i in 1:4) {
+  # add consensus values for 125
+  combcon$size125[, grep("^Con", names(combcon$size125))[i]] <- apply(full.125[, col.nam$c125], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][i]) 
+  # and the consensus values for 150
+  if (length(grep("Con", names(combcon$size150))) >= i)  # there aren't as many choices for the 150 consensus
+    combcon$size150[, grep("^Con", names(combcon$size150))[i]] <- apply(full.150[, col.nam$c150], 1, function (x) names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))][i])
+}
+rm(i)
+
+# add in the specimen agreement values
+combcon$size125$Agreement <- combcon$slide125$IFmaxCon/26*100
+combcon$size150$Agreement <- combcon$slide150$IFmaxCon/26*100
+
+# there are more cases where the slide wins out than where the digital wins out. Sometimes including both helps break a tie, other times it picks a new consensus
+
+# what fraction of specimens don't have a single consensus
+sum(!is.na(combcon$size125$Con2)) # 6 vs 16/34
+sum(!is.na(combcon$size150$Con2)) # 5 vs 11/18
+
+# have three possibilities
+sum(!is.na(combcon$size125$Con3)) # 0 vs 1/4
+sum(!is.na(combcon$size150$Con3)) # 0 vs 0/0
+
+# have four possibilities
+sum(!is.na(combcon$size125$Con4)) # 0 vs 1/1
+sum(!is.na(combcon$size150$Con4)) # 0 vs 0/0
+
+# creating species level dataframes
+# create a blank data frame
+combcon$slide125sp <- data.frame(species = c(sp.abb$Abbreviation[1:2], sort(sp.abb$Abbreviation[3:nrow(sp.abb)]))) 
+combcon$slide125sp[, names(combcon$slide125)[2:ncol(combcon$slide125)]] <- NA
+head(combcon$slide125sp)
+# fill that dataframe
+for (i in 2:ncol(combcon$slide125)) {
+  # table each column
+  tmp <- table(combcon$slide125[,i]) 
+  # add them in in the right order
+  combcon$slide125sp[, names(combcon$slide125)[i] == names(combcon$slide125sp)] <- tmp[match(combcon$slide125sp$species, names(tmp))]
+}
+combcon$slide125sp[is.na(combcon$slide125sp)] <- 0
+rm(i, tmp)
+
+# repeat for the other datasets
+# species 150
+combcon$slide150sp <- data.frame(species = c(sp.abb$Abbreviation[1:2], sort(sp.abb$Abbreviation[3:nrow(sp.abb)])))  
+combcon$slide150sp[, names(combcon$slide150)[2:ncol(combcon$slide150)]] <- NA
+# fill that dataframe
+for (i in 2:ncol(combcon$slide150)) {
+  tmp <- table(combcon$slide150[,i]) 
+  combcon$slide150sp[, names(combcon$slide150)[i] == names(combcon$slide150sp)] <- tmp[match(combcon$slide150sp$species, names(tmp))]
+}
+combcon$slide150sp[is.na(combcon$slide150sp)] <- 0
+rm(i, tmp)
+# combcon$digital 125
+combcon$digital125sp <- data.frame(species = c(sp.abb$Abbreviation[1:2], sort(sp.abb$Abbreviation[3:nrow(sp.abb)]))) 
+combcon$digital125sp[, names(combcon$digital125)[2:ncol(combcon$digital125)]] <- NA
+# fill that dataframe
+for (i in 2:ncol(combcon$digital125)) {
+  tmp <- table(combcon$digital125[,i]) 
+  combcon$digital125sp[, names(combcon$digital125)[i] == names(combcon$digital125sp)] <- tmp[match(combcon$digital125sp$species, names(tmp))]
+}
+combcon$digital125sp[is.na(combcon$digital125sp)] <- 0
+rm(i, tmp)
+# combcon$digital 150
+combcon$digital150sp <- data.frame(species = c(sp.abb$Abbreviation[1:2], sort(sp.abb$Abbreviation[3:nrow(sp.abb)]))) 
+combcon$digital150sp[, names(combcon$digital150)[2:ncol(combcon$digital150)]] <- NA
+# fill that dataframe
+for (i in 2:ncol(combcon$digital150)) {
+  tmp <- table(combcon$digital150[,i]) 
+  combcon$digital150sp[, names(combcon$digital150)[i] == names(combcon$digital150sp)] <- tmp[match(combcon$digital150sp$species, names(tmp))]
+}
+combcon$digital150sp[is.na(combcon$digital150sp)] <- 0
+rm(i, tmp)
+
+
+# 13b. Comparison between workers ------------------------------------------
+combcon$accuracySlide <- data.frame(PersonID = names(slide125)[col.nam$s125][c(1, 3, 2, 4:length(names(slide125)[col.nam$s125]))], stringsAsFactors = FALSE)
+combcon$accuracyDigital <- data.frame(PersonID = names(digital125)[col.nam$d125], stringsAsFactors = FALSE)
+
+# based on my consensus
+combcon$accuracySlide$IF_PtAc125 <- apply(combcon$slide125[,col.nam$s125], 2, function(x) sum(x == combcon$slide125$IFcMin) / 300 * 100)[combcon$accuracySlide$PersonID]
+combcon$accuracySlide$IF_PtAc150 <- apply(combcon$slide150[,col.nam$s150], 2, function(x) sum(x == combcon$slide150$IFcMin) / 300 * 100)[combcon$accuracySlide$PersonID]
+combcon$accuracyDigital$IF_PtAc125 <- apply(combcon$digital125[,col.nam$d125], 2, function(x) sum(x == combcon$digital125$IFcMin) / 300 * 100)
+combcon$accuracyDigital$IF_PtAc150 <- apply(combcon$digital150[,col.nam$d150], 2, function(x) sum(x == combcon$digital150$IFcMin) / 300 * 100)
+
+CCc20_mn <- list()
+CCc20_mn$IF_PtAc125s <- mean(combcon$accuracySlide$IF_PtAc125)
+CCc20_mn$IF_PtAc150s <- mean(combcon$accuracySlide$IF_PtAc150)
+CCc20_mn$IF_PtAc125d <- mean(combcon$accuracyDigital$IF_PtAc125)
+CCc20_mn$IF_PtAc150d <- mean(combcon$accuracyDigital$IF_PtAc150)
+
+# and sd
+CCc20_sd <- list()
+CCc20_sd$IF_PtAc125s <- sd(combcon$accuracySlide$IF_PtAc125)
+CCc20_sd$IF_PtAc150s <- sd(combcon$accuracySlide$IF_PtAc150)
+CCc20_sd$IF_PtAc125d <- sd(combcon$accuracyDigital$IF_PtAc125)
+CCc20_sd$IF_PtAc150d <- sd(combcon$accuracyDigital$IF_PtAc150)
+
+# How does this depend on whether workers routinely count specimens? 
+# add in routine to the accuracy info
+combcon$accuracySlide$Routine <- people$Routine[match(combcon$accuracySlide$PersonID, people$SlideID)]
+combcon$accuracySlide$Routine[combcon$accuracySlide$PersonID %in% c("1a", "2a")] <- people$Routine[1:2]
+combcon$accuracySlide$Routine[combcon$accuracySlide$PersonID %in% c("1b", "2b")] <- people$Routine[1:2]
+combcon$accuracyDigital$Routine <- people$Routine[match(combcon$accuracyDigital$PersonID, people$DigitalID)]
+
+tapply(combcon$accuracySlide$IF_PtAc125, combcon$accuracySlide$Routine, summary)
+tapply(combcon$accuracySlide$IF_PtAc150, combcon$accuracySlide$Routine, summary)
+
+tapply(combcon$accuracyDigital$IF_PtAc125, combcon$accuracyDigital$Routine, summary)
+tapply(combcon$accuracyDigital$IF_PtAc150, combcon$accuracyDigital$Routine, summary)
+
+par(mfrow = c(2,2))
+boxplot(accuracySlide$IF_PtAc125 ~ accuracySlide$Routine, main = "Slide 125")
+boxplot(accuracySlide$IF_PtAc150 ~ accuracySlide$Routine, main = "Slide 150")
+boxplot(accuracyDigital$IF_PtAc125 ~ accuracyDigital$Routine, main = "Digital 125")
+boxplot(accuracyDigital$IF_PtAc150 ~ accuracyDigital$Routine, main = "Digital 150")
+par(mfrow = c(1,1))
+
+# Digital and slide on one plot
+combcon$accuracyFull <- rbind(combcon$accuracySlide, combcon$accuracyDigital)
+combcon$accuracyFull$Analysis <- c(rep("Slide", 17), rep("Digital", 9))
+
+png("Figures/CombCon/Fig3_CombCon_agreement_fullID.png", 800, 1000)
+par(mfrow = c(2, 1))
+with(combcon$accuracyFull, plot(IF_PtAc125[match(ord.div, PersonID)], ylim = c(40, 90), type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Participant", cex.lab = 1.5, las = 2, cex.axis = 1.1))
+axis(1, at = 1:26, labels = combcon$accuracyFull$PersonID[match(ord.div, combcon$accuracyFull$PersonID)], cex.axis = 1.1)
+# adding mean values
+lines(x = c(0, 20.5), y = rep(CCc20_mn$IF_PtAc125s, 2), lty = 1)
+lines(x = c(0, 20.5), y = rep(CCc20_mn$IF_PtAc125s - CCc20_sd$IF_PtAc125s, 2), lty = 4)
+lines(x = c(0, 20.5), y = rep(CCc20_mn$IF_PtAc125s + CCc20_sd$IF_PtAc125s, 2), lty = 4)
+lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_PtAc125d, 2), lty = 1, col = "blue")
+lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_PtAc125d - CCc20_sd$IF_PtAc125d, 2), lty = 4, col = "blue")
+lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_PtAc125d + CCc20_sd$IF_PtAc125d, 2), lty = 4, col = "blue")
+# points
+with(combcon$accuracyFull, points(1:26, IF_PtAc125[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
+with(combcon$accuracyFull, arrows(1, IF_PtAc125[PersonID == "1a"], 2, IF_PtAc125[PersonID == "1b"], length = 0.14))
+with(combcon$accuracyFull, arrows(3, IF_PtAc125[PersonID == "2a"], 4, IF_PtAc125[PersonID == "2b"], length = 0.14))
+text(26, 90, "125", cex = 1.5)
+
+with(combcon$accuracyFull, plot(IF_PtAc150[match(ord.div, PersonID)], ylim = c(40, 90), type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Participant", cex.lab = 1.5, las = 2, cex.axis = 1.1))
+axis(1, at = 1:26, labels = accuracyFull$PersonID[match(ord.div, accuracyFull$PersonID)], cex.axis = 1.1)
+# adding mean values
+lines(x = c(0, 20.5), y = rep(CCc20_mn$IF_PtAc150s, 2), lty = 1)
+lines(x = c(0, 20.5), y = rep(CCc20_mn$IF_PtAc150s - CCc20_sd$IF_PtAc150s, 2), lty = 4)
+lines(x = c(0, 20.5), y = rep(CCc20_mn$IF_PtAc150s + CCc20_sd$IF_PtAc150s, 2), lty = 4)
+lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_PtAc150d, 2), lty = 1, col = "blue")
+lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_PtAc150d - CCc20_sd$IF_PtAc150d, 2), lty = 4, col = "blue")
+lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_PtAc150d + CCc20_sd$IF_PtAc150d, 2), lty = 4, col = "blue")
+# points
+with(combcon$accuracyFull, points(1:26, IF_PtAc150[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
+with(combcon$accuracyFull, arrows(1, IF_PtAc150[PersonID == "1a"], 2, IF_PtAc150[PersonID == "1b"], length = 0.14))
+with(combcon$accuracyFull, arrows(3, IF_PtAc150[PersonID == "2a"], 4, IF_PtAc150[PersonID == "2b"], length = 0.14))
+text(26, 90, "150", cex = 1.5)
+
+par(mfrow = c(1,1))
+dev.off()
+
+# looking at the summary of this data
+tapply(accuracyFull$IF_PtAc125, accuracyFull$Analysis, summary)
+tapply(accuracyFull$IF_PtAc150, accuracyFull$Analysis, summary)
+
+# sensitivity to alphabetical order
+combcon$slide125$IFcMinR <- apply(full.125[, col.nam$c125], 1, function (x) rev(names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))])[1]) 
+combcon$slide150$IFcMinR <- apply(full.150[, col.nam$c150], 1, function (x) rev(names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))])[1]) 
+combcon$digital125$IFcMinR <- apply(full.125[, col.nam$c125], 1, function (x) rev(names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))])[1]) 
+combcon$digital150$IFcMinR <- apply(full.150[, col.nam$c150], 1, function (x) rev(names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))])[1]) 
+
+combcon$accuracySlide$IF_revPtAc125 <- apply(combcon$slide125[,col.nam$s125], 2, function(x) sum(x == combcon$slide125$IFcMinR) / 300 * 100)[combcon$accuracySlide$PersonID]
+combcon$accuracySlide$IF_revPtAc150 <- apply(combcon$slide150[,col.nam$s150], 2, function(x) sum(x == combcon$slide150$IFcMinR) / 300 * 100)[combcon$accuracySlide$PersonID]
+combcon$accuracyDigital$IF_revPtAc125 <- apply(combcon$digital125[,col.nam$d125], 2, function(x) sum(x == combcon$digital125$IFcMinR) / 300 * 100)
+combcon$accuracyDigital$IF_revPtAc150 <- apply(combcon$digital150[,col.nam$d150], 2, function(x) sum(x == combcon$digital150$IFcMinR) / 300 * 100)
+
+CCc20_mn$IF_revPtAc125s <- mean(combcon$accuracySlide$IF_revPtAc125)
+CCc20_mn$IF_revPtAc150s <- mean(combcon$accuracySlide$IF_revPtAc150)
+CCc20_mn$IF_revPtAc125d <- mean(combcon$accuracyDigital$IF_revPtAc125)
+CCc20_mn$IF_revPtAc150d <- mean(combcon$accuracyDigital$IF_revPtAc150)
+
+# My value
+CCc20_sd$IF_revPtAc125s <- sd(combcon$accuracySlide$IF_revPtAc125)
+CCc20_sd$IF_revPtAc150s <- sd(combcon$accuracySlide$IF_revPtAc150)
+CCc20_sd$IF_revPtAc125d <- sd(combcon$accuracyDigital$IF_revPtAc125)
+CCc20_sd$IF_revPtAc150d <- sd(combcon$accuracyDigital$IF_revPtAc150)
+
+# plot it up
+ord.div <- c("1a", "1b", "2a", "2b", "A", 3:6, "F", 7:9, "G", 10:15, LETTERS[2:5], LETTERS[8:9])
+combcon$accuracyFull <- rbind(combcon$accuracySlide, combcon$accuracyDigital)
+combcon$accuracyFull$Analysis <- c(rep("Slide", 17), rep("Digital", 9))
+
+png("Figures/CombCon/Fig3_CombConsensus_agreement_rev.png", 800, 1000)
+par(mfrow = c(2, 1))
+with(combcon$accuracyFull, plot(IF_revPtAc125[match(ord.div, PersonID)], ylim = c(40, 90), type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Participant", cex.lab = 1.5, las = 2, cex.axis = 1.1))
+axis(1, at = 1:26, labels = combcon$accuracyFull$PersonID[match(ord.div, combcon$accuracyFull$PersonID)], cex.axis = 1.1)
+# adding mean values
+lines(x = c(0, 20.5), y = rep(CCc20_mn$IF_revPtAc125s, 2), lty = 1)
+lines(x = c(0, 20.5), y = rep(CCc20_mn$IF_revPtAc125s - CCc20_sd$IF_revPtAc125s, 2), lty = 4)
+lines(x = c(0, 20.5), y = rep(CCc20_mn$IF_revPtAc125s + CCc20_sd$IF_revPtAc125s, 2), lty = 4)
+lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_revPtAc125d, 2), lty = 1, col = "blue")
+lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_revPtAc125d - CCc20_sd$IF_revPtAc125d, 2), lty = 4, col = "blue")
+lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_revPtAc125d + CCc20_sd$IF_revPtAc125d, 2), lty = 4, col = "blue")
+# points
+with(combcon$accuracyFull, points(1:26, IF_revPtAc125[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
+with(combcon$accuracyFull, arrows(1, IF_revPtAc125[PersonID == "1a"], 2, IF_revPtAc125[PersonID == "1b"], length = 0.14))
+with(combcon$accuracyFull, arrows(3, IF_revPtAc125[PersonID == "2a"], 4, IF_revPtAc125[PersonID == "2b"], length = 0.14))
+text(26, 90, "125", cex = 1.5)
+
+with(combcon$accuracyFull, plot(IF_revPtAc150[match(ord.div, PersonID)], ylim = c(40, 90), type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Participant", cex.lab = 1.5, las = 2, cex.axis = 1.1))
+axis(1, at = 1:26, labels = combcon$accuracyFull$PersonID[match(ord.div, combcon$accuracyFull$PersonID)], cex.axis = 1.1)
+# adding mean values
+lines(x = c(0, 20.5), y = rep(CCc20_mn$IF_revPtAc150s, 2), lty = 1)
+lines(x = c(0, 20.5), y = rep(CCc20_mn$IF_revPtAc150s - CCc20_sd$IF_revPtAc150s, 2), lty = 4)
+lines(x = c(0, 20.5), y = rep(CCc20_mn$IF_revPtAc150s + CCc20_sd$IF_revPtAc150s, 2), lty = 4)
+lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_revPtAc150d, 2), lty = 1, col = "blue")
+lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_revPtAc150d - CCc20_sd$IF_revPtAc150d, 2), lty = 4, col = "blue")
+lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_revPtAc150d + CCc20_sd$IF_revPtAc150d, 2), lty = 4, col = "blue")
+# points
+with(combcon$accuracyFull, points(1:26, IF_revPtAc150[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
+with(combcon$accuracyFull, arrows(1, IF_revPtAc150[PersonID == "1a"], 2, IF_revPtAc150[PersonID == "1b"], length = 0.14))
+with(combcon$accuracyFull, arrows(3, IF_revPtAc150[PersonID == "2a"], 4, IF_revPtAc150[PersonID == "2b"], length = 0.14))
+text(26, 90, "150", cex = 1.5)
+
+par(mfrow = c(1,1))
+dev.off()
+
+# confusion matrices
+# initially with slide 125
+# this requires the data to be in long format
+combconlong <- list()
+combconlong$s125 <- reshape(combcon$slide125, varying = list(names(combcon$slide125)[col.nam$s125]), direction = "long", times = names(combcon$slide125)[col.nam$s125], timevar = "Person")
+rownames(combconlong$s125) <- 1:nrow(combconlong$s125)
+combconlong$s125 <- combconlong$s125[, (names(combconlong$s125) != "id")]
+names(combconlong$s125)[names(combconlong$s125) == "1a"] <- "origID"
+head(combconlong$s125)
+tail(combconlong$s125)
+
+png("Figures/CombCon/confusion_combcon$slide125.png", 1000, 700)
+conf_mat(combconlong$s125, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+mtext("Slide 125", 1, cex = 2, adj = -0.8,  line = -5)
+dev.off() 
+
+# same for the other datasets
+# so combcon$slide 150
+combconlong$s150 <- reshape(combcon$slide150, varying = list(names(combcon$slide150)[col.nam$s150]), direction = "long", times = names(combcon$slide150)[col.nam$s150], timevar = "Person")
+rownames(combconlong$s150) <- 1:nrow(combconlong$s150)
+combconlong$s150 <- combconlong$s150[, (names(combconlong$s150) != "id")]
+names(combconlong$s150)[names(combconlong$s150) == "1a"] <- "origID"
+head(combconlong$s150)
+tail(combconlong$s150)
+
+png("Figures/CombCon/confusion_combcon$slide150.png", 1000, 650)
+conf_mat(combconlong$s150, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+mtext("Slide 150", 1, cex = 2, adj = -.8,  line = -5)
+dev.off() 
+
+
+# combcon$digital 125
+combconlong$d125 <- reshape(combcon$digital125, varying = list(names(combcon$digital125)[col.nam$d125]), direction = "long", times = names(combcon$digital125)[col.nam$d125], timevar = "Person")
+rownames(combconlong$d125) <- 1:nrow(combconlong$d125)
+combconlong$d125 <- combconlong$d125[, (names(combconlong$d125) != "id")]
+names(combconlong$d125)[names(combconlong$d125) == "A"] <- "origID"
+head(combconlong$d125)
+tail(combconlong$d125)
+
+png("Figures/CombCon/confusion_combcon$digital125.png", 1000, 700)
+conf_mat(combconlong$d125, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+mtext("Digital 125", 1, cex = 2, adj = -.8,  line = -5)
+dev.off() 
+
+
+# combcon$digital 150
+combconlong$d150 <- reshape(combcon$digital150, varying = list(names(combcon$digital150)[col.nam$d150]), direction = "long", times = names(combcon$digital150)[col.nam$d150], timevar = "Person")
+rownames(combconlong$d150) <- 1:nrow(combconlong$d150)
+combconlong$d150 <- combconlong$d150[, (names(combconlong$d150) != "id")]
+names(combconlong$d150)[names(combconlong$d150) == "A"] <- "origID"
+head(combconlong$d150)
+tail(combconlong$d150)
+
+png("Figures/CombCon/confusion_combcon$digital150.png", 1000, 650)
+conf_mat(combconlong$d150, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+mtext("Digital 150", 1, cex = 2, adj = -.8,  line = -5)
+dev.off() 
+
+# influence of the alphabetical ordering
+png("Figures/CombCon/confusion_combcon$slide125r.png", 1000, 700)
+conf_mat(combconlong$s125, "origID", "IFcMinR", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+mtext("Slide 125", 1, cex = 2, adj = -0.8,  line = -5)
+dev.off() 
+
+png("Figures/CombCon/confusion_combcon$slide150r.png", 1000, 650)
+conf_mat(combconlong$s150, "origID", "IFcMinR", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+mtext("Slide 150", 1, cex = 2, adj = -.8,  line = -5)
+dev.off() 
+
+png("Figures/CombCon/confusion_combcon$digital125r.png", 1000, 700)
+conf_mat(combconlong$d125, "origID", "IFcMinR", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+mtext("Digital 125", 1, cex = 2, adj = -.8,  line = -5)
+dev.off() 
+
+png("Figures/CombCon/confusion_combcon$digital150r.png", 1000, 650)
+conf_mat(combconlong$d150, "origID", "IFcMinR", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+mtext("Digital 150", 1, cex = 2, adj = -.8,  line = -5)
+dev.off() 
+
+
+# 13c. NMDS analysis ------------------------------------------------------
+# for 125
+combcon$full.125 <- merge(combcon$slide125, combcon$digital125, by = "Specimen")
+
+trsp$CCIF125f <- data.frame(t(combcon$full.125[, !(names(combcon$full.125) %in% c("Specimen", "consensus50.x", "consensus20.x", "consensus50.y", "consensus20.y", "IFmaxCon.x", "IFcMinR.x", "IFmaxCon.y", "IFcMinR.y"))]))
+rownames(trsp$CCIF125f)[nchar(rownames(trsp$CCIF125f)) >= 5] <- c("SsC", "SCID", "DsC", "DCID")
+
+# consider the stress of the NMDS
+stress$CCIF125f <- rep(NA, 10)
+for (i in 1:10) {
+  stress$CCIF125f[i] <- metaMDS(daisy(trsp$CCIF125f), k = i)$stress
+}
+plot(stress$CCIF125f, type = "b")  
+rm(i)
+# looks like between 2 and 3 dimensions would be reasonable
+
+# check for variation
+tmp <- metaMDS(daisy(trsp$CCIF125f))
+tmp$stress
+plot(tmp, display = "sites", type = "t", cex = 1.5)
+# some variation, so optimise
+
+stress$CCIFop125f <- 1
+# find the nmds plot with the lowest stress out of 20000 runs
+# for (i in 1:1000) {
+#   tmp <- metaMDS(daisy(trsp$CCIF125f))
+#   if (stress$CCIFop125f > tmp$stress) {
+#     nmds$CCIF125f <- tmp
+#     stress$CCIFop125f <- tmp$stress
+#   }
+# }
+# rm(i, tmp)
+# save(stress, nmds, file = "Outputs/CCNMDS_125.RData")
+load("Outputs/CCNMDS_125.RData")
+
+stressplot(nmds$CCIF125f)
+
+png("Figures/CombCon/IF_NMDS_125.png", 600, 600)
+plot(nmds$CCIF125f, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab = "Axis 2", las = 1, cex.lab = 1.5, cex.axis = 1.2, main = "NMDS 125")
+points(nmds$CCIF125f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
+text(nmds$CCIF125f$points[nchar(rownames(nmds$CCIF125f$points)) <3, ], labels = rownames(nmds$CCIF125f$points)[nchar(rownames(nmds$CCIF125f$points)) <3])
+points(nmds$CCIF125f$points[nchar(rownames(nmds$CCIF125f$points)) >2, ], pch = "+")
+text(nmds$CCIF125f$points[rownames(nmds$CCIF125f$points) == "SCID", 1]+0.03, nmds$CCIF125f$points[rownames(nmds$CCIF125f$points) == "SCID", 2]+0.00, labels = "CID")
+text(nmds$CCIF125f$points[rownames(nmds$CCIF125f$points) == "SsC", 1]+0.02, nmds$CCIF125f$points[rownames(nmds$CCIF125f$points) == "SsC", 2]+0.00, labels = "sC")
+
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16, cex = 1.3)
+dev.off()
+
+# for 150
+combcon$full.150 <- merge(combcon$slide150, combcon$digital150, by = "Specimen")
+trsp$CCIF150f <- data.frame(t(combcon$full.150[, !(names(combcon$full.150) %in% c("Specimen", "consensus50.x", "consensus20.x", "consensus50.y", "consensus20.y", "IFmaxCon.x", "IFcMinR.x", "IFmaxCon.y", "IFcMinR.y"))]))
+rownames(trsp$CCIF150f)[nchar(rownames(trsp$CCIF150f)) >= 5] <- c("SsC", "SCID", "DsC", "DCID")
+
+# consider the stress of the NMDS
+stress$CCIF150f <- rep(NA, 10)
+for (i in 1:10) {
+  stress$CCIF150f[i] <- metaMDS(daisy(trsp$CCIF150f), k = i)$stress
+}
+plot(stress$CCIF150f, type = "b")
+rm(i)
+# looks like between 2 and 3 dimensions would be reasonable, although as with Nadia's data, the breakpoint is less obvious for 150 than it is for 125. 
+
+# check for variation
+tmp <- metaMDS(daisy(trsp$CCIF150f))
+tmp$stress
+plot(tmp, display = "sites", type = "t", cex = 1.5)
+# some variation, so optimise
+
+stress$CCIFop150f <- 1
+# find the nmds plot with the lowest stress out of 1000 runs
+# for (i in 1:1000) {
+#   tmp <- metaMDS(daisy(trsp$CCIF150f))
+#   if (stress$CCIFop150f > tmp$stress) {
+#     nmds$CCIF150f <- tmp
+#     stress$CCIFop150f <- tmp$stress
+#   }
+# }
+# rm(i, tmp)
+# save(stress, nmds, file = "Outputs/CCNMDS_150f.RData")
+load("Outputs/CCNMDS_150f.RData")
+
+stressplot(nmds$CCIF150f)
+
+# the full plot
+png("Figures/CombCon/IF_NMDS_150.png", 600, 600)
+plot(nmds$CCIF150f, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab = "Axis 2", las = 1, cex.lab = 1.5, cex.axis = 1.2, main = "NMDS 150")
+points(nmds$CCIF150f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
+text(nmds$CCIF150f$points[nchar(rownames(nmds$CCIF150f$points)) <3, ], labels = rownames(nmds$CCIF150f$points)[nchar(rownames(nmds$CCIF150f$points)) <3])
+points(nmds$CCIF150f$points[nchar(rownames(nmds$CCIF150f$points)) >2, ], pch = "+")
+text(nmds$CCIF150f$points[rownames(nmds$CCIF150f$points) == "SCID", 1]+0.02, nmds$CCIF150f$points[rownames(nmds$CCIF150f$points) == "SCID", 2], labels = "CID")
+text(nmds$CCIF150f$points[rownames(nmds$CCIF150f$points) == "SsC", 1]+0.025, nmds$CCIF150f$points[rownames(nmds$CCIF150f$points) == "SsC", 2], labels = "sC")
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16, cex = 1.3)
+dev.off()
+
+# focussing on the main section. As noted above, it is better to run this as a new analysis rather than just zoom in, as the influence of the outliers means that the stability of the central points hasn't been tested
+nmds$CCIF150z <- metaMDS(daisy(trsp$CCIF150f[!(rownames(trsp$CCIF150f) %in% c("3", "C", "E", "G")),]))
+
+# consider the stress of the NMDS
+stress$CCIF150z <- rep(NA, 10)
+for (i in 1:10) {
+  stress$CCIF150z[i] <- metaMDS(daisy(trsp$CCIF150f[!(rownames(trsp$CCIF150f) %in% c("3", "C", "E", "G")),]), k = i)$stress
+}
+plot(stress$CCIF150z, type = "b")
+rm(i)
+stressplot(nmds$CCIF150z)
+# again between 2 and 3 dimensions is probably reasonable
+
+# check for variation
+tmp <- metaMDS(daisy(trsp$CCIF150f[!(rownames(trsp$CCIF150f) %in% c("3", "C", "E", "G")),]))
+tmp$stress
+plot(tmp, display = "sites", type = "t", cex = 1.5)
+# some variation, so optimise
+
+stress$CCIFop150z <- 1
+# find the nmds plot with the lowest stress out of 1000 runs
+# for (i in 1:1000) {
+#   tmp <- metaMDS(daisy(trsp$CCIF150f[!(rownames(trsp$CCIF150f) %in% c("3", "C", "E", "G")),]))
+#   if (stress$CCIFop150z > tmp$stress) {
+#     nmds$CCIF150z <- tmp
+#     stress$CCIFop150z <- tmp$stress
+#   }
+# }
+# rm(i, tmp)
+# save(stress, nmds, file = "Outputs/CCNMDS_150z.RData")
+load("Outputs/CCNMDS_150z.RData")
+
+stress$CCIFop150z
+stressplot(nmds$CCIF150z)
+
+# the zoomed plot
+png("Figures/CombCon/IF_NMDS_150_zoom.png", 600, 600)
+plot(nmds$CCIF150z, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab = "Axis 2", las = 1, cex.lab = 1.5, cex.axis = 1.2, main = "NMDS 150 zoomed")
+points(nmds$CCIF150z, pch = 21, cex = 4, col = mds.col$pair[!(mds.col$person %in% c("3", "C", "E", "G"))], bg = brewer.pal(5, "Set2")[mds.col$sch.col[!(mds.col$person %in% c("3", "C", "E", "G"))]], lwd = 2)
+text(nmds$CCIF150z$points[nchar(rownames(nmds$CCIF150z$points)) <3, ], labels = rownames(nmds$CCIF150z$points)[nchar(rownames(nmds$CCIF150z$points)) <3])
+points(nmds$CCIF150z$points[nchar(rownames(nmds$CCIF150z$points)) >2, ], pch = "+")
+text(nmds$CCIF150z$points[rownames(nmds$CCIF150z$points) == "SCID", 1]+0.012, nmds$CCIF150z$points[rownames(nmds$CCIF150z$points) == "SCID", 2]+0.008, labels = "CID")
+text(nmds$CCIF150z$points[rownames(nmds$CCIF150z$points) == "SsC", 1]+0.012, nmds$CCIF150z$points[rownames(nmds$CCIF150z$points) == "SsC", 2]+0.008, labels = "sC")
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16, cex = 1.3)
+dev.off()
+
+# output the scree plots
+png("Figures/CombCon/Scree plots.png")
+par(mfrow = c(2, 2))
+plot(stress$CCIF125f, type = "b", bty = "l", las = 1, xlab = "Dimensions", ylab = "Stress", main = "NMDS 125")
+plot(stress$CCIF150f, type = "b", bty = "l", las = 1, xlab = "Dimensions", ylab = "Stress", main = "NMDS 150")
+plot(stress$CCIF150z, type = "b", bty = "l", las = 1, xlab = "Dimensions", ylab = "Stress", main = "NMDS 150 zoomed")
+par(mfrow = c(1,1))
+dev.off()
+
+# 13d. Repeated analysis by workers -----------------------------------------
+# for 1a / 1b slide 125
+head(combconlong$s125)
+
+sum(combcon$slide125$`1a` == combcon$slide125$'1b') # 183 or 61% similarity
+sum(combcon$slide125$`1a` == combcon$slide125$IFcMin) # 192 or 64% accuracy (cf. 198)
+sum(combcon$slide125$`1b` == combcon$slide125$IFcMin) # 227 or 76% accuracy (cf. 228)
+
+png("Figures/Combcon/Time/confusion_125_1aCon.png", 1000, 700)
+conf_mat(combconlong$s125[combconlong$s125$Person == "1a", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "1a", ylab = "Consensus")
+dev.off() 
+png("Figures/Combcon/Time/confusion_125_1bCon.png", 1000, 700)
+conf_mat(combconlong$s125[combconlong$s125$Person == "1b", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "1b", ylab = "Consensus")
+dev.off() 
+
+# and for 2a / 2b
+sum(combcon$slide125$`2a` == combcon$slide125$'2b') # 241 or 80% similarity
+sum(combcon$slide125$`2a` == combcon$slide125$IFcMin) # 206 or 69% accuracy (cf. 208)
+sum(combcon$slide125$`2b` == combcon$slide125$IFcMin) # 240 or 80% accuracy (cf. 237)
+
+# again, do this as a confusion matrix
+png("Figures/Combcon/Time/confusion_125_2aCon.png", 1000, 700)
+conf_mat(combconlong$s125[combconlong$s125$Person == "2a", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2a", ylab = "Consensus")
+dev.off() 
+png("Figures/Combcon/Time/confusion_125_2bCon.png", 1000, 700)
+conf_mat(combconlong$s125[combconlong$s125$Person == "2b", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2b", ylab = "Consensus")
+dev.off() 
+
+# And for 150
+sum(combcon$slide150$`1a` == combcon$slide150$'1b') # 204 or 68% similarity
+sum(combcon$slide150$`1a` == combcon$slide150$IFcMin) # 221 or 74% accuracy (cf. 221)
+sum(combcon$slide150$`1b` == combcon$slide150$IFcMin) # 219 or 73% accuracy (cf. 223)
+
+png("Figures/Combcon/Time/confusion_150_1aCon.png", 1000, 700)
+conf_mat(combconlong$s150[combconlong$s150$Person == "1a", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "1a", ylab = "Consensus")
+dev.off() 
+png("Figures/Combcon/Time/confusion_150_1bCon.png", 1000, 700)
+conf_mat(combconlong$s150[combconlong$s150$Person == "1b", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "1b", ylab = "Consensus")
+dev.off() 
+
+# 2a/2b
+sum(combcon$slide150$`2a` == combcon$slide150$'2b') # 288 or 96% similarity
+sum(combcon$slide150$`2a` == combcon$slide150$IFcMin) # 257 or 86% accuracy (cf. 255)
+sum(combcon$slide150$`2b` == combcon$slide150$IFcMin) # 257 or 86% accuracy (cf. 255)
+
+png("Figures/Combcon/Time/confusion_150_2aCon.png", 1000, 700)
+conf_mat(combconlong$s150[combconlong$s150$Person == "2a", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2a", ylab = "Consensus")
+dev.off()
+png("Figures/Combcon/Time/confusion_150_2bCon.png", 1000, 700)
+conf_mat(combconlong$s150[combconlong$s150$Person == "2b", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2b", ylab = "Consensus")
+dev.off()
+
+# 13e. Digital vs. slides ---------------------------------------------------
+combconlong$f125 <- rbind(combconlong$s125, combconlong$d125)
+
+# 125 2b vs. A
+sum(combcon$full.125$`2b` == combcon$full.125$'A') # 171 or 57% similarity
+sum(combcon$full.125$`2b` == combcon$full.125$IFcMin.x) # 240 or 80% (cf. 237)
+sum(combcon$full.125$`A` == combcon$full.125$IFcMin.y) # 175 or 58% accuracy (cf. 181)
+
+png("Figures/CombCon/DigitalSlide/confusion_125_2bA.png", 1000, 700)
+conf_mat(combconlong$f125, "origID", axis.col = "Person", axis1 = "2b", axis2 = "A", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
+dev.off() 
+
+png("Figures/CombCon/DigitalSlide/confusion_125_2bCon.png", 1000, 700)
+conf_mat(combconlong$f125[combconlong$f125$Person == "2b", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2b", ylab = "Consensus")
+dev.off() 
+png("Figures/CombCon/DigitalSlide/confusion_125_ACon.png", 1000, 700)
+conf_mat(combconlong$f125[combconlong$f125$Person == "A", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "A", ylab = "Consensus")
+dev.off() 
+
+# 125 6 vs. F
+sum(combcon$full.125$`6` == combcon$full.125$'F') # 187 or 62% similarity
+sum(combcon$full.125$`6` == combcon$full.125$IFcMin.x) # 212 or 71% (cf. 211)
+sum(combcon$full.125$`F` == combcon$full.125$IFcMin.y) # 229 or 76% accuracy (cf. 226)
+
+png("Figures/CombCon/DigitalSlide/confusion_125_6F.png", 1000, 700)
+conf_mat(combconlong$f125, "origID", axis.col = "Person", axis1 = "6", axis2 = "F", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
+dev.off() 
+png("Figures/CombCon/DigitalSlide/confusion_125_FCon.png", 1000, 700)
+conf_mat(combconlong$f125[combconlong$f125$Person == "F", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "F", ylab = "Consensus")
+dev.off() 
+png("Figures/CombCon/DigitalSlide/confusion_125_6Con.png", 1000, 700)
+conf_mat(combconlong$f125[combconlong$f125$Person == "6", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "6", ylab = "Consensus")
+dev.off() 
+
+# 125 9 vs. G
+sum(combcon$full.125$`9` == combcon$full.125$'G') # 232 or 77% similarity
+sum(combcon$full.125$`9` == combcon$full.125$IFcMin.x) # 212 or 71% accuracy (cf. 206)
+sum(combcon$full.125$`G` == combcon$full.125$IFcMin.y) # 160 or 53% accuracy (cf. 157)
+
+png("Figures/CombCon/DigitalSlide/confusion_125_9G.png", 1000, 700)
+conf_mat(combconlong$f125, "origID", axis.col = "Person", axis1 = "9", axis2 = "G", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
+dev.off() 
+
+png("Figures/CombCon/DigitalSlide/confusion_125_GCon.png", 1000, 700)
+conf_mat(combconlong$f125[combconlong$f125$Person == "G", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "G", ylab = "Consensus")
+dev.off() 
+png("Figures/CombCon/DigitalSlide/confusion_125_9Con.png", 1000, 700)
+conf_mat(combconlong$f125[combconlong$f125$Person == "9", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "9", ylab = "Consensus")
+dev.off() 
+
+# for 150
+combconlong$f150 <- rbind(combconlong$s150, combconlong$d150)
+
+# 150 2b vs. A
+sum(combcon$full.150$`2b` == combcon$full.150$'A') # 232 or 77% similarity
+sum(combcon$full.150$`2b` == combcon$full.150$IFcMin.x) # 257 or 86% accuracy (cf. 255)
+sum(combcon$full.150$`A` == combcon$full.150$IFcMin.y) # 241 or 80% accuracy  (cf. 246)
+
+png("Figures/CombCon/DigitalSlide/confusion_150_2bA.png", 1000, 700)
+conf_mat(combconlong$f150, "origID", axis.col = "Person", axis1 = "2b", axis2 = "A", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
+dev.off() 
+
+png("Figures/CombCon/DigitalSlide/confusion_150_2bCon.png", 1000, 700)
+conf_mat(combconlong$f150[combconlong$f150$Person == "2b", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2b", ylab = "Consensus")
+dev.off() 
+png("Figures/CombCon/DigitalSlide/confusion_150_ACon.png", 1000, 700)
+conf_mat(combconlong$f150[combconlong$f150$Person == "A", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "A", ylab = "Consensus")
+dev.off() 
+
+# 150 6 vs. F
+sum(combcon$full.150$`6` == combcon$full.150$'F') # 216 or 72% similarity
+sum(combcon$full.150$`6` == combcon$full.150$IFcMin.x) # 246 or 82% accuracy (cf. 244)
+sum(combcon$full.150$`F` == combcon$full.150$IFcMin.y) # 244 or 81% accuracy (cf. 242) 
+
+png("Figures/CombCon/DigitalSlide/confusion_150_6F.png", 1000, 700)
+conf_mat(combconlong$f150, "origID", axis.col = "Person", axis1 = "6", axis2 = "F", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
+dev.off() 
+
+png("Figures/CombCon/DigitalSlide/confusion_150_FCon.png", 1000, 700)
+conf_mat(combconlong$f150[combconlong$f150$Person == "F", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "F", ylab = "Consensus")
+dev.off() 
+png("Figures/CombCon/DigitalSlide/confusion_150_6Con.png", 1000, 700)
+conf_mat(combconlong$f150[combconlong$f150$Person == "6", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "6", ylab = "Consensus")
+dev.off() 
+
+# 150 9 vs. G
+sum(combcon$full.150$`9` == combcon$full.150$'G') # 212 or 71% similarity
+sum(combcon$full.150$`9` == combcon$full.150$IFcMin.x) # 216 or 72% accuracy (cf. 220)
+sum(combcon$full.150$`G` == combcon$full.150$IFcMin.y) # 148 or 49% accuracy (cf. 149)
+
+png("Figures/CombCon/DigitalSlide/confusion_150_9G.png", 1000, 700)
+conf_mat(combconlong$f150, "origID", axis.col = "Person", axis1 = "9", axis2 = "G", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
+dev.off() 
+
+png("Figures/CombCon/DigitalSlide/confusion_150_GCon.png", 1000, 700)
+conf_mat(combconlong$f150[combconlong$f150$Person == "G", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "G", ylab = "Consensus")
+dev.off() 
+png("Figures/CombCon/DigitalSlide/confusion_150_9Con.png", 1000, 700)
+conf_mat(combconlong$f150[combconlong$f150$Person == "9", ], "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "9", ylab = "Consensus")
+dev.off() 
+
+# 13f. SST ----------------------------------------------------------------
+# this was only done 150 size fraction.
+# it is also not perfect as it currently uses Nadia's consensus values not mine. But that's because I can't currently rerun the ANN analysis. 
+# Figure 6
+combcon$divTemp <- divTemp
+
+png("Figures/CombCon/Fig6_SST_comb.png", 800, 500)
+par(mar = c(5.1, 5.1, 4.1, 2.1))
+# points
+with(combcon$divTemp[combcon$divTemp$Size == 150,], plot(1:26, SST10m[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Participant", ylab = expression(paste("SST / ", degree, "C")), col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(20, 24), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
+# consensus values - this should be one line, but haven't been able to re-run yet. 
+with(combcon$divTemp[row.nam$s150c,], lines(x = c(0, 20.5), y = rep(SST10m - SD, each = 2), col = "green4", lty = 4))
+with(combcon$divTemp[row.nam$s150c,], lines(x = c(0, 20.5), y = rep(SST10m + SD, each = 2), col = "green4", lty = 4))
+with(combcon$divTemp[row.nam$d150c,], lines(x = c(20.5, 27), y = rep(SST10m - SD, each = 2), col = "green4", lty = 4))
+with(combcon$divTemp[row.nam$d150c,], lines(x = c(20.5, 27), y = rep(SST10m + SD, each = 2), col = "green4", lty = 4))
+with(combcon$divTemp[row.nam$s150c,], lines(x = c(0, 20.5), y = rep(SST10m, each = 2), col = "green4"))
+with(combcon$divTemp[row.nam$d150c,], lines(x = c(20.5, 27), y = rep(SST10m, each = 2), col = "green4"))
+# mean values
+with(combcon$divTemp[row.nam$s150c,], lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$SST10m[row.nam$s150]), each = 2)))
+with(combcon$divTemp[row.nam$d150c,], lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$SST10m[row.nam$d150]), each = 2), col = 4))
+
+# error bars / actual  / legend
+with(combcon$divTemp[combcon$divTemp$Size == 150,], err_bar(SST10m[match(ord.div, Person)], SD[match(ord.div, Person)], 1:26, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+abline(h = 21.76, col = "green4", lwd = 2)
+text(25, 21.65, "WOA 1998", cex = 1.3, col = "green4")
+legend("topleft", legend = c("Slide 150", "Digital 150"), pch = 16, col = c(1, 4))
+par(mar = c(5.1, 4.1, 4.1, 2.1))
+dev.off()
+
+# 13g. Diversity ------------------------------------------------------------
+# Calculating diversity 
+# richness 
+combcon$divTemp$IF_Richness[row.nam$s125c] <- specnumber(t(combcon$slide125sp[3:nrow(combcon$slide125sp),2:ncol(combcon$slide125sp)]))["IFcMin"]
+combcon$divTemp$IF_Richness[row.nam$s150c] <- specnumber(t(combcon$slide150sp[3:nrow(combcon$slide150sp),2:ncol(combcon$slide150sp)]))["IFcMin"]
+combcon$divTemp$IF_Richness[row.nam$d125c] <- specnumber(t(combcon$digital125sp[3:nrow(combcon$digital125sp),2:ncol(combcon$digital125sp)]))["IFcMin"]
+combcon$divTemp$IF_Richness[row.nam$d150c] <- specnumber(t(combcon$digital150sp[3:nrow(combcon$digital150sp),2:ncol(combcon$digital150sp)]))["IFcMin"]
+
+# ShannonWiener
+combcon$divTemp$IF_ShannonWiener[row.nam$s125c] <- diversity(t(combcon$slide125sp[3:nrow(combcon$slide125sp),2:ncol(combcon$slide125sp)]))["IFcMin"]
+combcon$divTemp$IF_ShannonWiener[row.nam$s150c] <- diversity(t(combcon$slide150sp[3:nrow(combcon$slide150sp),2:ncol(combcon$slide150sp)]))["IFcMin"]
+combcon$divTemp$IF_ShannonWiener[row.nam$d125c] <- diversity(t(combcon$digital125sp[3:nrow(combcon$digital125sp),2:ncol(combcon$digital125sp)]))["IFcMin"]
+combcon$divTemp$IF_ShannonWiener[row.nam$d150c] <- diversity(t(combcon$digital150sp[3:nrow(combcon$digital150sp),2:ncol(combcon$digital150sp)]))["IFcMin"]
+
+# Dominance
+combcon$divTemp$IF_Dominance[row.nam$s125c] <- (1 - diversity(t(combcon$slide125sp[3:nrow(combcon$slide125sp),2:ncol(combcon$slide125sp)]), index = "simpson"))["IFcMin"]  
+combcon$divTemp$IF_Dominance[row.nam$s150c] <- (1 - diversity(t(combcon$slide150sp[3:nrow(combcon$slide150sp),2:ncol(combcon$slide150sp)]), index = "simpson"))["IFcMin"]  
+combcon$divTemp$IF_Dominance[row.nam$d125c] <- (1 - diversity(t(combcon$digital125sp[3:nrow(combcon$digital125sp),2:ncol(combcon$digital125sp)]), index = "simpson"))["IFcMin"]  
+combcon$divTemp$IF_Dominance[row.nam$d150c] <- (1 - diversity(t(combcon$digital150sp[3:nrow(combcon$digital150sp),2:ncol(combcon$digital150sp)]), index = "simpson"))["IFcMin"]  
+
+# Evenness
+combcon$divTemp$IF_Evenness[row.nam$s125c] <- (exp(diversity(t(combcon$slide125sp[3:nrow(combcon$slide125sp),2:ncol(combcon$slide125sp)]))) / specnumber(t(combcon$slide125sp[3:nrow(combcon$slide125sp),2:ncol(combcon$slide125sp)])))["IFcMin"]
+combcon$divTemp$IF_Evenness[row.nam$s150c] <- (exp(diversity(t(combcon$slide150sp[3:nrow(combcon$slide125sp),2:ncol(combcon$slide150sp)]))) / specnumber(t(combcon$slide150sp[3:nrow(combcon$slide125sp),2:ncol(combcon$slide150sp)])))["IFcMin"]
+combcon$divTemp$IF_Evenness[row.nam$d125c] <- (exp(diversity(t(combcon$digital125sp[3:nrow(combcon$slide125sp),2:ncol(combcon$digital125sp)]))) / specnumber(t(combcon$digital125sp[3:nrow(combcon$slide125sp),2:ncol(combcon$digital125sp)])))["IFcMin"]
+combcon$divTemp$IF_Evenness[row.nam$d150c] <- (exp(diversity(t(combcon$digital150sp[3:nrow(combcon$slide125sp),2:ncol(combcon$digital150sp)]))) / specnumber(t(combcon$digital150sp[3:nrow(combcon$slide125sp),2:ncol(combcon$digital150sp)])))["IFcMin"]
+
+# Plotting diversity 
+ord.div <- c("1a", "1b", "2a", "2b", "A", 3:6, "F", 7:9, "G", 10:15, LETTERS[2:5], LETTERS[8:9])
+
+# Figure 7
+png("Figures/CombCon/Fig7_richness.png", 800, 500)
+par(mar = c(5.1, 5.1, 4.1, 2.1))
+# points
+with(combcon$divTemp[combcon$divTemp$Size == 125,], plot(1:26, IF_Richness[match(ord.div, Person)], pch = 1, xaxt = "n", xlab = "Participant", ylab = "Richness", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(14, 30), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
+with(combcon$divTemp[combcon$divTemp$Size == 150,], points(1:26, IF_Richness[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+with(combcon$divTemp[c(row.nam$s150c, row.nam$d150c),], abline(h = IF_Richness, col = 1))
+# consensus lines
+abline(h = combcon$divTemp$IF_Richness[row.nam$s125c], col = "green4", lty = 2)
+abline(h = combcon$divTemp$IF_Richness[row.nam$s150c], col = "green4")
+# mean values
+lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$IF_Richness[row.nam$d125]), 2), col = "blue", lty = 2)
+lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$IF_Richness[row.nam$s125]), 2), lty = 2)
+lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$IF_Richness[row.nam$d150]), 2), col = "blue")
+lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$IF_Richness[row.nam$s150]), 2))
+# legend
+legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
+par(mar = c(5.1, 4.1, 4.1, 2.1))
+dev.off()
+
+png("Figures/CombCon/Fig7_Dominance.png", 800, 500)
+# points
+par(mar = c(5.1, 5.1, 4.1, 2.1))
+with(combcon$divTemp[combcon$divTemp$Size == 125,], plot(1:26, IF_Dominance[match(ord.div, Person)], pch = 1, xaxt = "n", xlab = "Participant", ylab = "Dominance", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(0.1, 0.22), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+with(combcon$divTemp[combcon$divTemp$Size == 150,], points(1:26, IF_Dominance[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
+# consensus lines
+abline(h = combcon$divTemp$IF_Dominance[row.nam$s125c], col = "green4", lty = 2)
+abline(h = combcon$divTemp$IF_Dominance[row.nam$s150c], col = "green4")
+# mean values
+lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$IF_Dominance[row.nam$d125]), 2), col = "blue", lty = 2)
+lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$IF_Dominance[row.nam$s125]), 2), lty = 2)
+lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$IF_Dominance[row.nam$d150]), 2), col = "blue")
+lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$IF_Dominance[row.nam$s150]), 2))
+# legend
+legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
+par(mar = c(5.1, 4.1, 4.1, 2.1))
+dev.off()
+
+png("Figures/CombCon/Fig7_ShannonWiener.png", 800, 500)
+# 125
+par(mar = c(5.1, 5.1, 4.1, 2.1))
+# points
+with(combcon$divTemp[combcon$divTemp$Size == 125,], plot(1:26, IF_ShannonWiener[match(ord.div, Person)], pch = 1, xaxt = "n", xlab = "Participant", ylab = "Shannon-Wiener Diversity", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(1.95, 2.6), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
+with(combcon$divTemp[combcon$divTemp$Size == 150,], points(1:26, IF_ShannonWiener[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+# consensus lines
+abline(h = combcon$divTemp$IF_ShannonWiener[row.nam$s125c], col = "green4", lty = 2)
+abline(h = combcon$divTemp$IF_ShannonWiener[row.nam$s150c], col = "green4")
+# mean values
+lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$IF_ShannonWiener[row.nam$d125]), 2), col = "blue", lty = 2)
+lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$IF_ShannonWiener[row.nam$s125]), 2), lty = 2)
+lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$IF_ShannonWiener[row.nam$d150]), 2), col = "blue")
+lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$IF_ShannonWiener[row.nam$s150]), 2))
+# legend
+legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
+par(mar = c(5.1, 4.1, 4.1, 2.1))
+dev.off()
+
+png("Figures/CombCon/Fig7_Evenness.png", 800, 500)
+par(mar = c(5.1, 5.1, 4.1, 2.1))
+with(combcon$divTemp[combcon$divTemp$Size == 125,], plot(1:26, IF_Evenness[match(ord.div, Person)], pch = 1, xaxt = "n", xlab = "Participant", ylab = "Evenness", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(0.35, 0.6), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
+with(combcon$divTemp[combcon$divTemp$Size == 150,], points(1:26, IF_Evenness[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+# consensus lines
+abline(h = combcon$divTemp$IF_Evenness[row.nam$s125c], col = "green4", lty = 2)
+abline(h = combcon$divTemp$IF_Evenness[row.nam$s150c], col = "green4")
+# mean values
+lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$IF_Evenness[row.nam$d125]), 2), col = "blue", lty = 2)
+lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$IF_Evenness[row.nam$s125]), 2), lty = 2)
+lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$IF_Evenness[row.nam$d150]), 2), col = "blue")
+lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$IF_Evenness[row.nam$s150]), 2))
+# legend
+legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
+par(mar = c(5.1, 4.1, 4.1, 2.1))
+dev.off()
+
+# Sensitivity to alphabetical order 
+# checking diversity
+# 125 (both slide and digital are the same)
+specnumber(table(combcon$slide125$IFcMin)) # 22 (s - same, d - 23)
+specnumber(table(combcon$slide125$IFcMinR)) # 22 (s - same, d - 21)
+
+# ShannonWiener
+diversity(table(combcon$slide125$IFcMin)) # 2.28 (s - same, d - 2.257)
+diversity(table(combcon$slide125$IFcMinR)) # 2.26 (s - same, d - 2.233)
+
+# Dominance
+1 - diversity(table(combcon$slide125$IFcMin), index = "simpson") # 0.134 (s - 0.133, d - 0.141)
+1 - diversity(table(combcon$slide125$IFcMinR), index = "simpson") # 0.137 (s - 0.138, d - 0.145)
+
+# Evenness
+exp(diversity(table(combcon$slide125$IFcMin))) / specnumber(table(combcon$slide125$IFcMin)) # 0.446 (s - 0.445, d - 0.415)
+exp(diversity(table(combcon$slide125$IFcMinR))) / specnumber(table(combcon$slide125$IFcMinR)) # 0.436 (s - 0.440, d - 0.444)
+
+# combcon$slide 150
+specnumber(table(combcon$slide150$IFcMin)) # 20 (s - 18, d - 21)
+specnumber(table(combcon$slide150$IFcMinR)) # 20 (s - 19, d - 21)
+
+# ShannonWiener
+diversity(table(combcon$slide150$IFcMin)) # 2.213 (s - 2.189, d - 2.303)
+diversity(table(combcon$slide150$IFcMinR)) # 2.213 (s - 2.206, d - 2.289)
+
+# Dominance
+1 - diversity(table(combcon$slide150$IFcMin), index = "simpson") # 0.164 (s - 0.166, d - 0.151)
+1 - diversity(table(combcon$slide150$IFcMinR), index = "simpson") # 0.166 (s - 0.165, d - 0.156)
+
+# Evenness
+exp(diversity(table(combcon$slide150$IFcMin))) / specnumber(table(combcon$slide150$IFcMin)) # 0.457 (s - 0.496, d - 0.476)
+exp(diversity(table(combcon$slide150$IFcMinR))) / specnumber(table(combcon$slide150$IFcMinR)) # 0.457 (s - 0.478, d - 0.470)
+
+# 13h. Outliers -------------------------------------------------------------
+# Outliers for each analysis 
+combcon$outliers <- data.frame(PersonID = accuracyFull$PersonID, Analysis = accuracyFull$Analysis)
+
+# rank for MDS 125
+combcon$outliers$MDS125 <- NA
+tmp.pt <- nmds$CCIF125f$points["SCID", ]
+tmp.tab <- sqrt((nmds$CCIF125f$points[,1] - tmp.pt[1])^2 + (nmds$CCIF125f$points[,2] - tmp.pt[2])^2)
+combcon$outliers$MDS125[combcon$outliers$Analysis == "Slide"][order(tmp.tab[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.tab))])] <- sort(rank(tmp.tab[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.tab))]))
+tmp.tab <- sqrt((nmds$CCIF125f$points[,1] - tmp.pt[1])^2 + (nmds$CCIF125f$points[,2] - tmp.pt[2])^2)
+combcon$outliers$MDS125[combcon$outliers$Analysis == "Digital"][order(tmp.tab[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.tab))])] <- sort(rank(tmp.tab[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.tab))]))
+rm(tmp.pt, tmp.tab)
+
+# and mds 150
+combcon$outliers$MDS150 <- NA
+tmp.pt <- nmds$CCIF150f$points["SCID", ]
+tmp.tab <- sqrt((nmds$CCIF150f$points[,1] - tmp.pt[1])^2 + (nmds$CCIF150f$points[,2] - tmp.pt[2])^2)
+combcon$outliers$MDS150[combcon$outliers$Analysis == "Slide"][order(tmp.tab[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.tab))])] <- sort(rank(tmp.tab[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.tab))]))
+tmp.tab <- sqrt((nmds$CCIF150f$points[,1] - tmp.pt[1])^2 + (nmds$CCIF150f$points[,2] - tmp.pt[2])^2)
+combcon$outliers$MDS150[combcon$outliers$Analysis == "Digital"][order(tmp.tab[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.tab))])] <- sort(rank(tmp.tab[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.tab))]))
+rm(tmp.pt, tmp.tab)
+
+# for percentage accuracy
+combcon$outliers$IF_PtAc125 <- NA
+combcon$outliers$IF_PtAc125[combcon$outliers$Analysis == "Slide"][order(100-combcon$accuracySlide$IF_PtAc125[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], combcon$accuracySlide$PersonID)])] <- sort(rank(100-combcon$accuracySlide$IF_PtAc125))
+combcon$outliers$IF_PtAc125[combcon$outliers$Analysis == "Digital"][order(100-combcon$accuracyDigital$IF_PtAc125[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], combcon$accuracyDigital$PersonID)])] <- sort(rank(100-combcon$accuracyDigital$IF_PtAc125))
+
+combcon$outliers$IF_PtAc150 <- NA
+combcon$outliers$IF_PtAc150[combcon$outliers$Analysis == "Slide"][order(100-combcon$accuracySlide$IF_PtAc150[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], combcon$accuracySlide$PersonID)])] <- sort(rank(100-combcon$accuracySlide$IF_PtAc150))
+combcon$outliers$IF_PtAc150[combcon$outliers$Analysis == "Digital"][order(100-combcon$accuracyDigital$IF_PtAc150[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], combcon$accuracyDigital$PersonID)])] <- sort(rank(100-combcon$accuracyDigital$IF_PtAc150))
+
+# for mean pairwise agreement
+# for percentage combcon$accuracy
+combcon$outliers$mnPA125 <- NA
+combcon$outliers$mnPA125[combcon$outliers$Analysis == "Slide"][order(100-combcon$accuracySlide$mnPA125[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], combcon$accuracySlide$PersonID)])] <- sort(rank(100-combcon$accuracySlide$mnPA125))
+combcon$outliers$mnPA125[combcon$outliers$Analysis == "Digital"][order(100-combcon$accuracyDigital$mnPA125[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], combcon$accuracyDigital$PersonID)])] <- sort(rank(100-combcon$accuracyDigital$mnPA125))
+
+combcon$outliers$mnPA150 <- NA
+combcon$outliers$mnPA150[combcon$outliers$Analysis == "Slide"][order(100-combcon$accuracySlide$mnPA150[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], combcon$accuracySlide$PersonID)])] <- sort(rank(100-combcon$accuracySlide$mnPA150))
+combcon$outliers$mnPA150[combcon$outliers$Analysis == "Digital"][order(100-combcon$accuracyDigital$mnPA150[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], combcon$accuracyDigital$PersonID)])] <- sort(rank(100-combcon$accuracyDigital$mnPA150))
+
+# SST
+combcon$outliers$SST <- NA
+tmp.pt <- abs(divTemp$SST10m[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - 21.76)
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+combcon$outliers$SST[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+tmp.pt <- abs(divTemp$SST10m[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - 21.76)
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+combcon$outliers$SST[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+rm(tmp.pt)
+
+# richness
+combcon$outliers$IF_Richness125 <- NA
+tmp.pt <- abs(divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+combcon$outliers$IF_Richness125[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+
+tmp.pt <- abs(divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+combcon$outliers$IF_Richness125[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+
+combcon$outliers$IF_Richness150 <- NA
+tmp.pt <- abs(divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+combcon$outliers$IF_Richness150[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+
+tmp.pt <- abs(divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+combcon$outliers$IF_Richness150[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+rm(tmp.pt)
+
+# Dominance
+combcon$outliers$IF_Dominance125 <- NA
+tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+combcon$outliers$IF_Dominance125[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+
+tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+combcon$outliers$IF_Dominance125[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+
+combcon$outliers$IF_Dominance150 <- NA
+tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+combcon$outliers$IF_Dominance150[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+
+tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+combcon$outliers$IF_Dominance150[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+rm(tmp.pt)
+
+# Evenness
+combcon$outliers$IF_Evenness125 <- NA
+tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+combcon$outliers$IF_Evenness125[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+
+tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+combcon$outliers$IF_Evenness125[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+
+combcon$outliers$IF_Evenness150 <- NA
+tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+combcon$outliers$IF_Evenness150[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+
+tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+combcon$outliers$IF_Evenness150[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+rm(tmp.pt)
+
+# ShannonWiener
+combcon$outliers$IF_ShannonWiener125 <- NA
+tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+combcon$outliers$IF_ShannonWiener125[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+
+tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+combcon$outliers$IF_ShannonWiener125[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+
+combcon$outliers$IF_ShannonWiener150 <- NA
+tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+combcon$outliers$IF_ShannonWiener150[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+
+tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+combcon$outliers$IF_ShannonWiener150[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
+rm(tmp.pt)
+
+# weighted sums
+combcon$outliers$fullSum <- rowSums(combcon$outliers[, 3:17])
+
+combcon$outliers$wtSum <- rowSums(combcon$outliers[, grep("MDS", names(combcon$outliers))])/2 + rowSums(combcon$outliers[, grep("PA|Pt", names(combcon$outliers))])/2 + combcon$outliers$SST + rowSums(combcon$outliers[, grep("Richness", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("Dominance", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("Evenness", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("ShannonWiener", names(combcon$outliers))])/8
+
+combcon$outliers$wtSumPt <- combcon$outliers$wtSum / c(rep(4*17, 17), rep(4*9, 9)) * 100
+
+# Table 8 
+# add percentage of specimens identified to combcon$accuracy
+combcon$accuracySlide$ptID125 <- apply(slide125[,col.nam$s125], 2, function(x) sum(x != "na") / 300 * 100)[combcon$accuracySlide$PersonID]
+combcon$accuracySlide$ptID150 <- apply(slide150[,col.nam$s150], 2, function(x) sum(x != "na") / 300 * 100)[combcon$accuracySlide$PersonID]
+combcon$accuracyDigital$ptID125 <- apply(digital125[,col.nam$d125], 2, function(x) sum(x != "na") / 300 * 100)[combcon$accuracyDigital$PersonID]
+combcon$accuracyDigital$ptID150 <- apply(digital150[,col.nam$d150], 2, function(x) sum(x != "na") / 300 * 100)[combcon$accuracyDigital$PersonID]
+combcon$accuracyFull <- rbind(combcon$accuracySlide, combcon$accuracyDigital)
+combcon$accuracyFull$Analysis <- c(rep("Slide", 17), rep("Digital", 9))
+
+# looking for correlations
+pairs(combcon$outliers[, 3:ncol(combcon$outliers)])
+pairs(combcon$outliers[, grep("125", names(combcon$outliers))])
+pairs(combcon$outliers[, grep("150", names(combcon$outliers))])
+
+# Create a .csv file for the combcon$accuracy data
+# create a subset of the data for this
+tmp.sub <- combcon$accuracyFull[, c("PersonID", "Analysis", "Experience", "Routine", "IF_PtAc125", "IF_PtAc150", "ptID125", "ptID150")]
+tmp.sub[, grep("125|150", names(tmp.sub))] <- round(tmp.sub[, grep("125|150", names(tmp.sub))], 2)
+write.csv(tmp.sub, "Outputs/combcon$accuracy.csv", row.names = FALSE)
+rm(tmp.sub)
+
+# add the person level info to this
+tmp.s <- people[!is.na(people$SlideID), !grepl("Digital", names(people))]
+tmp.d <- people[!is.na(people$DigitalID), !grepl("Slide", names(people))]
+names(tmp.s)[1] <- names(tmp.d)[1] <- "PersonID"
+tmp.s <- rbind(tmp.s, tmp.s[!is.na(tmp.s$ExperienceSlideB), ])
+tmp.s$PersonID[tmp.s$PersonID %in% tmp.s$PersonID[duplicated(tmp.s$PersonID)]] <- paste(tmp.s$PersonID[tmp.s$PersonID %in% tmp.s$PersonID[duplicated(tmp.s$PersonID)]], rep(c("a", "b"), each = 2), sep = "")
+tmp.s$ExperienceSlideA[grep("b", tmp.s$PersonID)] <- tmp.s$ExperienceSlideB[grep("b", tmp.s$PersonID)]
+tmp.s <- tmp.s[, names(tmp.s) != "ExperienceSlideB"]
+names(tmp.d) <- names(tmp.s) <- gsub("SlideA", "", names(tmp.s))
+tmp <- rbind(tmp.s, tmp.d)
+tmp.out <- merge(combcon$outliers, tmp)
+tmp.out <- merge(tmp.out, combcon$accuracyFull[, c("PersonID", "ptID125", "ptID150")])
+
+#par(ask = TRUE)
+par(mfrow = c(6, 3))
+par(mar = c(2,2,1,1))
+for (i in names(tmp.out)[c(21:25, 27:28)]) {
+  for (j in names(tmp.out)[3:20]) 
+    plot(factor(tmp.out[tmp.out$Analysis == "Slide",i]), tmp.out[tmp.out$Analysis == "Slide",j], main = j, col = "red")
+  for (j in names(tmp.out)[3:20]) 
+    plot(factor(tmp.out[tmp.out$Analysis == "Digital",i]), tmp.out[tmp.out$Analysis == "Digital",j], main = j, col = "blue")
+}
+rm(i, j)
+#par(ask = FALSE)
+par(mfrow = c(1,1))
+par(mar = c(5.1, 4.1, 4.1, 2.1))
+rm(tmp.s, tmp.out, tmp.d, tmp)
+
+
+# outliers for digital and slide combined -----------------------------
+# I decided not to try to do this as it was done here. Instead, I will rank species based on their distance from the mean
+# rank for MDS 125
+combcon$outliers$cMDS125 <- NA
+tmp.pt <- nmds$CCIF125f$points["SCID", ]
+tmp.tab <- sqrt((nmds$CCIF125f$points[,1] - tmp.pt[1])^2 + (nmds$CCIF125f$points[,2] - tmp.pt[2])^2)
+tmp.pt <- nmds$CCIF125f$points["DCID", ]
+tmp.tab[grep("^[A-M]", names(tmp.tab))] <- sqrt((nmds$CCIF125f$points[,1] - tmp.pt[1])^2 + (nmds$CCIF125f$points[,2] - tmp.pt[2])^2)[grep("^[A-M]", names(tmp.tab))]
+combcon$outliers$cMDS125[order(tmp.tab[match(combcon$outliers$PersonID, names(tmp.tab))])] <- sort(rank(tmp.tab[match(combcon$outliers$PersonID, names(tmp.tab))]))
+rm(tmp.pt, tmp.tab)
+
+# and mds 150
+combcon$outliers$cMDS150 <- NA
+tmp.pt <- nmds$CCIF150f$points["SCID", ]
+tmp.tab <- sqrt((nmds$CCIF150f$points[,1] - tmp.pt[1])^2 + (nmds$CCIF150f$points[,2] - tmp.pt[2])^2)
+tmp.pt <- nmds$CCIF150f$points["DCID", ]
+tmp.tab[grep("^[A-M]", names(tmp.tab))] <- sqrt((nmds$CCIF150f$points[,1] - tmp.pt[1])^2 + (nmds$CCIF150f$points[,2] - tmp.pt[2])^2)[grep("^[A-M]", names(tmp.tab))]
+combcon$outliers$cMDS150[order(tmp.tab[match(combcon$outliers$PersonID, names(tmp.tab))])] <- sort(rank(tmp.tab[match(combcon$outliers$PersonID, names(tmp.tab))]))
+rm(tmp.pt, tmp.tab)
+
+# for percentage combcon$accuracy
+combcon$outliers$cIF_PtAc125 <- NA
+combcon$outliers$cIF_PtAc125[order(100-combcon$accuracyFull$IF_PtAc125[match(combcon$outliers$PersonID, combcon$accuracyFull$PersonID)])] <- sort(rank(100-combcon$accuracyFull$IF_PtAc125))
+
+combcon$outliers$cIF_PtAc150 <- NA
+combcon$outliers$cIF_PtAc150[order(100-combcon$accuracyFull$IF_PtAc150[match(combcon$outliers$PersonID, combcon$accuracyFull$PersonID)])] <- sort(rank(100-combcon$accuracyFull$IF_PtAc150))
+
+# for mean pairwise agreement
+# for percentage combcon$accuracy
+combcon$outliers$cmnPA125 <- NA
+combcon$outliers$cmnPA125[order(100-combcon$accuracyFull$mnPA125[match(combcon$outliers$PersonID, combcon$accuracyFull$PersonID)])] <- sort(rank(100-combcon$accuracyFull$mnPA125))
+
+combcon$outliers$cmnPA150 <- NA
+combcon$outliers$cmnPA150[order(100-combcon$accuracyFull$mnPA150[match(combcon$outliers$PersonID, combcon$accuracyFull$PersonID)])] <- sort(rank(100-combcon$accuracyFull$mnPA150))
+
+# SST
+combcon$outliers$cSST <- NA
+tmp.pt <- abs(divTemp$SST10m[divTemp$Size == 150 & nchar(divTemp$Person) < 5] - 21.76)
+names(tmp.pt) <- divTemp$Person[divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+combcon$outliers$cSST[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
+rm(tmp.pt)
+
+# richness
+combcon$outliers$cIF_Richness125 <- NA
+tmp.pt <- abs(divTemp$IF_Richness[divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+combcon$outliers$cIF_Richness125[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
+
+combcon$outliers$cIF_Richness150 <- NA
+tmp.pt <- abs(divTemp$IF_Richness[divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+combcon$outliers$cIF_Richness150[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
+rm(tmp.pt)
+
+# Dominance
+combcon$outliers$cIF_Dominance125 <- NA
+tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+combcon$outliers$cIF_Dominance125[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
+
+combcon$outliers$cIF_Dominance150 <- NA
+tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+combcon$outliers$cIF_Dominance150[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
+rm(tmp.pt)
+
+# Evenness
+combcon$outliers$cIF_Evenness125 <- NA
+tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+combcon$outliers$cIF_Evenness125[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
+
+combcon$outliers$cIF_Evenness150 <- NA
+tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+combcon$outliers$cIF_Evenness150[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
+rm(tmp.pt)
+
+# ShannonWiener
+combcon$outliers$cIF_ShannonWiener125 <- NA
+tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+combcon$outliers$cIF_ShannonWiener125[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
+
+combcon$outliers$cIF_ShannonWiener150 <- NA
+tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+names(tmp.pt) <- divTemp$Person[divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+combcon$outliers$cIF_ShannonWiener150[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
+rm(tmp.pt)
+
+# weighted sums
+combcon$outliers$cfullSum <- rowSums(combcon$outliers[, grep("^c", names(combcon$outliers))])
+
+combcon$outliers$cwtSum <- rowSums(combcon$outliers[, grep("cMDS", names(combcon$outliers))])/2 + rowSums(combcon$outliers[, grep("^c.*PA|^c.*Pt", names(combcon$outliers))])/2 + combcon$outliers$cSST + rowSums(combcon$outliers[, grep("cIF_Richness", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("cIF_Dominance", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("cIF_Evenness", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("cIF_ShannonWiener", names(combcon$outliers))])/8
+
+combcon$outliers$cwtSumPt <- combcon$outliers$cwtSum / 26 * 100
+
+# looking for correlations
+pairs(combcon$outliers[, grep("^c", names(combcon$outliers))])
+pairs(combcon$outliers[, grep("^c.*125", names(combcon$outliers))])
+pairs(combcon$outliers[, grep("^c.*150", names(combcon$outliers))])
+
+# add the person level info to this
+tmp.s <- people[!is.na(people$SlideID), !grepl("Digital", names(people))]
+tmp.d <- people[!is.na(people$DigitalID), !grepl("Slide", names(people))]
+names(tmp.s)[1] <- names(tmp.d)[1] <- "PersonID"
+tmp.s <- rbind(tmp.s, tmp.s[!is.na(tmp.s$ExperienceSlideB), ])
+tmp.s$PersonID[tmp.s$PersonID %in% tmp.s$PersonID[duplicated(tmp.s$PersonID)]] <- paste(tmp.s$PersonID[tmp.s$PersonID %in% tmp.s$PersonID[duplicated(tmp.s$PersonID)]], rep(c("a", "b"), each = 2), sep = "")
+tmp.s$ExperienceSlideA[grep("b", tmp.s$PersonID)] <- tmp.s$ExperienceSlideB[grep("b", tmp.s$PersonID)]
+tmp.s <- tmp.s[, names(tmp.s) != "ExperienceSlideB"]
+names(tmp.d) <- names(tmp.s) <- gsub("SlideA", "", names(tmp.s))
+tmp <- rbind(tmp.s, tmp.d)
+tmp.out <- merge(combcon$outliers, tmp)
+tmp.out <- merge(tmp.out, combcon$accuracyFull[, c("PersonID", "ptID125", "ptID150")])
+
+#par(ask = TRUE)
+par(mfrow = c(6, 3))
+par(mar = c(2,2,1,1))
+for (i in names(tmp.out)[c(39:43, 45:45)]) {
+  for (j in grep("^c", names(tmp.out), value = TRUE)) 
+    plot(factor(tmp.out[,i]), tmp.out[,j], main = j, col = "red")
+}
+rm(i, j)
+#par(ask = FALSE)
+par(mfrow = c(1,1))
+par(mar = c(5.1, 4.1, 4.1, 2.1))
+
+plot(tmp.out$Analysis, tmp.out$cwtSumPt)
+
+rm(tmp.s, tmp.out, tmp.d, tmp)
+
+
+
+# 14. Save the data -------------------------------------------------------
 save.image("Outputs/Reanalysis_NA_IF.RData")
 

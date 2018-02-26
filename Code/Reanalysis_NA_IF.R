@@ -1,8 +1,8 @@
 # IF reanalysis of Nadia's repeatability
 # IF reanalysis
 # Isabel Fenton
-# Date created: 18 / 1 / 2017
-# Date last edited: 18 / 1 / 2017
+# Date created: 18 / 1 / 2018
+# Date last edited: 26 / 2 / 2018
 # 
 # Re running the analyses done by Nadia in the repeatability analysis. Lab book repeatability
 # 
@@ -1777,10 +1777,10 @@ plot(seq(2, 18, by = 2), sort(divTemp$IF_Richness[divTemp$Analysis == "Digital" 
 points(seq(2, 18, by = 2), sort(divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person != "consensus"]), type = "b", col = "blue")
 points(1:17, sort(divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person != "consensus"]), type = "b")
 points(1:17, sort(divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person != "consensus"]), type = "b", lty = 2)
-abline(h = divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"], lty = 2, col = "blue")
-abline(h = divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"], col = "blue")
-abline(h = divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"], lty = 2)
-abline(h = divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+abline(h = divTemp$IF_Richness[row.nam$d125c], lty = 2, col = "blue")
+abline(h = divTemp$IF_Richness[row.nam$d150c], col = "blue")
+abline(h = divTemp$IF_Richness[row.nam$s125c], lty = 2)
+abline(h = divTemp$IF_Richness[row.nam$s150c])
 
 png("Figures/Fig7_Dominance.png", 800, 500)
 # 125
@@ -1958,98 +1958,98 @@ outliers$mnPA150[outliers$Analysis == "Digital"][order(100-accuracyDigital$mnPA1
 
 # SST
 outliers$SST <- NA
-tmp.pt <- abs(divTemp$SST10m[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - 21.76)
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$SST10m[row.nam$s150] - 21.76)
+names(tmp.pt) <- divTemp$Person[row.nam$s150]
 outliers$SST[outliers$Analysis == "Slide"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
-tmp.pt <- abs(divTemp$SST10m[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - 21.76)
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$SST10m[row.nam$d150] - 21.76)
+names(tmp.pt) <- divTemp$Person[row.nam$d150]
 outliers$SST[outliers$Analysis == "Digital"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # richness
 outliers$IF_Richness125 <- NA
-tmp.pt <- abs(divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$IF_Richness[row.nam$s125] - divTemp$IF_Richness[row.nam$s125c])
+names(tmp.pt) <- divTemp$Person[row.nam$s125]
 outliers$IF_Richness125[outliers$Analysis == "Slide"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
-tmp.pt <- abs(divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$IF_Richness[row.nam$d125] - divTemp$IF_Richness[row.nam$d125c])
+names(tmp.pt) <- divTemp$Person[row.nam$d125]
 outliers$IF_Richness125[outliers$Analysis == "Digital"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
 outliers$IF_Richness150 <- NA
-tmp.pt <- abs(divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$IF_Richness[row.nam$s150] - divTemp$IF_Richness[row.nam$s150c])
+names(tmp.pt) <- divTemp$Person[row.nam$s150]
 outliers$IF_Richness150[outliers$Analysis == "Slide"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
-tmp.pt <- abs(divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$IF_Richness[row.nam$d150] - divTemp$IF_Richness[row.nam$d150c])
+names(tmp.pt) <- divTemp$Person[row.nam$d150]
 outliers$IF_Richness150[outliers$Analysis == "Digital"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # Dominance
 outliers$IF_Dominance125 <- NA
-tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$IF_Dominance[row.nam$s125] - divTemp$IF_Dominance[row.nam$s125c])
+names(tmp.pt) <- divTemp$Person[row.nam$s125]
 outliers$IF_Dominance125[outliers$Analysis == "Slide"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
-tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$IF_Dominance[row.nam$d125] - divTemp$IF_Dominance[row.nam$d125c])
+names(tmp.pt) <- divTemp$Person[row.nam$d125]
 outliers$IF_Dominance125[outliers$Analysis == "Digital"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
 outliers$IF_Dominance150 <- NA
-tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$IF_Dominance[row.nam$s150] - divTemp$IF_Dominance[row.nam$s150c])
+names(tmp.pt) <- divTemp$Person[row.nam$s150]
 outliers$IF_Dominance150[outliers$Analysis == "Slide"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
-tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$IF_Dominance[row.nam$d150] - divTemp$IF_Dominance[row.nam$d150c])
+names(tmp.pt) <- divTemp$Person[row.nam$d150]
 outliers$IF_Dominance150[outliers$Analysis == "Digital"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # Evenness
 outliers$IF_Evenness125 <- NA
-tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$IF_Evenness[row.nam$s125] - divTemp$IF_Evenness[row.nam$s125c])
+names(tmp.pt) <- divTemp$Person[row.nam$s125]
 outliers$IF_Evenness125[outliers$Analysis == "Slide"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
-tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$IF_Evenness[row.nam$d125] - divTemp$IF_Evenness[row.nam$d125c])
+names(tmp.pt) <- divTemp$Person[row.nam$d125]
 outliers$IF_Evenness125[outliers$Analysis == "Digital"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
 outliers$IF_Evenness150 <- NA
-tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$IF_Evenness[row.nam$s150] - divTemp$IF_Evenness[row.nam$s150c])
+names(tmp.pt) <- divTemp$Person[row.nam$s150]
 outliers$IF_Evenness150[outliers$Analysis == "Slide"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
-tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$IF_Evenness[row.nam$d150] - divTemp$IF_Evenness[row.nam$d150c])
+names(tmp.pt) <- divTemp$Person[row.nam$d150]
 outliers$IF_Evenness150[outliers$Analysis == "Digital"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # ShannonWiener
 outliers$IF_ShannonWiener125 <- NA
-tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$IF_ShannonWiener[row.nam$s125] - divTemp$IF_ShannonWiener[row.nam$s125c])
+names(tmp.pt) <- divTemp$Person[row.nam$s125]
 outliers$IF_ShannonWiener125[outliers$Analysis == "Slide"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
-tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$IF_ShannonWiener[row.nam$d125] - divTemp$IF_ShannonWiener[row.nam$d125c])
+names(tmp.pt) <- divTemp$Person[row.nam$d125]
 outliers$IF_ShannonWiener125[outliers$Analysis == "Digital"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
 outliers$IF_ShannonWiener150 <- NA
-tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$IF_ShannonWiener[row.nam$s150] - divTemp$IF_ShannonWiener[row.nam$s150c])
+names(tmp.pt) <- divTemp$Person[row.nam$s150]
 outliers$IF_ShannonWiener150[outliers$Analysis == "Slide"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
-tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$IF_ShannonWiener[row.nam$d150] - divTemp$IF_ShannonWiener[row.nam$d150c])
+names(tmp.pt) <- divTemp$Person[row.nam$d150]
 outliers$IF_ShannonWiener150[outliers$Analysis == "Digital"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # weighted sums
 outliers$fullSum <- rowSums(outliers[, 3:17])
 
-outliers$wtSum <- rowSums(outliers[, grep("MDS", names(outliers))])/2 + rowSums(outliers[, grep("PA|Pt", names(outliers))])/2 + outliers$SST + rowSums(outliers[, grep("Richness", names(outliers))])/8 + rowSums(outliers[, grep("Dominance", names(outliers))])/8 + rowSums(outliers[, grep("Evenness", names(outliers))])/8 + rowSums(outliers[, grep("ShannonWiener", names(outliers))])/8
+outliers$wtSum <- rowSums(outliers[, grep("MDS", names(outliers))])/2 + rowSums(outliers[, grep("Pt", names(outliers))])/2 + outliers$SST + rowSums(outliers[, grep("Richness", names(outliers))])/8 + rowSums(outliers[, grep("Dominance", names(outliers))])/8 + rowSums(outliers[, grep("Evenness", names(outliers))])/8 + rowSums(outliers[, grep("ShannonWiener", names(outliers))])/8
 
 outliers$wtSumPt <- outliers$wtSum / c(rep(4*17, 17), rep(4*9, 9)) * 100
 
@@ -2140,71 +2140,71 @@ outliers$cmnPA150[order(100-accuracyFull$mnPA150[match(outliers$PersonID, accura
 
 # SST
 outliers$cSST <- NA
-tmp.pt <- abs(divTemp$SST10m[divTemp$Size == 150 & nchar(divTemp$Person) < 5] - 21.76)
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(divTemp$SST10m[c(row.nam$s150, row.nam$d150)] - 21.76)
+names(tmp.pt) <- divTemp$Person[c(row.nam$s150, row.nam$d150)]
 outliers$cSST[order(tmp.pt[match(outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # richness
 outliers$cIF_Richness125 <- NA
-tmp.pt <- abs(divTemp$IF_Richness[divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 125 & nchar(divTemp$Person) < 5]
-tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+tmp.pt <- abs(divTemp$IF_Richness[c(row.nam$s125, row.nam$d125)] - divTemp$IF_Richness[row.nam$s125c])
+names(tmp.pt) <- divTemp$Person[c(row.nam$s125, row.nam$d125)]
+tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Richness[row.nam$d125] - divTemp$IF_Richness[row.nam$d125c])
 outliers$cIF_Richness125[order(tmp.pt[match(outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 
 outliers$cIF_Richness150 <- NA
-tmp.pt <- abs(divTemp$IF_Richness[divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 150 & nchar(divTemp$Person) < 5]
-tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+tmp.pt <- abs(divTemp$IF_Richness[c(row.nam$s150, row.nam$d150)] - divTemp$IF_Richness[row.nam$s150c])
+names(tmp.pt) <- divTemp$Person[c(row.nam$s150, row.nam$d150)]
+tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Richness[row.nam$d150] - divTemp$IF_Richness[row.nam$d150c])
 outliers$cIF_Richness150[order(tmp.pt[match(outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # Dominance
 outliers$cIF_Dominance125 <- NA
-tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 125 & nchar(divTemp$Person) < 5]
-tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+tmp.pt <- abs(divTemp$IF_Dominance[c(row.nam$s125, row.nam$d125)] - divTemp$IF_Dominance[row.nam$s125c])
+names(tmp.pt) <- divTemp$Person[c(row.nam$s125, row.nam$d125)]
+tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Dominance[row.nam$d125] - divTemp$IF_Dominance[row.nam$d125c])
 outliers$cIF_Dominance125[order(tmp.pt[match(outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 
 outliers$cIF_Dominance150 <- NA
-tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 150 & nchar(divTemp$Person) < 5]
-tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+tmp.pt <- abs(divTemp$IF_Dominance[c(row.nam$s150, row.nam$d150)] - divTemp$IF_Dominance[row.nam$s150c])
+names(tmp.pt) <- divTemp$Person[c(row.nam$s150, row.nam$d150)]
+tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Dominance[row.nam$d150] - divTemp$IF_Dominance[row.nam$d150c])
 outliers$cIF_Dominance150[order(tmp.pt[match(outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # Evenness
 outliers$cIF_Evenness125 <- NA
-tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 125 & nchar(divTemp$Person) < 5]
-tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+tmp.pt <- abs(divTemp$IF_Evenness[c(row.nam$s125, row.nam$d125)] - divTemp$IF_Evenness[row.nam$s125c])
+names(tmp.pt) <- divTemp$Person[c(row.nam$s125, row.nam$d125)]
+tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Evenness[row.nam$d125] - divTemp$IF_Evenness[row.nam$d125c])
 outliers$cIF_Evenness125[order(tmp.pt[match(outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 
 outliers$cIF_Evenness150 <- NA
-tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 150 & nchar(divTemp$Person) < 5]
-tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+tmp.pt <- abs(divTemp$IF_Evenness[c(row.nam$s150, row.nam$d150)] - divTemp$IF_Evenness[row.nam$s150c])
+names(tmp.pt) <- divTemp$Person[c(row.nam$s150, row.nam$d150)]
+tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Evenness[row.nam$d150] - divTemp$IF_Evenness[row.nam$d150c])
 outliers$cIF_Evenness150[order(tmp.pt[match(outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # ShannonWiener
 outliers$cIF_ShannonWiener125 <- NA
-tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 125 & nchar(divTemp$Person) < 5]
-tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+tmp.pt <- abs(divTemp$IF_ShannonWiener[c(row.nam$s125, row.nam$d125)] - divTemp$IF_ShannonWiener[row.nam$s125c])
+names(tmp.pt) <- divTemp$Person[c(row.nam$s125, row.nam$d125)]
+tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_ShannonWiener[row.nam$d125] - divTemp$IF_ShannonWiener[row.nam$d125c])
 outliers$cIF_ShannonWiener125[order(tmp.pt[match(outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 
 outliers$cIF_ShannonWiener150 <- NA
-tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 150 & nchar(divTemp$Person) < 5]
-tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+tmp.pt <- abs(divTemp$IF_ShannonWiener[c(row.nam$s150, row.nam$d150)] - divTemp$IF_ShannonWiener[row.nam$s150c])
+names(tmp.pt) <- divTemp$Person[c(row.nam$s150, row.nam$d150)]
+tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_ShannonWiener[row.nam$d150] - divTemp$IF_ShannonWiener[row.nam$d150c])
 outliers$cIF_ShannonWiener150[order(tmp.pt[match(outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # weighted sums
 outliers$cfullSum <- rowSums(outliers[, grep("^c", names(outliers))])
 
-outliers$cwtSum <- rowSums(outliers[, grep("cMDS", names(outliers))])/2 + rowSums(outliers[, grep("^c.*PA|^c.*Pt", names(outliers))])/2 + outliers$cSST + rowSums(outliers[, grep("cIF_Richness", names(outliers))])/8 + rowSums(outliers[, grep("cIF_Dominance", names(outliers))])/8 + rowSums(outliers[, grep("cIF_Evenness", names(outliers))])/8 + rowSums(outliers[, grep("cIF_ShannonWiener", names(outliers))])/8
+outliers$cwtSum <- rowSums(outliers[, grep("cMDS", names(outliers))])/2 + rowSums(outliers[, grep("^c.*Pt", names(outliers))])/2 + outliers$cSST + rowSums(outliers[, grep("cIF_Richness", names(outliers))])/8 + rowSums(outliers[, grep("cIF_Dominance", names(outliers))])/8 + rowSums(outliers[, grep("cIF_Evenness", names(outliers))])/8 + rowSums(outliers[, grep("cIF_ShannonWiener", names(outliers))])/8
 
 outliers$cwtSumPt <- outliers$cwtSum / 26 * 100
 
@@ -2603,7 +2603,7 @@ combcon$accuracyFull$Analysis <- c(rep("Slide", 17), rep("Digital", 9))
 
 png("Figures/CombCon/Fig3_CombCon_agreement_fullID.png", 800, 1000)
 par(mfrow = c(2, 1))
-with(combcon$accuracyFull, plot(IF_PtAc125[match(ord.div, PersonID)], ylim = c(40, 90), type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Participant", cex.lab = 1.5, las = 2, cex.axis = 1.1))
+with(combcon$accuracyFull, plot(IF_PtAc125[match(ord.div, PersonID)], ylim = c(40, 90), type = "n", xaxt = "n", ylab = "Percentage agreement", xlab = "Participant", cex.lab = 1.5, las = 2, cex.axis = 1.1))
 axis(1, at = 1:26, labels = combcon$accuracyFull$PersonID[match(ord.div, combcon$accuracyFull$PersonID)], cex.axis = 1.1)
 # adding mean values
 lines(x = c(0, 20.5), y = rep(CCc20_mn$IF_PtAc125s, 2), lty = 1)
@@ -2612,13 +2612,14 @@ lines(x = c(0, 20.5), y = rep(CCc20_mn$IF_PtAc125s + CCc20_sd$IF_PtAc125s, 2), l
 lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_PtAc125d, 2), lty = 1, col = "blue")
 lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_PtAc125d - CCc20_sd$IF_PtAc125d, 2), lty = 4, col = "blue")
 lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_PtAc125d + CCc20_sd$IF_PtAc125d, 2), lty = 4, col = "blue")
+abline(v = 20.5, col = "grey 50")
 # points
 with(combcon$accuracyFull, points(1:26, IF_PtAc125[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
 with(combcon$accuracyFull, arrows(1, IF_PtAc125[PersonID == "1a"], 2, IF_PtAc125[PersonID == "1b"], length = 0.14))
 with(combcon$accuracyFull, arrows(3, IF_PtAc125[PersonID == "2a"], 4, IF_PtAc125[PersonID == "2b"], length = 0.14))
 text(26, 90, "125", cex = 1.5)
 
-with(combcon$accuracyFull, plot(IF_PtAc150[match(ord.div, PersonID)], ylim = c(40, 90), type = "n", xaxt = "n", ylab = "Percentage accuracy", xlab = "Participant", cex.lab = 1.5, las = 2, cex.axis = 1.1))
+with(combcon$accuracyFull, plot(IF_PtAc150[match(ord.div, PersonID)], ylim = c(40, 90), type = "n", xaxt = "n", ylab = "Percentage agreement", xlab = "Participant", cex.lab = 1.5, las = 2, cex.axis = 1.1))
 axis(1, at = 1:26, labels = accuracyFull$PersonID[match(ord.div, accuracyFull$PersonID)], cex.axis = 1.1)
 # adding mean values
 lines(x = c(0, 20.5), y = rep(CCc20_mn$IF_PtAc150s, 2), lty = 1)
@@ -2627,6 +2628,7 @@ lines(x = c(0, 20.5), y = rep(CCc20_mn$IF_PtAc150s + CCc20_sd$IF_PtAc150s, 2), l
 lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_PtAc150d, 2), lty = 1, col = "blue")
 lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_PtAc150d - CCc20_sd$IF_PtAc150d, 2), lty = 4, col = "blue")
 lines(x = c(20.5, 27), y = rep(CCc20_mn$IF_PtAc150d + CCc20_sd$IF_PtAc150d, 2), lty = 4, col = "blue")
+abline(v = 20.5, col = "grey 50")
 # points
 with(combcon$accuracyFull, points(1:26, IF_PtAc150[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
 with(combcon$accuracyFull, arrows(1, IF_PtAc150[PersonID == "1a"], 2, IF_PtAc150[PersonID == "1b"], length = 0.14))
@@ -3264,7 +3266,6 @@ combcon$outliers$MDS125 <- NA
 tmp.pt <- nmds$CCIF125f$points["SCID", ]
 tmp.tab <- sqrt((nmds$CCIF125f$points[,1] - tmp.pt[1])^2 + (nmds$CCIF125f$points[,2] - tmp.pt[2])^2)
 combcon$outliers$MDS125[combcon$outliers$Analysis == "Slide"][order(tmp.tab[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.tab))])] <- sort(rank(tmp.tab[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.tab))]))
-tmp.tab <- sqrt((nmds$CCIF125f$points[,1] - tmp.pt[1])^2 + (nmds$CCIF125f$points[,2] - tmp.pt[2])^2)
 combcon$outliers$MDS125[combcon$outliers$Analysis == "Digital"][order(tmp.tab[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.tab))])] <- sort(rank(tmp.tab[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.tab))]))
 rm(tmp.pt, tmp.tab)
 
@@ -3273,7 +3274,6 @@ combcon$outliers$MDS150 <- NA
 tmp.pt <- nmds$CCIF150f$points["SCID", ]
 tmp.tab <- sqrt((nmds$CCIF150f$points[,1] - tmp.pt[1])^2 + (nmds$CCIF150f$points[,2] - tmp.pt[2])^2)
 combcon$outliers$MDS150[combcon$outliers$Analysis == "Slide"][order(tmp.tab[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.tab))])] <- sort(rank(tmp.tab[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.tab))]))
-tmp.tab <- sqrt((nmds$CCIF150f$points[,1] - tmp.pt[1])^2 + (nmds$CCIF150f$points[,2] - tmp.pt[2])^2)
 combcon$outliers$MDS150[combcon$outliers$Analysis == "Digital"][order(tmp.tab[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.tab))])] <- sort(rank(tmp.tab[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.tab))]))
 rm(tmp.pt, tmp.tab)
 
@@ -3286,132 +3286,124 @@ combcon$outliers$IF_PtAc150 <- NA
 combcon$outliers$IF_PtAc150[combcon$outliers$Analysis == "Slide"][order(100-combcon$accuracySlide$IF_PtAc150[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], combcon$accuracySlide$PersonID)])] <- sort(rank(100-combcon$accuracySlide$IF_PtAc150))
 combcon$outliers$IF_PtAc150[combcon$outliers$Analysis == "Digital"][order(100-combcon$accuracyDigital$IF_PtAc150[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], combcon$accuracyDigital$PersonID)])] <- sort(rank(100-combcon$accuracyDigital$IF_PtAc150))
 
-# for mean pairwise agreement
-# for percentage combcon$accuracy
-combcon$outliers$mnPA125 <- NA
-combcon$outliers$mnPA125[combcon$outliers$Analysis == "Slide"][order(100-combcon$accuracySlide$mnPA125[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], combcon$accuracySlide$PersonID)])] <- sort(rank(100-combcon$accuracySlide$mnPA125))
-combcon$outliers$mnPA125[combcon$outliers$Analysis == "Digital"][order(100-combcon$accuracyDigital$mnPA125[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], combcon$accuracyDigital$PersonID)])] <- sort(rank(100-combcon$accuracyDigital$mnPA125))
-
-combcon$outliers$mnPA150 <- NA
-combcon$outliers$mnPA150[combcon$outliers$Analysis == "Slide"][order(100-combcon$accuracySlide$mnPA150[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], combcon$accuracySlide$PersonID)])] <- sort(rank(100-combcon$accuracySlide$mnPA150))
-combcon$outliers$mnPA150[combcon$outliers$Analysis == "Digital"][order(100-combcon$accuracyDigital$mnPA150[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], combcon$accuracyDigital$PersonID)])] <- sort(rank(100-combcon$accuracyDigital$mnPA150))
-
 # SST
 combcon$outliers$SST <- NA
-tmp.pt <- abs(divTemp$SST10m[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - 21.76)
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$SST10m[row.nam$s150] - 21.76)
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$s150]
 combcon$outliers$SST[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
-tmp.pt <- abs(divTemp$SST10m[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - 21.76)
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$SST10m[row.nam$d150] - 21.76)
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$d150]
 combcon$outliers$SST[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # richness
 combcon$outliers$IF_Richness125 <- NA
-tmp.pt <- abs(divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$IF_Richness[row.nam$s125] - combcon$divTemp$IF_Richness[row.nam$s125c])
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$s125]
 combcon$outliers$IF_Richness125[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
-tmp.pt <- abs(divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$IF_Richness[row.nam$d125] - combcon$divTemp$IF_Richness[row.nam$d125c])
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$d125]
 combcon$outliers$IF_Richness125[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
 combcon$outliers$IF_Richness150 <- NA
-tmp.pt <- abs(divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$IF_Richness[row.nam$s150] - combcon$divTemp$IF_Richness[row.nam$s150c])
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$s150]
 combcon$outliers$IF_Richness150[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
-tmp.pt <- abs(divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$IF_Richness[row.nam$d150] - combcon$divTemp$IF_Richness[row.nam$d150c])
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$d150]
 combcon$outliers$IF_Richness150[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # Dominance
 combcon$outliers$IF_Dominance125 <- NA
-tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$IF_Dominance[row.nam$s125] - combcon$divTemp$IF_Dominance[row.nam$s125c])
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$s125]
 combcon$outliers$IF_Dominance125[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
-tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$IF_Dominance[row.nam$d125] - combcon$divTemp$IF_Dominance[row.nam$d125c])
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$d125]
 combcon$outliers$IF_Dominance125[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
 combcon$outliers$IF_Dominance150 <- NA
-tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$IF_Dominance[row.nam$s150] - combcon$divTemp$IF_Dominance[row.nam$s150c])
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$s150]
 combcon$outliers$IF_Dominance150[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
-tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$IF_Dominance[row.nam$d150] - combcon$divTemp$IF_Dominance[row.nam$d150c])
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$d150]
 combcon$outliers$IF_Dominance150[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # Evenness
 combcon$outliers$IF_Evenness125 <- NA
-tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$IF_Evenness[row.nam$s125] - combcon$divTemp$IF_Evenness[row.nam$s125c])
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$s125]
 combcon$outliers$IF_Evenness125[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
-tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$IF_Evenness[row.nam$d125] - combcon$divTemp$IF_Evenness[row.nam$d125c])
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$d125]
 combcon$outliers$IF_Evenness125[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
 combcon$outliers$IF_Evenness150 <- NA
-tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$IF_Evenness[row.nam$s150] - combcon$divTemp$IF_Evenness[row.nam$s150c])
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$s150]
 combcon$outliers$IF_Evenness150[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
-tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$IF_Evenness[row.nam$d150] - combcon$divTemp$IF_Evenness[row.nam$d150c])
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$d150]
 combcon$outliers$IF_Evenness150[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # ShannonWiener
 combcon$outliers$IF_ShannonWiener125 <- NA
-tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$IF_ShannonWiener[row.nam$s125] - combcon$divTemp$IF_ShannonWiener[row.nam$s125c])
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$s125]
 combcon$outliers$IF_ShannonWiener125[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
-tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$IF_ShannonWiener[row.nam$d125] - combcon$divTemp$IF_ShannonWiener[row.nam$d125c])
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$d125]
 combcon$outliers$IF_ShannonWiener125[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
 combcon$outliers$IF_ShannonWiener150 <- NA
-tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Slide" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$IF_ShannonWiener[row.nam$s150] - combcon$divTemp$IF_ShannonWiener[row.nam$s150c])
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$s150]
 combcon$outliers$IF_ShannonWiener150[combcon$outliers$Analysis == "Slide"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 
-tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$IF_ShannonWiener[row.nam$d150] - combcon$divTemp$IF_ShannonWiener[row.nam$d150c])
+names(tmp.pt) <- combcon$divTemp$Person[row.nam$d150]
 combcon$outliers$IF_ShannonWiener150[combcon$outliers$Analysis == "Digital"][order(tmp.pt[match(combcon$outliers$PersonID[combcon$outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # weighted sums
-combcon$outliers$fullSum <- rowSums(combcon$outliers[, 3:17])
+combcon$outliers$fullSum <- rowSums(combcon$outliers[, 3:15])
 
-combcon$outliers$wtSum <- rowSums(combcon$outliers[, grep("MDS", names(combcon$outliers))])/2 + rowSums(combcon$outliers[, grep("PA|Pt", names(combcon$outliers))])/2 + combcon$outliers$SST + rowSums(combcon$outliers[, grep("Richness", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("Dominance", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("Evenness", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("ShannonWiener", names(combcon$outliers))])/8
+combcon$outliers$wtSum <- rowSums(combcon$outliers[, grep("MDS", names(combcon$outliers))])/2 + rowSums(combcon$outliers[, grep("Pt", names(combcon$outliers))])/2 + combcon$outliers$SST + rowSums(combcon$outliers[, grep("Richness", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("Dominance", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("Evenness", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("ShannonWiener", names(combcon$outliers))])/8
 
 combcon$outliers$wtSumPt <- combcon$outliers$wtSum / c(rep(4*17, 17), rep(4*9, 9)) * 100
 
 # Table 8 
 # add percentage of specimens identified to combcon$accuracy
-combcon$accuracySlide$ptID125 <- apply(slide125[,col.nam$s125], 2, function(x) sum(x != "na") / 300 * 100)[combcon$accuracySlide$PersonID]
-combcon$accuracySlide$ptID150 <- apply(slide150[,col.nam$s150], 2, function(x) sum(x != "na") / 300 * 100)[combcon$accuracySlide$PersonID]
-combcon$accuracyDigital$ptID125 <- apply(digital125[,col.nam$d125], 2, function(x) sum(x != "na") / 300 * 100)[combcon$accuracyDigital$PersonID]
-combcon$accuracyDigital$ptID150 <- apply(digital150[,col.nam$d150], 2, function(x) sum(x != "na") / 300 * 100)[combcon$accuracyDigital$PersonID]
+combcon$accuracySlide$ptID125 <- apply(combcon$slide125[,col.nam$s125], 2, function(x) sum(x != "na") / 300 * 100)[combcon$accuracySlide$PersonID]
+combcon$accuracySlide$ptID150 <- apply(combcon$slide150[,col.nam$s150], 2, function(x) sum(x != "na") / 300 * 100)[combcon$accuracySlide$PersonID]
+combcon$accuracyDigital$ptID125 <- apply(combcon$digital125[,col.nam$d125], 2, function(x) sum(x != "na") / 300 * 100)[combcon$accuracyDigital$PersonID]
+combcon$accuracyDigital$ptID150 <- apply(combcon$digital150[,col.nam$d150], 2, function(x) sum(x != "na") / 300 * 100)[combcon$accuracyDigital$PersonID]
+
+combcon$accuracySlide$Experience <- people$ExperienceSlideA[match(combcon$accuracySlide$PersonID, people$SlideID)]
+combcon$accuracySlide$Experience[combcon$accuracySlide$PersonID %in% c("1a", "2a")] <- people$ExperienceSlideA[1:2]
+combcon$accuracySlide$Experience[combcon$accuracySlide$PersonID %in% c("1b", "2b")] <- people$ExperienceSlideB[1:2]
+combcon$accuracyDigital$Experience <- people$ExperienceDigital[match(combcon$accuracyDigital$PersonID, people$DigitalID)]
+
 combcon$accuracyFull <- rbind(combcon$accuracySlide, combcon$accuracyDigital)
 combcon$accuracyFull$Analysis <- c(rep("Slide", 17), rep("Digital", 9))
 
-# looking for correlations
-pairs(combcon$outliers[, 3:ncol(combcon$outliers)])
-pairs(combcon$outliers[, grep("125", names(combcon$outliers))])
-pairs(combcon$outliers[, grep("150", names(combcon$outliers))])
-
 # Create a .csv file for the combcon$accuracy data
+
 # create a subset of the data for this
 tmp.sub <- combcon$accuracyFull[, c("PersonID", "Analysis", "Experience", "Routine", "IF_PtAc125", "IF_PtAc150", "ptID125", "ptID150")]
 tmp.sub[, grep("125|150", names(tmp.sub))] <- round(tmp.sub[, grep("125|150", names(tmp.sub))], 2)
-write.csv(tmp.sub, "Outputs/combcon$accuracy.csv", row.names = FALSE)
+write.csv(tmp.sub, "Outputs/combconAccuracy.csv", row.names = FALSE)
 rm(tmp.sub)
 
 # add the person level info to this
@@ -3428,12 +3420,12 @@ tmp.out <- merge(combcon$outliers, tmp)
 tmp.out <- merge(tmp.out, combcon$accuracyFull[, c("PersonID", "ptID125", "ptID150")])
 
 #par(ask = TRUE)
-par(mfrow = c(6, 3))
+par(mfrow = c(4, 4))
 par(mar = c(2,2,1,1))
-for (i in names(tmp.out)[c(21:25, 27:28)]) {
-  for (j in names(tmp.out)[3:20]) 
-    plot(factor(tmp.out[tmp.out$Analysis == "Slide",i]), tmp.out[tmp.out$Analysis == "Slide",j], main = j, col = "red")
-  for (j in names(tmp.out)[3:20]) 
+for (i in names(tmp.out)[c(19:23, 25:26)]) {
+  for (j in names(tmp.out)[3:18]) 
+    plot(factor(tmp.out[tmp.out$Analysis == "Slide",i]), tmp.out[tmp.out$Analysis == "Slide",j], main = i, col = "red")
+  for (j in names(tmp.out)[3:18]) 
     plot(factor(tmp.out[tmp.out$Analysis == "Digital",i]), tmp.out[tmp.out$Analysis == "Digital",j], main = j, col = "blue")
 }
 rm(i, j)
@@ -3443,14 +3435,11 @@ par(mar = c(5.1, 4.1, 4.1, 2.1))
 rm(tmp.s, tmp.out, tmp.d, tmp)
 
 
-# outliers for digital and slide combined -----------------------------
-# I decided not to try to do this as it was done here. Instead, I will rank species based on their distance from the mean
+# outliers for digital and slide combined 
 # rank for MDS 125
 combcon$outliers$cMDS125 <- NA
 tmp.pt <- nmds$CCIF125f$points["SCID", ]
 tmp.tab <- sqrt((nmds$CCIF125f$points[,1] - tmp.pt[1])^2 + (nmds$CCIF125f$points[,2] - tmp.pt[2])^2)
-tmp.pt <- nmds$CCIF125f$points["DCID", ]
-tmp.tab[grep("^[A-M]", names(tmp.tab))] <- sqrt((nmds$CCIF125f$points[,1] - tmp.pt[1])^2 + (nmds$CCIF125f$points[,2] - tmp.pt[2])^2)[grep("^[A-M]", names(tmp.tab))]
 combcon$outliers$cMDS125[order(tmp.tab[match(combcon$outliers$PersonID, names(tmp.tab))])] <- sort(rank(tmp.tab[match(combcon$outliers$PersonID, names(tmp.tab))]))
 rm(tmp.pt, tmp.tab)
 
@@ -3458,93 +3447,75 @@ rm(tmp.pt, tmp.tab)
 combcon$outliers$cMDS150 <- NA
 tmp.pt <- nmds$CCIF150f$points["SCID", ]
 tmp.tab <- sqrt((nmds$CCIF150f$points[,1] - tmp.pt[1])^2 + (nmds$CCIF150f$points[,2] - tmp.pt[2])^2)
-tmp.pt <- nmds$CCIF150f$points["DCID", ]
-tmp.tab[grep("^[A-M]", names(tmp.tab))] <- sqrt((nmds$CCIF150f$points[,1] - tmp.pt[1])^2 + (nmds$CCIF150f$points[,2] - tmp.pt[2])^2)[grep("^[A-M]", names(tmp.tab))]
 combcon$outliers$cMDS150[order(tmp.tab[match(combcon$outliers$PersonID, names(tmp.tab))])] <- sort(rank(tmp.tab[match(combcon$outliers$PersonID, names(tmp.tab))]))
 rm(tmp.pt, tmp.tab)
 
-# for percentage combcon$accuracy
+# for percentage accuracy
 combcon$outliers$cIF_PtAc125 <- NA
 combcon$outliers$cIF_PtAc125[order(100-combcon$accuracyFull$IF_PtAc125[match(combcon$outliers$PersonID, combcon$accuracyFull$PersonID)])] <- sort(rank(100-combcon$accuracyFull$IF_PtAc125))
 
 combcon$outliers$cIF_PtAc150 <- NA
 combcon$outliers$cIF_PtAc150[order(100-combcon$accuracyFull$IF_PtAc150[match(combcon$outliers$PersonID, combcon$accuracyFull$PersonID)])] <- sort(rank(100-combcon$accuracyFull$IF_PtAc150))
 
-# for mean pairwise agreement
-# for percentage combcon$accuracy
-combcon$outliers$cmnPA125 <- NA
-combcon$outliers$cmnPA125[order(100-combcon$accuracyFull$mnPA125[match(combcon$outliers$PersonID, combcon$accuracyFull$PersonID)])] <- sort(rank(100-combcon$accuracyFull$mnPA125))
-
-combcon$outliers$cmnPA150 <- NA
-combcon$outliers$cmnPA150[order(100-combcon$accuracyFull$mnPA150[match(combcon$outliers$PersonID, combcon$accuracyFull$PersonID)])] <- sort(rank(100-combcon$accuracyFull$mnPA150))
-
 # SST
 combcon$outliers$cSST <- NA
-tmp.pt <- abs(divTemp$SST10m[divTemp$Size == 150 & nchar(divTemp$Person) < 5] - 21.76)
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 150 & nchar(divTemp$Person) < 5]
+tmp.pt <- abs(combcon$divTemp$SST10m[c(row.nam$s150, row.nam$d150)] - 21.76)
+names(tmp.pt) <- combcon$divTemp$Person[c(row.nam$s150, row.nam$d150)]
 combcon$outliers$cSST[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # richness
 combcon$outliers$cIF_Richness125 <- NA
-tmp.pt <- abs(divTemp$IF_Richness[divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 125 & nchar(divTemp$Person) < 5]
-tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+tmp.pt <- abs(combcon$divTemp$IF_Richness[c(row.nam$s125, row.nam$d125)] - combcon$divTemp$IF_Richness[row.nam$s125c])
+names(tmp.pt) <- combcon$divTemp$Person[c(row.nam$s125, row.nam$d125)]
 combcon$outliers$cIF_Richness125[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 
 combcon$outliers$cIF_Richness150 <- NA
-tmp.pt <- abs(divTemp$IF_Richness[divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 150 & nchar(divTemp$Person) < 5]
-tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Richness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+tmp.pt <- abs(combcon$divTemp$IF_Richness[c(row.nam$s150, row.nam$d150)] - combcon$divTemp$IF_Richness[row.nam$s150c])
+names(tmp.pt) <- combcon$divTemp$Person[c(row.nam$s150, row.nam$d150)]
 combcon$outliers$cIF_Richness150[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # Dominance
 combcon$outliers$cIF_Dominance125 <- NA
-tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 125 & nchar(divTemp$Person) < 5]
-tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+tmp.pt <- abs(combcon$divTemp$IF_Dominance[c(row.nam$s125, row.nam$d125)] - combcon$divTemp$IF_Dominance[row.nam$s125c])
+names(tmp.pt) <- combcon$divTemp$Person[c(row.nam$s125, row.nam$d125)]
 combcon$outliers$cIF_Dominance125[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 
 combcon$outliers$cIF_Dominance150 <- NA
-tmp.pt <- abs(divTemp$IF_Dominance[divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 150 & nchar(divTemp$Person) < 5]
-tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Dominance[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+tmp.pt <- abs(combcon$divTemp$IF_Dominance[c(row.nam$s150, row.nam$d150)] - combcon$divTemp$IF_Dominance[row.nam$s150c])
+names(tmp.pt) <- combcon$divTemp$Person[c(row.nam$s150, row.nam$d150)]
 combcon$outliers$cIF_Dominance150[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # Evenness
 combcon$outliers$cIF_Evenness125 <- NA
-tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 125 & nchar(divTemp$Person) < 5]
-tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+tmp.pt <- abs(combcon$divTemp$IF_Evenness[c(row.nam$s125, row.nam$d125)] - combcon$divTemp$IF_Evenness[row.nam$s125c])
+names(tmp.pt) <- combcon$divTemp$Person[c(row.nam$s125, row.nam$d125)]
 combcon$outliers$cIF_Evenness125[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 
 combcon$outliers$cIF_Evenness150 <- NA
-tmp.pt <- abs(divTemp$IF_Evenness[divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 150 & nchar(divTemp$Person) < 5]
-tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_Evenness[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+tmp.pt <- abs(combcon$divTemp$IF_Evenness[c(row.nam$s150, row.nam$d150)] - combcon$divTemp$IF_Evenness[row.nam$s150c])
+names(tmp.pt) <- combcon$divTemp$Person[c(row.nam$s150, row.nam$d150)]
 combcon$outliers$cIF_Evenness150[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # ShannonWiener
 combcon$outliers$cIF_ShannonWiener125 <- NA
-tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 125 & nchar(divTemp$Person) < 5]
-tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 125 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus"])
+tmp.pt <- abs(combcon$divTemp$IF_ShannonWiener[c(row.nam$s125, row.nam$d125)] - combcon$divTemp$IF_ShannonWiener[row.nam$s125c])
+names(tmp.pt) <- combcon$divTemp$Person[c(row.nam$s125, row.nam$d125)]
 combcon$outliers$cIF_ShannonWiener125[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 
 combcon$outliers$cIF_ShannonWiener150 <- NA
-tmp.pt <- abs(divTemp$IF_ShannonWiener[divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus"])
-names(tmp.pt) <- divTemp$Person[divTemp$Size == 150 & nchar(divTemp$Person) < 5]
-tmp.pt[grep("^[A-M]", names(tmp.pt))] <- abs(divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 150 & nchar(divTemp$Person) < 5] - divTemp$IF_ShannonWiener[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus"])
+tmp.pt <- abs(combcon$divTemp$IF_ShannonWiener[c(row.nam$s150, row.nam$d150)] - combcon$divTemp$IF_ShannonWiener[row.nam$s150c])
+names(tmp.pt) <- combcon$divTemp$Person[c(row.nam$s150, row.nam$d150)]
 combcon$outliers$cIF_ShannonWiener150[order(tmp.pt[match(combcon$outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
 # weighted sums
 combcon$outliers$cfullSum <- rowSums(combcon$outliers[, grep("^c", names(combcon$outliers))])
 
-combcon$outliers$cwtSum <- rowSums(combcon$outliers[, grep("cMDS", names(combcon$outliers))])/2 + rowSums(combcon$outliers[, grep("^c.*PA|^c.*Pt", names(combcon$outliers))])/2 + combcon$outliers$cSST + rowSums(combcon$outliers[, grep("cIF_Richness", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("cIF_Dominance", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("cIF_Evenness", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("cIF_ShannonWiener", names(combcon$outliers))])/8
+combcon$outliers$cwtSum <- rowSums(combcon$outliers[, grep("cMDS", names(combcon$outliers))])/2 + rowSums(combcon$outliers[, grep("^c.*Pt", names(combcon$outliers))])/2 + combcon$outliers$cSST + rowSums(combcon$outliers[, grep("cIF_Richness", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("cIF_Dominance", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("cIF_Evenness", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("cIF_ShannonWiener", names(combcon$outliers))])/8
 
 combcon$outliers$cwtSumPt <- combcon$outliers$cwtSum / 26 * 100
 
@@ -3567,9 +3538,9 @@ tmp.out <- merge(combcon$outliers, tmp)
 tmp.out <- merge(tmp.out, combcon$accuracyFull[, c("PersonID", "ptID125", "ptID150")])
 
 #par(ask = TRUE)
-par(mfrow = c(6, 3))
+par(mfrow = c(4, 4))
 par(mar = c(2,2,1,1))
-for (i in names(tmp.out)[c(39:43, 45:45)]) {
+for (i in names(tmp.out)[c(35:39, 41:42)]) {
   for (j in grep("^c", names(tmp.out), value = TRUE)) 
     plot(factor(tmp.out[,i]), tmp.out[,j], main = j, col = "red")
 }
@@ -3583,6 +3554,70 @@ plot(tmp.out$Analysis, tmp.out$cwtSumPt)
 rm(tmp.s, tmp.out, tmp.d, tmp)
 
 
+
+# 13i. Size vs. maximum agreement ------------------------------------------
+# Figure 5
+png("Figures/CombCon/Fig5_size_agreement_sd125.png")
+with(combcon$size125, plot(slideAgreement, Length, pch = 16, main = "> 125", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diamter / ", mu, "m"))))
+lines(names(tapply(combcon$size125$Length, combcon$size125$slideAgreement, max)), tapply(combcon$size125$Length, combcon$size125$slideAgreement, max), pch = 16)
+with(combcon$size125, points(digitalAgreement, Length, pch = 16, col = "blue"))
+lines(names(tapply(combcon$size125$Length, combcon$size125$digitalAgreement, max)), tapply(combcon$size125$Length, combcon$size125$digitalAgreement, max), pch = 16, col = 4)
+legend("topleft", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"))
+dev.off()
+
+png("Figures/CombCon/Fig5_size_agreement_sd150.png")
+with(combcon$size150, plot(slideAgreement, Length, pch = 16, main = "> 150", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diamter / ", mu, "m"))))
+lines(names(tapply(combcon$size150$Length, combcon$size150$slideAgreement, max)), tapply(combcon$size150$Length, combcon$size150$slideAgreement, max), pch = 16)
+with(combcon$size150, points(digitalAgreement, Length, pch = 16, col = "blue"))
+lines(names(tapply(combcon$size150$Length, combcon$size150$digitalAgreement, max)), tapply(combcon$size150$Length, combcon$size150$digitalAgreement, max), pch = 16, col = 4)
+legend("topleft", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"))
+dev.off()
+
+png("Figures/CombCon/Fig5_size_agreement_c125.png")
+with(combcon$size125, plot(Length, Agreement, pch = 16, main = "> 125", las = 1, ylab = "Agreement", xlab = expression(paste("Maximum diamter / ", mu, "m"))))
+lines(tapply(combcon$size125$Length, combcon$size125$Agreement, max), names(tapply(combcon$size125$Length, combcon$size125$Agreement, max)), pch = 16)
+dev.off()
+
+png("Figures/CombCon/Fig5_size_agreement_c150.png")
+with(combcon$size150, plot(Length, Agreement, pch = 16, main = "> 150", las = 1, ylab = "Agreement", xlab = expression(paste("Maximum diamter / ", mu, "m"))))
+lines(tapply(combcon$size150$Length, combcon$size150$Agreement, max), names(tapply(combcon$size150$Length, combcon$size150$Agreement, max)), pch = 16)
+dev.off()
+
+# 13j. Comparison with MARGO -----------------------------------------------
+# see how the datasets compare with the MARGO values for that latitude
+load("../../../../../../../Dropbox/Documents/PhD/Project/MARGO/Outputs/Diversity_measures.RData")
+
+png("Figures/CombCon/Div_cf_Margo.png", 550, 600)
+par(mfrow = c(2,2))
+# species richness
+plot(ldg.margo.data$Latitude, ldg.margo.data$sp.rich, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness")
+points(rep(30.2, nrow(combcon$divTemp)), combcon$divTemp$IF_Richness, col = "blue", pch = 16)
+points(rep(30.2, 4), combcon$divTemp$IF_Richness[combcon$divTemp$Person == "consensus"], col = "red", pch = 16)
+
+# check the metrics are the same
+sum(ldg.margo.data$sp.rich != specnumber(ldg.margo.data[,14:44])) # should be 0, so yes
+
+# ShannonWiener
+tmp.sw <- diversity(ldg.margo.data[,14:44])
+plot(ldg.margo.data$Latitude, tmp.sw, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener")
+points(rep(30.2, nrow(combcon$divTemp)), combcon$divTemp$IF_ShannonWiener, col = "blue", pch = 16)
+points(rep(30.2, 4), combcon$divTemp$IF_ShannonWiener[combcon$divTemp$Person == "consensus"], col = "red", pch = 16)
+
+# Dominance
+tmp.dom <- (1 - diversity(ldg.margo.data[,14:44], index = "simpson"))
+plot(ldg.margo.data$Latitude, tmp.dom, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance")
+points(rep(30.2, nrow(combcon$divTemp)), combcon$divTemp$IF_Dominance, col = "blue", pch = 16)
+points(rep(30.2, 4), combcon$divTemp$IF_Dominance[combcon$divTemp$Person == "consensus"], col = "red", pch = 16)
+
+
+# Evenness
+tmp.eve <- (exp(diversity(ldg.margo.data[,14:44])) / specnumber(ldg.margo.data[,14:44]))
+plot(ldg.margo.data$Latitude, tmp.eve, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Evenness")
+points(rep(30.2, nrow(combcon$divTemp)), combcon$divTemp$IF_Evenness, col = "blue", pch = 16)
+points(rep(30.2, 4), combcon$divTemp$IF_Evenness[combcon$divTemp$Person == "consensus"], col = "red", pch = 16)
+par(mfrow = c(1,1))
+dev.off()
+rm(tmp.sw, tmp.dom, tmp.eve, margo.all.species, margo.cons, margo.macro, ldg.margo.data, margo.traits, margo.traits.cons)
 
 # 14. Save the data -------------------------------------------------------
 save.image("Outputs/Reanalysis_NA_IF.RData")

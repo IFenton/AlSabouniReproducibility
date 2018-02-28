@@ -1608,9 +1608,12 @@ sum(full.150$IFcMin.x == full.150$IFcMin.y) # 248 or 83% accuracy
 # plotting the consensus' against each other
 png("Figures/DigitalSlide/confusion_125_Con.png", 1000, 700)
 conf_mat(long$f125, "IFcMin", axis.col = "Person", axis1 = "A", axis2 = "1a", spec.abb = sp.abb, abb.end = c("na", "nc"), xlab = "Digital", ylab = "Slide")
+text(-0.4, 1, "Consensus 125", cex = 1.5)
 dev.off()
+
 png("Figures/DigitalSlide/confusion_150_Con.png", 1000, 700)
 conf_mat(long$f150, "IFcMin", axis.col = "Person", axis1 = "A", axis2 = "1a", spec.abb = sp.abb, abb.end = c("na", "nc"), xlab = "Digital", ylab = "Slide")
+text(-0.4, 1, "Consensus 150", cex = 1.5)
 dev.off()
 
 # 7. SST ------------------------------------------------------------------
@@ -1839,9 +1842,12 @@ abline(lm(divTemp$IF_ShannonWiener[divTemp$Size == 150 & !(divTemp$Person %in% c
 dev.off()
 
 # the other variables show mixed results
-# richness r2 = 0.1849, p = 0.0283
-# evenness r2 = 0.1891, p = 0.0264
+# richness r2 = 0.1849, p = 0.0283*
+summary(lm(divTemp$IF_Richness[c(row.nam$s150, row.nam$d150)] ~ divTemp$IF_Richness[c(row.nam$s125, row.nam$d125)]))
+# evenness r2 = 0.1891, p = 0.0264*
+summary(lm(divTemp$IF_Evenness[c(row.nam$s150, row.nam$d150)] ~ divTemp$IF_Evenness[c(row.nam$s125, row.nam$d125)]))
 # dominance r2 = 0.0551, p = 0.248
+summary(lm(divTemp$IF_Dominance[c(row.nam$s150, row.nam$d150)] ~ divTemp$IF_Dominance[c(row.nam$s125, row.nam$d125)]))
 
 # 8d. Sensitivity to alphabetical order ---------------------------------
 # checking diversity
@@ -2302,6 +2308,28 @@ points(100:700, pred, type = "l")
 dev.off()
 rm(pred)
 
+# is size correlated with abundance?
+# what is the mean species size
+sp.size <- list()
+sp.size$ssC <- tapply(c(combcon$size125$Length, combcon$size150$Length), c(combcon$size125$Con1, combcon$size150$Con1), mean)
+sp.size$ss125 <-tapply(combcon$size125$Length, combcon$size125$Con1, mean)
+sp.size$ss150 <-tapply(combcon$size150$Length, combcon$size150$Con1, mean)
+
+sp.abun <- list()
+sp.abun$ssC <- table(c(combcon$size125$Con1, combcon$size150$Con1))
+sp.abun$ss125 <- table(combcon$size125$Con1)
+sp.abun$ss150 <- table(combcon$size150$Con1)
+
+# plot species mean against abundance
+plot(as.numeric(sp.size$ssC), log(as.numeric(sp.abun$ssC)), pch = 16)
+points(as.numeric(sp.size$ss125), log(as.numeric(sp.abun$ss125)), pch = 16, col = "blue")
+points(as.numeric(sp.size$ss150), log(as.numeric(sp.abun$ss150)), pch = 16, col = "red")
+abline(lm(log(as.numeric(sp.abun$ssC)) ~ as.numeric(sp.size$ssC)))
+abline(lm(log(as.numeric(sp.abun$ss125)) ~ as.numeric(sp.size$ss125)), col = "blue")
+abline(lm(log(as.numeric(sp.abun$ss150)) ~ as.numeric(sp.size$ss150)), col = "red")
+
+sort(sp.size)
+
 # 11. Comparison of different tests ---------------------------------------
 # ex. Figure 12
 png("Figures/exFig12_Consensus frequency.png", 500, 700)
@@ -2336,41 +2364,41 @@ sum(digital150$IFmaxCon <= c50_cutoff$digital) # 72
 
 # 12. Interpreting the diversity metrics ----------------------------------
 
-# 12a. Comparison with MARGO -----------------------------------------------
-# see how the datasets compare with the MARGO values for that latitude
-load("../../../../../../../Dropbox/Documents/PhD/Project/MARGO/Outputs/Diversity_measures.RData")
+# 12a. Comparison with ForCenS -----------------------------------------------
+# see how the datasets compare with the ForCenS values for that latitude
+ForCenSred <- as.data.frame(read_excel("../../../ForCenS/Data/ForCenS.xlsx", sheet = "ForCenSred", na = "N/A")) 
+ForCenSred[, 22:62][is.na(ForCenSred[, 22:62])] <- 0
+str(ForCenSred)
 
-png("Figures/Div_cf_Margo.png", 550, 600)
+png("Figures/Div_cf_ForCenSred.png", 550, 600)
 par(mfrow = c(2,2))
 # species richness
-plot(ldg.margo.data$Latitude, ldg.margo.data$sp.rich, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness")
+tmp.rich <- specnumber(ForCenSred[, 22:62]) # richness(ForCenSred[,22:62])
+plot(ForCenSred$Latitude, tmp.rich, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness")
 points(rep(30.2, nrow(divTemp)), divTemp$IF_Richness, col = "blue", pch = 16)
 points(rep(30.2, 4), divTemp$IF_Richness[divTemp$Person == "consensus"], col = "red", pch = 16)
 
-# check the metrics are the same
-sum(ldg.margo.data$sp.rich != specnumber(ldg.margo.data[,14:44])) # should be 0, so yes
-
 # ShannonWiener
-tmp.sw <- diversity(ldg.margo.data[,14:44])
-plot(ldg.margo.data$Latitude, tmp.sw, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener")
+tmp.sw <- diversity(ForCenSred[,22:62])
+plot(ForCenSred$Latitude, tmp.sw, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener")
 points(rep(30.2, nrow(divTemp)), divTemp$IF_ShannonWiener, col = "blue", pch = 16)
 points(rep(30.2, 4), divTemp$IF_ShannonWiener[divTemp$Person == "consensus"], col = "red", pch = 16)
 
 # Dominance
-tmp.dom <- (1 - diversity(ldg.margo.data[,14:44], index = "simpson"))
-plot(ldg.margo.data$Latitude, tmp.dom, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance")
+tmp.dom <- (1 - diversity(ForCenSred[,22:62], index = "simpson"))
+plot(ForCenSred$Latitude, tmp.dom, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance")
 points(rep(30.2, nrow(divTemp)), divTemp$IF_Dominance, col = "blue", pch = 16)
 points(rep(30.2, 4), divTemp$IF_Dominance[divTemp$Person == "consensus"], col = "red", pch = 16)
 
-
 # Evenness
-tmp.eve <- (exp(diversity(ldg.margo.data[,14:44])) / specnumber(ldg.margo.data[,14:44]))
-plot(ldg.margo.data$Latitude, tmp.eve, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Evenness")
+tmp.eve <- (exp(diversity(ForCenSred[,22:62])) / specnumber(ForCenSred[,22:62]))
+plot(ForCenSred$Latitude, tmp.eve, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Evenness")
 points(rep(30.2, nrow(divTemp)), divTemp$IF_Evenness, col = "blue", pch = 16)
 points(rep(30.2, 4), divTemp$IF_Evenness[divTemp$Person == "consensus"], col = "red", pch = 16)
 par(mfrow = c(1,1))
 dev.off()
-rm(tmp.sw, tmp.dom, tmp.eve, margo.all.species, margo.cons, margo.macro, ldg.margo.data, margo.traits, margo.traits.cons)
+
+rm(tmp, i, tmp.rich, tmp.sw, tmp.dom, tmp.eve, ForCenSred)
 
 
 # 12b. Simulations for studying changes -----------------------------------
@@ -2387,25 +2415,25 @@ rm(tmp)
 # 12c. Direction of change ------------------------------------------------
 # add some columns to the diversity dataframe to investigate the magnitude of the change. 
 divTemp$Cen_IFE <- divTemp$Cen_IFD <- divTemp$Cen_IFSW <- divTemp$Cen_IFR <- divTemp$Cen_SST <- NA
-divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person != "consensus", grep("Cen", names(divTemp))] <- sweep(data.matrix(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus", c(8, 10:13)]))
+divTemp[row.nam$s125, grep("Cen", names(divTemp))] <- sweep(data.matrix(divTemp[row.nam$s125, c(8, 10:13)]), 2, as.numeric(divTemp[row.nam$s125c, c(8, 10:13)]))
 
-divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person != "consensus", grep("Cen", names(divTemp))] <- sweep(data.matrix(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus", c(8, 10:13)]))
+divTemp[row.nam$s150, grep("Cen", names(divTemp))] <- sweep(data.matrix(divTemp[row.nam$s150, c(8, 10:13)]), 2, as.numeric(divTemp[row.nam$s150c, c(8, 10:13)]))
 
-divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person != "consensus", grep("Cen", names(divTemp))] <- sweep(data.matrix(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus", c(8, 10:13)]))
+divTemp[row.nam$d125, grep("Cen", names(divTemp))] <- sweep(data.matrix(divTemp[row.nam$d125, c(8, 10:13)]), 2, as.numeric(divTemp[row.nam$d125c, c(8, 10:13)]))
 
-divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person != "consensus", grep("Cen", names(divTemp))] <- sweep(data.matrix(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus", c(8, 10:13)]))
+divTemp[row.nam$d150, grep("Cen", names(divTemp))] <- sweep(data.matrix(divTemp[row.nam$d150, c(8, 10:13)]), 2, as.numeric(divTemp[row.nam$d150c, c(8, 10:13)]))
 
 pairs(divTemp[, grep("Cen_", names(divTemp))], col = factor(paste(divTemp$Analysis, divTemp$Size, sep = "_")), pch = 16)
 
 # add some columns to the diversity dataframe to investigate the direction of the change. 
 divTemp$Dir_IFE <- divTemp$Dir_IFD <- divTemp$Dir_IFSW <- divTemp$Dir_IFR <- divTemp$Dir_SST <- NA
-divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person != "consensus", grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 125 & divTemp$Person == "consensus", c(8, 10:13)])) > 0, 1, -1)
+divTemp[row.nam$s125, grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[row.nam$s125, c(8, 10:13)]), 2, as.numeric(divTemp[row.nam$s125c, c(8, 10:13)])) > 0, 1, -1)
 
-divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person != "consensus", grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Slide" & divTemp$Size == 150 & divTemp$Person == "consensus", c(8, 10:13)])) > 0, 1, -1)
+divTemp[row.nam$s150, grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[row.nam$s150, c(8, 10:13)]), 2, as.numeric(divTemp[row.nam$s150c, c(8, 10:13)])) > 0, 1, -1)
 
-divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person != "consensus", grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 125 & divTemp$Person == "consensus", c(8, 10:13)])) > 0, 1, -1)
+divTemp[row.nam$d125, grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[row.nam$d125, c(8, 10:13)]), 2, as.numeric(divTemp[row.nam$d125c, c(8, 10:13)])) > 0, 1, -1)
 
-divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person != "consensus", grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person != "consensus", c(8, 10:13)]), 2, as.numeric(divTemp[divTemp$Analysis == "Digital" & divTemp$Size == 150 & divTemp$Person == "consensus", c(8, 10:13)])) > 0, 1, -1)
+divTemp[row.nam$d150, grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[row.nam$d150, c(8, 10:13)]), 2, as.numeric(divTemp[row.nam$d150c, c(8, 10:13)])) > 0, 1, -1)
 
 table(divTemp$Dir_SST, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
 table(divTemp$Dir_IFR, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
@@ -3090,7 +3118,7 @@ dev.off()
 # this was only done 150 size fraction.
 # it is also not perfect as it currently uses Nadia's consensus values not mine. But that's because I can't currently rerun the ANN analysis. 
 # Figure 6
-combcon$divTemp <- divTemp
+combcon$divTemp <- divTemp[, !grepl("Cen_|Dir_", names(divTemp))]
 
 png("Figures/CombCon/Fig6_SST_comb.png", 800, 500)
 par(mar = c(5.1, 5.1, 4.1, 2.1))
@@ -3107,6 +3135,7 @@ with(combcon$divTemp[row.nam$d150c,], lines(x = c(20.5, 27), y = rep(SST10m, eac
 # mean values
 with(combcon$divTemp[row.nam$s150c,], lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$SST10m[row.nam$s150]), each = 2)))
 with(combcon$divTemp[row.nam$d150c,], lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$SST10m[row.nam$d150]), each = 2), col = 4))
+abline(v = 20.5, col = "grey 50")
 
 # error bars / actual  / legend
 with(combcon$divTemp[combcon$divTemp$Size == 150,], err_bar(SST10m[match(ord.div, Person)], SD[match(ord.div, Person)], 1:26, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
@@ -3161,6 +3190,7 @@ lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$IF_Richness[row.nam$d125]), 
 lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$IF_Richness[row.nam$s125]), 2), lty = 2)
 lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$IF_Richness[row.nam$d150]), 2), col = "blue")
 lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$IF_Richness[row.nam$s150]), 2))
+abline(v = 20.5, col = "grey 50")
 # legend
 legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
 par(mar = c(5.1, 4.1, 4.1, 2.1))
@@ -3180,6 +3210,7 @@ lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$IF_Dominance[row.nam$d125]),
 lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$IF_Dominance[row.nam$s125]), 2), lty = 2)
 lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$IF_Dominance[row.nam$d150]), 2), col = "blue")
 lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$IF_Dominance[row.nam$s150]), 2))
+abline(v = 20.5, col = "grey 50")
 # legend
 legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
 par(mar = c(5.1, 4.1, 4.1, 2.1))
@@ -3200,6 +3231,7 @@ lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$IF_ShannonWiener[row.nam$d12
 lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$IF_ShannonWiener[row.nam$s125]), 2), lty = 2)
 lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$IF_ShannonWiener[row.nam$d150]), 2), col = "blue")
 lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$IF_ShannonWiener[row.nam$s150]), 2))
+abline(v = 20.5, col = "grey 50")
 # legend
 legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
 par(mar = c(5.1, 4.1, 4.1, 2.1))
@@ -3218,6 +3250,7 @@ lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$IF_Evenness[row.nam$d125]), 
 lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$IF_Evenness[row.nam$s125]), 2), lty = 2)
 lines(x = c(20.5, 27), y = rep(mean(combcon$divTemp$IF_Evenness[row.nam$d150]), 2), col = "blue")
 lines(x = c(0, 20.5), y = rep(mean(combcon$divTemp$IF_Evenness[row.nam$s150]), 2))
+abline(v = 20.5, col = "grey 50")
 # legend
 legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
 par(mar = c(5.1, 4.1, 4.1, 2.1))
@@ -3256,6 +3289,36 @@ diversity(table(combcon$slide150$IFcMinR)) # 2.213 (s - 2.206, d - 2.289)
 # Evenness
 exp(diversity(table(combcon$slide150$IFcMin))) / specnumber(table(combcon$slide150$IFcMin)) # 0.457 (s - 0.496, d - 0.476)
 exp(diversity(table(combcon$slide150$IFcMinR))) / specnumber(table(combcon$slide150$IFcMinR)) # 0.457 (s - 0.478, d - 0.470)
+
+tmp.div <- combcon$divTemp[, grep("Analysis|Size|Person|SST10m|SD|IF_", names(divTemp))]
+tmp.div$ID <- paste(tmp.div$Analysis, tmp.div$Person)
+head(tmp.div)
+tmp.div <- reshape(tmp.div, direction = "wide", v.names = grep("SST10m|SD|IF_", names(tmp.div), value = TRUE), timevar = "Size", idvar = "ID")
+tmp.div <- tmp.div[, names(tmp.div) != "ID"]
+tmp.div[, grepl("1", names(tmp.div)) & !grepl("Rich", names(tmp.div))] <- round(tmp.div[, grepl("1", names(tmp.div)) & !grepl("Rich", names(tmp.div))], 2)
+write.csv(tmp.div, file = "Outputs/combconDiversity_temperature.csv", row.names = FALSE)
+rm(tmp.div)
+
+# add some columns to the diversity dataframe to investigate the direction of the change. 
+combcon$divTemp$Dir_IFE <- combcon$divTemp$Dir_IFD <- combcon$divTemp$Dir_IFSW <- combcon$divTemp$Dir_IFR <- combcon$divTemp$Dir_SST <- NA
+combcon$divTemp[row.nam$s125, grep("Dir", names(combcon$divTemp))] <- ifelse(sweep(data.matrix(combcon$divTemp[row.nam$s125, c(8, 10:13)]), 2, as.numeric(combcon$divTemp[row.nam$s125c, c(8, 10:13)])) > 0, 1, -1)
+
+combcon$divTemp[row.nam$s150, grep("Dir", names(combcon$divTemp))] <- ifelse(sweep(data.matrix(combcon$divTemp[row.nam$s150, c(8, 10:13)]), 2, as.numeric(combcon$divTemp[row.nam$s150c, c(8, 10:13)])) > 0, 1, -1)
+
+combcon$divTemp[row.nam$d125, grep("Dir", names(combcon$divTemp))] <- ifelse(sweep(data.matrix(combcon$divTemp[row.nam$d125, c(8, 10:13)]), 2, as.numeric(combcon$divTemp[row.nam$d125c, c(8, 10:13)])) > 0, 1, -1)
+
+combcon$divTemp[row.nam$d150, grep("Dir", names(combcon$divTemp))] <- ifelse(sweep(data.matrix(combcon$divTemp[row.nam$d150, c(8, 10:13)]), 2, as.numeric(combcon$divTemp[row.nam$d150c, c(8, 10:13)])) > 0, 1, -1)
+
+
+table(combcon$divTemp$Dir_SST, paste(combcon$divTemp$Analysis, combcon$divTemp$Size, sep = "_"))
+table(combcon$divTemp$Dir_IFR, paste(combcon$divTemp$Analysis, combcon$divTemp$Size, sep = "_"))
+table(combcon$divTemp$Dir_IFSW, paste(combcon$divTemp$Analysis, combcon$divTemp$Size, sep = "_"))
+table(combcon$divTemp$Dir_IFD, paste(combcon$divTemp$Analysis, combcon$divTemp$Size, sep = "_"))
+table(combcon$divTemp$Dir_IFE, paste(combcon$divTemp$Analysis, combcon$divTemp$Size, sep = "_"))
+
+table(combcon$divTemp$Dir_IFR, combcon$divTemp$Dir_IFE, paste(combcon$divTemp$Analysis, combcon$divTemp$Size, sep = "_"))
+table(combcon$divTemp$Dir_IFR, combcon$divTemp$Dir_IFSW, paste(combcon$divTemp$Analysis, combcon$divTemp$Size, sep = "_"))
+table(combcon$divTemp$Dir_IFR, combcon$divTemp$Dir_IFD, paste(combcon$divTemp$Analysis, combcon$divTemp$Size, sep = "_"))
 
 # 13h. Outliers -------------------------------------------------------------
 # Outliers for each analysis 
@@ -3583,42 +3646,71 @@ with(combcon$size150, plot(Length, Agreement, pch = 16, main = "> 150", las = 1,
 lines(tapply(combcon$size150$Length, combcon$size150$Agreement, max), names(tapply(combcon$size150$Length, combcon$size150$Agreement, max)), pch = 16)
 dev.off()
 
-# 13j. Comparison with MARGO -----------------------------------------------
-# see how the datasets compare with the MARGO values for that latitude
-load("../../../../../../../Dropbox/Documents/PhD/Project/MARGO/Outputs/Diversity_measures.RData")
+# 13j. Comparison with ForCenS -----------------------------------------------
+# see how the datasets compare with the ForCenS values for that latitude
+ForCenSred <- as.data.frame(read_excel("../../../ForCenS/Data/ForCenS.xlsx", sheet = "ForCenSred", na = "N/A")) 
+ForCenSred[, 22:62][is.na(ForCenSred[, 22:62])] <- 0
+str(ForCenSred)
 
-png("Figures/CombCon/Div_cf_Margo.png", 550, 600)
+png("Figures/CombCon/Div_cf_ForCenSred.png", 550, 600)
 par(mfrow = c(2,2))
 # species richness
-plot(ldg.margo.data$Latitude, ldg.margo.data$sp.rich, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness")
+tmp.rich <- specnumber(ForCenSred[, 22:62]) # richness(ForCenSred[,22:62])
+plot(ForCenSred$Latitude, tmp.rich, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness")
 points(rep(30.2, nrow(combcon$divTemp)), combcon$divTemp$IF_Richness, col = "blue", pch = 16)
 points(rep(30.2, 4), combcon$divTemp$IF_Richness[combcon$divTemp$Person == "consensus"], col = "red", pch = 16)
 
-# check the metrics are the same
-sum(ldg.margo.data$sp.rich != specnumber(ldg.margo.data[,14:44])) # should be 0, so yes
-
 # ShannonWiener
-tmp.sw <- diversity(ldg.margo.data[,14:44])
-plot(ldg.margo.data$Latitude, tmp.sw, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener")
+tmp.sw <- diversity(ForCenSred[,22:62])
+plot(ForCenSred$Latitude, tmp.sw, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener")
 points(rep(30.2, nrow(combcon$divTemp)), combcon$divTemp$IF_ShannonWiener, col = "blue", pch = 16)
 points(rep(30.2, 4), combcon$divTemp$IF_ShannonWiener[combcon$divTemp$Person == "consensus"], col = "red", pch = 16)
 
 # Dominance
-tmp.dom <- (1 - diversity(ldg.margo.data[,14:44], index = "simpson"))
-plot(ldg.margo.data$Latitude, tmp.dom, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance")
+tmp.dom <- (1 - diversity(ForCenSred[,22:62], index = "simpson"))
+plot(ForCenSred$Latitude, tmp.dom, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance")
 points(rep(30.2, nrow(combcon$divTemp)), combcon$divTemp$IF_Dominance, col = "blue", pch = 16)
 points(rep(30.2, 4), combcon$divTemp$IF_Dominance[combcon$divTemp$Person == "consensus"], col = "red", pch = 16)
 
 
 # Evenness
-tmp.eve <- (exp(diversity(ldg.margo.data[,14:44])) / specnumber(ldg.margo.data[,14:44]))
-plot(ldg.margo.data$Latitude, tmp.eve, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Evenness")
+tmp.eve <- (exp(diversity(ForCenSred[,22:62])) / specnumber(ForCenSred[,22:62]))
+plot(ForCenSred$Latitude, tmp.eve, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Evenness")
 points(rep(30.2, nrow(combcon$divTemp)), combcon$divTemp$IF_Evenness, col = "blue", pch = 16)
 points(rep(30.2, 4), combcon$divTemp$IF_Evenness[combcon$divTemp$Person == "consensus"], col = "red", pch = 16)
 par(mfrow = c(1,1))
 dev.off()
-rm(tmp.sw, tmp.dom, tmp.eve, margo.all.species, margo.cons, margo.macro, ldg.margo.data, margo.traits, margo.traits.cons)
+
+png("Figures/CombCon/Div_cf_ForCenSred_Atl.png", 550, 600)
+par(mfrow = c(2,2))
+# species richness
+with(ForCenSred[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11, ], plot(Latitude, tmp.rich[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness"))
+points(rep(30.2, nrow(combcon$divTemp)), combcon$divTemp$IF_Richness, col = "blue", pch = 16)
+points(rep(30.2, 4), combcon$divTemp$IF_Richness[combcon$divTemp$Person == "consensus"], col = "red", pch = 16)
+
+
+# ShannonWiener
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.sw[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener")
+points(rep(30.2, nrow(combcon$divTemp)), combcon$divTemp$IF_ShannonWiener, col = "blue", pch = 16)
+points(rep(30.2, 4), combcon$divTemp$IF_ShannonWiener[combcon$divTemp$Person == "consensus"], col = "red", pch = 16)
+
+# Dominance
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.dom[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance")
+points(rep(30.2, nrow(combcon$divTemp)), combcon$divTemp$IF_Dominance, col = "blue", pch = 16)
+points(rep(30.2, 4), combcon$divTemp$IF_Dominance[combcon$divTemp$Person == "consensus"], col = "red", pch = 16)
+
+
+# Evenness
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.eve[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Evenness")
+points(rep(30.2, nrow(combcon$divTemp)), combcon$divTemp$IF_Evenness, col = "blue", pch = 16)
+points(rep(30.2, 4), combcon$divTemp$IF_Evenness[combcon$divTemp$Person == "consensus"], col = "red", pch = 16)
+par(mfrow = c(1,1))
+dev.off()
+
+rm(tmp.sw, tmp.dom, tmp.eve, tmp.rich, ForCenSred)
+
 
 # 14. Save the data -------------------------------------------------------
 save.image("Outputs/Reanalysis_NA_IF.RData")
+
 

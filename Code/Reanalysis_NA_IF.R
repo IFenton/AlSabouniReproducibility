@@ -3712,5 +3712,16 @@ rm(tmp.sw, tmp.dom, tmp.eve, tmp.rich, ForCenSred)
 
 # 14. Save the data -------------------------------------------------------
 save.image("Outputs/Reanalysis_NA_IF.RData")
+# output the full species names
+tmp.125<- full.125
+for(i in 1:nrow(sp.abb)) {
+  tmp.125 <- as.data.frame(apply(tmp.125, 2, function(x) gsub(sp.abb$Abbreviation[i], sp.abb$Species[i], x)))
+}
+write.csv(tmp.125, "Outputs/PersonIDs_125_IF.csv")
 
-
+tmp.150 <- full.150
+for(i in 1:nrow(sp.abb)) {
+  tmp.150 <- as.data.frame(apply(tmp.150, 2, function(x) gsub(sp.abb$Abbreviation[i], sp.abb$Species[i], x)))
+}
+write.csv(tmp.150, "Outputs/PersonIDs_125_IF.csv")
+rm(tmp.125, tmp.150)

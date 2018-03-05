@@ -1,13 +1,13 @@
-# IF reanalysis of Nadia's repeatability
-# IF reanalysis
+# Code for the repeatability analysis 
+# Al-Sabouni, Fenton, Telford & Kucera
 # Isabel Fenton
-# Date created: 18 / 1 / 2018
+# Date created: 5 / 3 / 2018
 # Date last edited: 5 / 3 / 2018
 # 
-# Re running the analyses done by Nadia in the repeatability analysis. Lab book repeatability
+# All the code needed to run the Al-Sabouni et al repeatability paper. Lab book repeatability
 # 
-# Previous file: N/A
-# Next file: AlSabouni_repetability.R
+# Previous file: Reanalysis_NA_IF.R
+# Next file:
 #   
 
 rm(list = ls())

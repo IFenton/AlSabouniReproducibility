@@ -1001,7 +1001,7 @@ names(long$s150)[names(long$s150) == "1a"] <- "origID"
 head(long$s150)
 tail(long$s150)
 
-png("Figures/confusion_slide150.png", 1000, 600)
+png("Figures/confusion_slide150.png", 1000, 610)
 conf_mat(long$s150, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
 mtext("Slide 150", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 
@@ -1029,7 +1029,7 @@ names(long$d150)[names(long$d150) == "A"] <- "origID"
 head(long$d150)
 tail(long$d150)
 
-png("Figures/confusion_digital150.png", 1000, 600)
+png("Figures/confusion_digital150.png", 1000, 610)
 conf_mat(long$d150, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
 mtext("Digital 150", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 
@@ -1040,7 +1040,7 @@ conf_mat(long$s125, "origID", "IFcMinR", spec.abb = sp.abb, abb.end = c("na", "n
 mtext("Slide 125", 1, cex = 2, adj = -0.8,  line = -5)
 dev.off() 
 
-png("Figures/confusion_slide150r.png", 1000, 600)
+png("Figures/confusion_slide150r.png", 1000, 610)
 conf_mat(long$s150, "origID", "IFcMinR", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
 mtext("Slide 150", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 
@@ -1050,7 +1050,7 @@ conf_mat(long$d125, "origID", "IFcMinR", spec.abb = sp.abb, abb.end = c("na", "n
 mtext("Digital 125", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 
 
-png("Figures/confusion_digital150r.png", 1000, 600)
+png("Figures/confusion_digital150r.png", 1000, 610)
 conf_mat(long$d150, "origID", "IFcMinR", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
 mtext("Digital 150", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 
@@ -2757,7 +2757,7 @@ names(combconlong$s150)[names(combconlong$s150) == "1a"] <- "origID"
 head(combconlong$s150)
 tail(combconlong$s150)
 
-png("Figures/CombCon/confusion_combcon$slide150.png", 1000, 650)
+png("Figures/CombCon/confusion_combcon$slide150.png", 1000, 610)
 conf_mat(combconlong$s150, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
 mtext("Slide 150", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 
@@ -2785,7 +2785,7 @@ names(combconlong$d150)[names(combconlong$d150) == "A"] <- "origID"
 head(combconlong$d150)
 tail(combconlong$d150)
 
-png("Figures/CombCon/confusion_combcon$digital150.png", 1000, 650)
+png("Figures/CombCon/confusion_combcon$digital150.png", 1000, 610)
 conf_mat(combconlong$d150, "origID", "IFcMin", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
 mtext("Digital 150", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 
@@ -2796,7 +2796,7 @@ conf_mat(combconlong$s125, "origID", "IFcMinR", spec.abb = sp.abb, abb.end = c("
 mtext("Slide 125", 1, cex = 2, adj = -0.8,  line = -5)
 dev.off() 
 
-png("Figures/CombCon/confusion_combcon$slide150r.png", 1000, 650)
+png("Figures/CombCon/confusion_combcon$slide150r.png", 1000, 610)
 conf_mat(combconlong$s150, "origID", "IFcMinR", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
 mtext("Slide 150", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 
@@ -2806,7 +2806,7 @@ conf_mat(combconlong$d125, "origID", "IFcMinR", spec.abb = sp.abb, abb.end = c("
 mtext("Digital 125", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 
 
-png("Figures/CombCon/confusion_combcon$digital150r.png", 1000, 650)
+png("Figures/CombCon/confusion_combcon$digital150r.png", 1000, 610)
 conf_mat(combconlong$d150, "origID", "IFcMinR", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
 mtext("Digital 150", 1, cex = 2, adj = -.8,  line = -5)
 dev.off() 

@@ -2308,28 +2308,6 @@ points(100:700, pred, type = "l")
 dev.off()
 rm(pred)
 
-# is size correlated with abundance?
-# what is the mean species size
-sp.size <- list()
-sp.size$ssC <- tapply(c(combcon$size125$Length, combcon$size150$Length), c(combcon$size125$Con1, combcon$size150$Con1), mean)
-sp.size$ss125 <-tapply(combcon$size125$Length, combcon$size125$Con1, mean)
-sp.size$ss150 <-tapply(combcon$size150$Length, combcon$size150$Con1, mean)
-
-sp.abun <- list()
-sp.abun$ssC <- table(c(combcon$size125$Con1, combcon$size150$Con1))
-sp.abun$ss125 <- table(combcon$size125$Con1)
-sp.abun$ss150 <- table(combcon$size150$Con1)
-
-# plot species mean against abundance
-plot(as.numeric(sp.size$ssC), log(as.numeric(sp.abun$ssC)), pch = 16)
-points(as.numeric(sp.size$ss125), log(as.numeric(sp.abun$ss125)), pch = 16, col = "blue")
-points(as.numeric(sp.size$ss150), log(as.numeric(sp.abun$ss150)), pch = 16, col = "red")
-abline(lm(log(as.numeric(sp.abun$ssC)) ~ as.numeric(sp.size$ssC)))
-abline(lm(log(as.numeric(sp.abun$ss125)) ~ as.numeric(sp.size$ss125)), col = "blue")
-abline(lm(log(as.numeric(sp.abun$ss150)) ~ as.numeric(sp.size$ss150)), col = "red")
-
-sort(sp.size)
-
 # 11. Comparison of different tests ---------------------------------------
 # ex. Figure 12
 png("Figures/exFig12_Consensus frequency.png", 500, 700)
@@ -2398,7 +2376,7 @@ points(rep(30.2, 4), divTemp$IF_Evenness[divTemp$Person == "consensus"], col = "
 par(mfrow = c(1,1))
 dev.off()
 
-rm(tmp, i, tmp.rich, tmp.sw, tmp.dom, tmp.eve, ForCenSred)
+rm(tmp.rich, tmp.sw, tmp.dom, tmp.eve, ForCenSred)
 
 
 # 12b. Simulations for studying changes -----------------------------------
@@ -3645,6 +3623,27 @@ png("Figures/CombCon/Fig5_size_agreement_c150.png")
 with(combcon$size150, plot(Length, Agreement, pch = 16, main = "> 150", las = 1, ylab = "Agreement", xlab = expression(paste("Maximum diamter / ", mu, "m"))))
 lines(tapply(combcon$size150$Length, combcon$size150$Agreement, max), names(tapply(combcon$size150$Length, combcon$size150$Agreement, max)), pch = 16)
 dev.off()
+
+# is size correlated with abundance?
+# what is the mean species size
+sp.size <- list()
+sp.size$ssC <- tapply(c(combcon$size125$Length, combcon$size150$Length), c(combcon$size125$Con1, combcon$size150$Con1), mean)
+sp.size$ss125 <-tapply(combcon$size125$Length, combcon$size125$Con1, mean)
+sp.size$ss150 <-tapply(combcon$size150$Length, combcon$size150$Con1, mean)
+
+sp.abun <- list()
+sp.abun$ssC <- table(c(combcon$size125$Con1, combcon$size150$Con1))
+sp.abun$ss125 <- table(combcon$size125$Con1)
+sp.abun$ss150 <- table(combcon$size150$Con1)
+
+# plot species mean against abundance
+plot(as.numeric(sp.size$ssC), log(as.numeric(sp.abun$ssC)), pch = 16)
+points(as.numeric(sp.size$ss125), log(as.numeric(sp.abun$ss125)), pch = 16, col = "blue")
+points(as.numeric(sp.size$ss150), log(as.numeric(sp.abun$ss150)), pch = 16, col = "red")
+abline(lm(log(as.numeric(sp.abun$ssC)) ~ as.numeric(sp.size$ssC)))
+abline(lm(log(as.numeric(sp.abun$ss125)) ~ as.numeric(sp.size$ss125)), col = "blue")
+abline(lm(log(as.numeric(sp.abun$ss150)) ~ as.numeric(sp.size$ss150)), col = "red")
+
 
 # 13j. Comparison with ForCenS -----------------------------------------------
 # see how the datasets compare with the ForCenS values for that latitude

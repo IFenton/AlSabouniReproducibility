@@ -3558,7 +3558,7 @@ combcon$outliers$cfullSum <- rowSums(combcon$outliers[, grep("^c", names(combcon
 
 combcon$outliers$cwtSum <- rowSums(combcon$outliers[, grep("cMDS", names(combcon$outliers))])/2 + rowSums(combcon$outliers[, grep("^c.*Pt", names(combcon$outliers))])/2 + combcon$outliers$cSST + rowSums(combcon$outliers[, grep("cIF_Richness", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("cIF_Dominance", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("cIF_Evenness", names(combcon$outliers))])/8 + rowSums(combcon$outliers[, grep("cIF_ShannonWiener", names(combcon$outliers))])/8
 
-combcon$outliers$cwtSumPt <- combcon$outliers$cwtSum / 26 * 100
+combcon$outliers$cwtSumPt <- combcon$outliers$cwtSum / (4*26) * 100
 
 # looking for correlations
 pairs(combcon$outliers[, grep("^c", names(combcon$outliers))])

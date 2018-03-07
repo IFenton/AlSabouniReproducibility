@@ -2096,7 +2096,7 @@ tmp.out <- merge(tmp.out, accuracyFull[, c("PersonID", "ptID125", "ptID150")])
 #par(ask = TRUE)
 par(mfrow = c(6, 3))
 par(mar = c(2,2,1,1))
-for (i in names(tmp.out)[c(21:25, 27:28)]) {
+for (i in c("Residence", "School", "Experience", "Routine", "Region", "ptID125", "ptID150")) {
   for (j in names(tmp.out)[3:20]) 
     plot(factor(tmp.out[tmp.out$Analysis == "Slide",i]), tmp.out[tmp.out$Analysis == "Slide",j], main = j, col = "red")
   for (j in names(tmp.out)[3:20]) 
@@ -3463,7 +3463,7 @@ tmp.out <- merge(tmp.out, combcon$accuracyFull[, c("PersonID", "ptID125", "ptID1
 #par(ask = TRUE)
 par(mfrow = c(4, 4))
 par(mar = c(2,2,1,1))
-for (i in names(tmp.out)[c(19:23, 25:26)]) {
+for (i in c("Residence", "School", "Experience", "Routine", "Region", "ptID125", "ptID150")) {
   for (j in names(tmp.out)[3:18]) 
     plot(factor(tmp.out[tmp.out$Analysis == "Slide",i]), tmp.out[tmp.out$Analysis == "Slide",j], main = i, col = "red")
   for (j in names(tmp.out)[3:18]) 
@@ -3581,7 +3581,7 @@ tmp.out <- merge(tmp.out, combcon$accuracyFull[, c("PersonID", "ptID125", "ptID1
 #par(ask = TRUE)
 par(mfrow = c(4, 4))
 par(mar = c(2,2,1,1))
-for (i in names(tmp.out)[c(35:39, 41:42)]) {
+for (i in c("Residence", "School", "Experience", "Routine", "Region", "ptID125", "ptID150")) {
   for (j in grep("^c", names(tmp.out), value = TRUE)) 
     plot(factor(tmp.out[,i]), tmp.out[,j], main = j, col = "red")
 }

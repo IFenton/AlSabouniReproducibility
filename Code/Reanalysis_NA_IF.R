@@ -2251,7 +2251,7 @@ rm(tmp.s, tmp.out, tmp.d, tmp)
 # 10. Size vs. maximum agreement ------------------------------------------
 # Figure 5
 png("Figures/Fig5_size_agreement_125.png")
-with(size125, plot(slideAgreement, Length, pch = 16, main = "> 125", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diamter / ", mu, "m"))))
+with(size125, plot(slideAgreement, Length, pch = 16, main = "> 125", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diameter / ", mu, "m"))))
 lines(names(tapply(size125$Length, size125$slideAgreement, max)), tapply(size125$Length, size125$slideAgreement, max), pch = 16)
 with(size125, points(digitalAgreement, Length, pch = 16, col = "blue"))
 lines(names(tapply(size125$Length, size125$digitalAgreement, max)), tapply(size125$Length, size125$digitalAgreement, max), pch = 16, col = 4)
@@ -2259,7 +2259,7 @@ legend("topleft", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"))
 dev.off()
 
 png("Figures/Fig5_size_agreement_150.png")
-with(size150, plot(slideAgreement, Length, pch = 16, main = "> 150", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diamter / ", mu, "m"))))
+with(size150, plot(slideAgreement, Length, pch = 16, main = "> 150", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diameter / ", mu, "m"))))
 lines(names(tapply(size150$Length, size150$slideAgreement, max)), tapply(size150$Length, size150$slideAgreement, max), pch = 16)
 with(size150, points(digitalAgreement, Length, pch = 16, col = "blue"))
 lines(names(tapply(size150$Length, size150$digitalAgreement, max)), tapply(size150$Length, size150$digitalAgreement, max), pch = 16, col = 4)
@@ -3599,7 +3599,7 @@ rm(tmp.s, tmp.out, tmp.d, tmp)
 # 13i. Size vs. maximum agreement ------------------------------------------
 # Figure 5
 png("Figures/CombCon/Fig5_size_agreement_sd125.png")
-with(combcon$size125, plot(slideAgreement, Length, pch = 16, main = "> 125", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diamter / ", mu, "m"))))
+with(combcon$size125, plot(slideAgreement, Length, pch = 16, main = "> 125", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diameter / ", mu, "m"))))
 lines(names(tapply(combcon$size125$Length, combcon$size125$slideAgreement, max)), tapply(combcon$size125$Length, combcon$size125$slideAgreement, max), pch = 16)
 with(combcon$size125, points(digitalAgreement, Length, pch = 16, col = "blue"))
 lines(names(tapply(combcon$size125$Length, combcon$size125$digitalAgreement, max)), tapply(combcon$size125$Length, combcon$size125$digitalAgreement, max), pch = 16, col = 4)
@@ -3607,7 +3607,7 @@ legend("topleft", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"))
 dev.off()
 
 png("Figures/CombCon/Fig5_size_agreement_sd150.png")
-with(combcon$size150, plot(slideAgreement, Length, pch = 16, main = "> 150", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diamter / ", mu, "m"))))
+with(combcon$size150, plot(slideAgreement, Length, pch = 16, main = "> 150", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diameter / ", mu, "m"))))
 lines(names(tapply(combcon$size150$Length, combcon$size150$slideAgreement, max)), tapply(combcon$size150$Length, combcon$size150$slideAgreement, max), pch = 16)
 with(combcon$size150, points(digitalAgreement, Length, pch = 16, col = "blue"))
 lines(names(tapply(combcon$size150$Length, combcon$size150$digitalAgreement, max)), tapply(combcon$size150$Length, combcon$size150$digitalAgreement, max), pch = 16, col = 4)
@@ -3615,13 +3615,35 @@ legend("topleft", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"))
 dev.off()
 
 png("Figures/CombCon/Fig5_size_agreement_c125.png")
-with(combcon$size125, plot(Length, Agreement, pch = 16, main = "> 125", las = 1, ylab = "Agreement", xlab = expression(paste("Maximum diamter / ", mu, "m"))))
+with(combcon$size125, plot(Length, Agreement, pch = 16, main = "> 125", las = 1, ylab = "Agreement", xlab = expression(paste("Maximum diameter / ", mu, "m"))))
 lines(tapply(combcon$size125$Length, combcon$size125$Agreement, max), names(tapply(combcon$size125$Length, combcon$size125$Agreement, max)), pch = 16)
 dev.off()
 
 png("Figures/CombCon/Fig5_size_agreement_c150.png")
-with(combcon$size150, plot(Length, Agreement, pch = 16, main = "> 150", las = 1, ylab = "Agreement", xlab = expression(paste("Maximum diamter / ", mu, "m"))))
+with(combcon$size150, plot(Length, Agreement, pch = 16, main = "> 150", las = 1, ylab = "Agreement", xlab = expression(paste("Maximum diameter / ", mu, "m"))))
 lines(tapply(combcon$size150$Length, combcon$size150$Agreement, max), names(tapply(combcon$size150$Length, combcon$size150$Agreement, max)), pch = 16)
+dev.off()
+
+# the combined consensus, but slide / digital calculated separately
+combcon$size125$scAgreement <- rowSums(combcon$slide125[,col.nam$s125] == combcon$slide125$IFcMin)/length(col.nam$s125)*100
+combcon$size125$dcAgreement <- rowSums(combcon$digital125[,col.nam$d125] == combcon$digital125$IFcMin)/length(col.nam$d125)*100
+combcon$size150$scAgreement <- rowSums(combcon$slide150[,col.nam$s150] == combcon$slide150$IFcMin)/length(col.nam$s150)*100
+combcon$size150$dcAgreement <- rowSums(combcon$digital150[,col.nam$d150] == combcon$digital150$IFcMin)/length(col.nam$d150)*100
+
+png("Figures/CombCon/Fig5_SDC_size_agreement_sd125.png")
+with(combcon$size125, plot(scAgreement, Length, pch = 16, main = "> 125", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diameter / ", mu, "m"))))
+lines(names(tapply(combcon$size125$Length, combcon$size125$scAgreement, max)), tapply(combcon$size125$Length, combcon$size125$scAgreement, max), pch = 16)
+with(combcon$size125, points(dcAgreement, Length, pch = 16, col = "blue"))
+lines(names(tapply(combcon$size125$Length, combcon$size125$dcAgreement, max)), tapply(combcon$size125$Length, combcon$size125$dcAgreement, max), pch = 16, col = 4)
+legend("topleft", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"))
+dev.off()
+
+png("Figures/CombCon/Fig5_SDC_size_agreement_sd150.png")
+with(combcon$size150, plot(scAgreement, Length, pch = 16, main = "> 150", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diameter / ", mu, "m"))))
+lines(names(tapply(combcon$size150$Length, combcon$size150$scAgreement, max)), tapply(combcon$size150$Length, combcon$size150$scAgreement, max), pch = 16)
+with(combcon$size150, points(dcAgreement, Length, pch = 16, col = "blue"))
+lines(names(tapply(combcon$size150$Length, combcon$size150$dcAgreement, max)), tapply(combcon$size150$Length, combcon$size150$dcAgreement, max), pch = 16, col = 4)
+legend("topleft", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"))
 dev.off()
 
 # is size correlated with abundance?

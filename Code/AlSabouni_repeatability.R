@@ -675,7 +675,7 @@ for (i in 1:10) {
 }
 plot(stress$CC150f, type = "b")
 rm(i)
-# looks like between 2 and 3 dimensions would be reasonable, although as with Nadia's data, the breakpoint is less obvious for 150 than it is for 125.
+# looks like between 2 and 3 dimensions would be reasonable, although the breakpoint is less obvious for 150 than it is for 125.
 
 # check for variation
 tmp <- metaMDS(daisy(trsp$CC150f))

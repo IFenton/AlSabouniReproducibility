@@ -2333,7 +2333,7 @@ cum.sum$d150 <- cumsum(rev(table(digital150$IFmaxCon)))/300*100
 
 png("Figures/Cumulative.png", 480, 900)
 par(mfrow = c(2, 1))
-plot(names(cum.sum$s125), cum.sum$s125, type = "n", xlab = "Number of participants", ylab = "Fraction of specimens / %", las = 1, ylim = c(0, 100), lty = 2, xaxt = "n", cex.lab = 1.5, cex.main = 1.5, cex.axis = 1.1)
+plot(names(cum.sum$s125), cum.sum$s125, type = "n", xlab = "Number of participants", ylab = "Fraction of specimens / %", las = 1, ylim = c(0, 100), lty = 2, xaxt = "n", cex.lab = 1.5, cex.main = 1.5, cex.axis = 1.1, main = "Slide")
 axis(1, 3:17)
 legend("topright", lty = c(2, 1), legend = c(expression(paste(">125 ", mu, "m")), expression(paste(">150 ", mu, "m"))), cex = 1.3, lwd = 2)
 
@@ -2351,7 +2351,7 @@ points(names(cum.sum$s125), cum.sum$s125, type = "s", lty = 2)
 points(names(cum.sum$s150), cum.sum$s150, type = "s")
 
 
-plot(names(cum.sum$d125), cum.sum$d125, type = "n", xlab = "Number of participants", ylab = "Fraction of specimens / %", las = 1, ylim = c(0, 100), lty = 2, xaxt = "n", cex.lab = 1.5, cex.main = 1.5, cex.axis = 1.1)
+plot(names(cum.sum$d125), cum.sum$d125, type = "n", xlab = "Number of participants", ylab = "Fraction of specimens / %", las = 1, ylim = c(0, 100), lty = 2, xaxt = "n", cex.lab = 1.5, cex.main = 1.5, cex.axis = 1.1, main = "Digital")
 axis(1, 2:9)
 legend("topright", lty = c(2, 1), legend = c(expression(paste(">125 ", mu, "m")), expression(paste(">150 ", mu, "m"))), cex = 1.3, lwd = 2, col = "blue")
 

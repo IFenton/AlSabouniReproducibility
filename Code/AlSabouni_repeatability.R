@@ -196,17 +196,54 @@ sum(!is.na(size125$sCon4)); sum(!is.na(size125$dCon4)) # 0 for combined vs 1/1 f
 # 150 have 0 for any of them
 
 # create plots for slide / digital separately
-png("ASFigures/Consensus frequency.png", 500, 700)
-par(mfrow = c(2, 1))
-# for slide
-barplot(t(cbind(table(full.125$sMaxCon), table(full.150$sMaxCon))), beside = TRUE, xlab = "Maximum consensus", legend.text = c("125", "150"), args.legend = c(x = 7, y = 70), main = "Slide")
-abline(v = 18.5, lty = 2)
+# figures showing the cumulative maximum consensus for the IDs
+cum.sum <- list()
 
-# for digital
-barplot(t(cbind(table(full.125$dMaxCon), table(full.150$dMaxCon))), beside = TRUE, xlab = "Maximum consensus", legend.text = c("125", "150"), args.legend = c(x = 4.25, y = 70), main = "Digital")
-abline(v = 9.5, lty = 2)
-par(mfrow = c(1, 1))
+cum.sum$s125 <- cumsum(rev(table(full.125$sMaxCon)))/300*100
+cum.sum$s150 <- cumsum(rev(table(full.150$sMaxCon)))/300*100
+cum.sum$d125 <- cumsum(rev(table(full.125$dMaxCon)))/300*100
+cum.sum$d150 <- cumsum(rev(table(full.150$dMaxCon)))/300*100
+
+png("ASFigures/Cumulative.png", 480, 900)
+par(mfrow = c(2, 1))
+plot(names(cum.sum$s125), cum.sum$s125, type = "n", xlab = "Maximum consensus", ylab = "Cumulative agreement / %", las = 1, ylim = c(0, 100), lty = 2, main = "Slide", xaxt = "n", cex.lab = 1.5, cex.main = 1.5, cex.axis = 1.1)
+axis(1, 3:17)
+legend("topright", lty = c(2, 1), legend = c(expression(paste(">125 ", mu, "m")), expression(paste(">150 ", mu, "m"))), cex = 1.3, lwd = 2)
+
+# adding in the consensus lines
+tmp.s150 <- cum.sum$s150[(cum.sum$s150 - 50) > 0][1]
+lines(c(as.numeric(names(tmp.s150)), as.numeric(names(tmp.s150))), c(-5, 50), col = "grey")
+lines(c(2, as.numeric(names(tmp.s150))), c(50, 50), col = "grey")
+
+tmp.s125 <- cum.sum$s125[(cum.sum$s125 - 50) > 0][1]
+lines(c(as.numeric(names(tmp.s125)), as.numeric(names(tmp.s125))), c(-5, 50), col = "grey", lty = 2)
+lines(c(2, as.numeric(names(tmp.s125))), c(50, 50), col = "grey", lty = 2)
+
+# plotting the cumulative curves
+points(names(cum.sum$s125), cum.sum$s125, type = "s", lty = 2)
+points(names(cum.sum$s150), cum.sum$s150, type = "s")
+
+
+plot(names(cum.sum$d125), cum.sum$d125, type = "n", xlab = "Maximum consensus", ylab = "Cumulative agreement / %", las = 1, ylim = c(0, 100), lty = 2, main = "Digital", xaxt = "n", cex.lab = 1.5, cex.main = 1.5, cex.axis = 1.1)
+axis(1, 2:9)
+legend("topright", lty = c(2, 1), legend = c(expression(paste(">125 ", mu, "m")), expression(paste(">150 ", mu, "m"))), cex = 1.3, lwd = 2, col = "blue")
+
+# adding in the consensus lines
+tmp.d150 <- cum.sum$d150[(cum.sum$d150 - 50) > 0][1]
+lines(c(as.numeric(names(tmp.d150)), as.numeric(names(tmp.d150))), c(-5, 50), col = "grey")
+lines(c(1, as.numeric(names(tmp.d150))), c(50, 50), col = "grey")
+
+tmp.d125 <- cum.sum$d125[(cum.sum$d125 - 50) > 0][1]
+lines(c(as.numeric(names(tmp.d125)), as.numeric(names(tmp.d125))), c(-5, 50), col = "grey", lty = 2)
+lines(c(1, as.numeric(names(tmp.d125))), c(50, 50), col = "grey", lty = 2)
+
+# plotting the cumulative curves
+points(names(cum.sum$d125), cum.sum$d125, type = "s", lty = 2, col = "blue")
+points(names(cum.sum$d150), cum.sum$d150, type = "s", col = "blue")
+par(mfrow = c(1,1))
 dev.off()
+
+rm(tmp.s125, tmp.s150, tmp.d125, tmp.d150)
 
 # 2d. Generate a species total dataframe ----------------------------------
 # create a blank data frame
@@ -1797,3 +1834,96 @@ for(i in 1:nrow(sp.abb)) {
 write.csv(tmp.125, "ASOutputs/PersonIDs_125_IF.csv", row.names = FALSE)
 write.csv(tmp.150, "ASOutputs/PersonIDs_150_IF.csv", row.names = FALSE)
 rm(tmp.125, tmp.150, i)
+
+
+
+
+
+
+
+# see how the datasets compare with the ForCenS values for that latitude
+ForCenSred <- as.data.frame(read_excel("Data/Siccha_ForCenS.xlsx", sheet = "ForCenSred", na = "N/A"))
+ForCenSred[, 22:62][is.na(ForCenSred[, 22:62])] <- 0
+str(ForCenSred)
+
+png("ASFigures/Div_cf_ForCenSred.png", 550, 600)
+par(mfrow = c(2,2))
+# species richness
+tmp.rich <- specnumber(ForCenSred[, 22:62]) # richness(ForCenSred[,22:62])
+plot(ForCenSred$Latitude, tmp.rich, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness")
+points(rep(30.2, nrow(divTemp)), divTemp$Richness, col = "blue", pch = 16)
+points(rep(30.2, 2), divTemp$Richness[divTemp$Analysis == "Con"], col = "red", pch = 16)
+
+# ShannonWiener
+tmp.sw <- diversity(ForCenSred[,22:62])
+plot(ForCenSred$Latitude, tmp.sw, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener")
+points(rep(30.2, nrow(divTemp)), divTemp$ShannonWiener, col = "blue", pch = 16)
+points(rep(30.2, 2), divTemp$ShannonWiener[divTemp$Analysis == "Con"], col = "red", pch = 16)
+
+# Dominance
+tmp.dom <- (1 - diversity(ForCenSred[,22:62], index = "simpson"))
+plot(ForCenSred$Latitude, tmp.dom, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance")
+points(rep(30.2, nrow(divTemp)), divTemp$Dominance, col = "blue", pch = 16)
+points(rep(30.2, 2), divTemp$Dominance[divTemp$Analysis == "Con"], col = "red", pch = 16)
+
+
+# Evenness
+tmp.eve <- (exp(diversity(ForCenSred[,22:62])) / specnumber(ForCenSred[,22:62]))
+plot(ForCenSred$Latitude, tmp.eve, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Evenness")
+points(rep(30.2, nrow(divTemp)), divTemp$Evenness, col = "blue", pch = 16)
+points(rep(30.2, 2), divTemp$Evenness[divTemp$Analysis == "Con"], col = "red", pch = 16)
+par(mfrow = c(1,1))
+dev.off()
+
+png("ASFigures/Div_cf_ForCenSred_Atl_150.png", 700, 300)
+par(mfrow = c(1,3))
+# species richness
+with(ForCenSred[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11, ], plot(Latitude, tmp.rich[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness", cex = 1.5))
+points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$Richness[divTemp$Size == 150], col = "blue", pch = 16, cex = 2)
+points(rep(30.2, 1), divTemp$Richness[divTemp$Analysis == "Con" & divTemp$Size == 150], col = "red", pch = 16, cex = 2)
+
+
+# ShannonWiener
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.sw[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener")
+points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$ShannonWiener[divTemp$Size == 150], col = "blue", pch = 16, cex = 1.5)
+points(rep(30.2, 1), divTemp$ShannonWiener[divTemp$Analysis == "Con" & divTemp$Size == 150], col = "red", pch = 16, cex = 1.5)
+
+# Dominance
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.dom[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance")
+points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$Dominance[divTemp$Size == 150], col = "blue", pch = 16, cex = 1.5)
+points(rep(30.2, 1), divTemp$Dominance[divTemp$Analysis == "Con" & divTemp$Size == 150], col = "red", pch = 16, cex = 1.5)
+
+
+par(mfrow = c(1,1))
+dev.off()
+
+rm(tmp.sw, tmp.dom, tmp.eve, tmp.rich, ForCenSred)
+
+
+
+
+png("ASFigures/Div_cf_ForCenSred_Atl.png", 550, 600)
+par(mfrow = c(2,2))
+# species richness
+with(ForCenSred[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11, ], plot(Latitude, tmp.rich[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness"))
+points(rep(30.2, nrow(divTemp[divTemp$Size > 150])), divTemp$Richness[divTemp$Size > 150], col = "blue", pch = 16)
+points(rep(30.2, 2), divTemp$Richness[divTemp$Analysis == "Con" & divTemp$Size > 150], col = "red", pch = 16)
+
+
+# ShannonWiener
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.sw[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener")
+points(rep(30.2, nrow(divTemp)), divTemp$ShannonWiener, col = "blue", pch = 16)
+points(rep(30.2, 2), divTemp$ShannonWiener[divTemp$Analysis == "Con"], col = "red", pch = 16)
+
+# Dominance
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.dom[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance")
+points(rep(30.2, nrow(divTemp)), divTemp$Dominance, col = "blue", pch = 16)
+points(rep(30.2, 2), divTemp$Dominance[divTemp$Analysis == "Con"], col = "red", pch = 16)
+
+
+# Evenness
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.eve[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Evenness")
+points(rep(30.2, nrow(divTemp)), divTemp$Evenness, col = "blue", pch = 16)
+points(rep(30.2, 2), divTemp$Evenness[divTemp$Analysis == "Con"], col = "red", pch = 16)
+par(mfrow = c(1,1))
+dev.off()

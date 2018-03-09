@@ -2322,6 +2322,56 @@ abline(v = 9.5, lty = 2)
 par(mfrow = c(1, 1))
 dev.off()
 
+# create plots for slide / digital separately
+# figures showing the cumulative maximum consensus for the IDs
+cum.sum <- list()
+
+cum.sum$s125 <- cumsum(rev(table(slide125$IFmaxCon)))/300*100
+cum.sum$s150 <- cumsum(rev(table(slide150$IFmaxCon)))/300*100
+cum.sum$d125 <- cumsum(rev(table(digital125$IFmaxCon)))/300*100
+cum.sum$d150 <- cumsum(rev(table(digital150$IFmaxCon)))/300*100
+
+png("Figures/Cumulative.png", 480, 900)
+par(mfrow = c(2, 1))
+plot(names(cum.sum$s125), cum.sum$s125, type = "n", xlab = "Number of participants", ylab = "Fraction of specimens / %", las = 1, ylim = c(0, 100), lty = 2, xaxt = "n", cex.lab = 1.5, cex.main = 1.5, cex.axis = 1.1)
+axis(1, 3:17)
+legend("topright", lty = c(2, 1), legend = c(expression(paste(">125 ", mu, "m")), expression(paste(">150 ", mu, "m"))), cex = 1.3, lwd = 2)
+
+# adding in the consensus lines
+tmp.s150 <- rev(cum.sum$s150)[as.numeric(names(rev(cum.sum$s150))) > c50_cutoff$slide][1]
+lines(c(names(tmp.s150), names(tmp.s150)), c(-5, tmp.s150), col = "grey")
+lines(c(2, as.numeric(names(tmp.s150))), c(tmp.s150, tmp.s150), col = "grey")
+
+tmp.s125 <- rev(cum.sum$s125)[as.numeric(names(rev(cum.sum$s125))) > c50_cutoff$slide][1]
+lines(c(names(tmp.s125), names(tmp.s125)), c(-5, tmp.s125), col = "grey", lty = 2)
+lines(c(2, names(tmp.s125)), c(tmp.s125, tmp.s125), col = "grey", lty = 2)
+
+# plotting the cumulative curves
+points(names(cum.sum$s125), cum.sum$s125, type = "s", lty = 2)
+points(names(cum.sum$s150), cum.sum$s150, type = "s")
+
+
+plot(names(cum.sum$d125), cum.sum$d125, type = "n", xlab = "Number of participants", ylab = "Fraction of specimens / %", las = 1, ylim = c(0, 100), lty = 2, xaxt = "n", cex.lab = 1.5, cex.main = 1.5, cex.axis = 1.1)
+axis(1, 2:9)
+legend("topright", lty = c(2, 1), legend = c(expression(paste(">125 ", mu, "m")), expression(paste(">150 ", mu, "m"))), cex = 1.3, lwd = 2, col = "blue")
+
+# adding in the consensus lines
+tmp.d150 <- rev(cum.sum$d150)[as.numeric(names(rev(cum.sum$d150))) > c50_cutoff$digital][1]
+lines(c(names(tmp.d150), names(tmp.d150)), c(-5, tmp.d150), col = "grey")
+lines(c(1, names(tmp.d150)), c(tmp.d150, tmp.d150), col = "grey")
+
+tmp.d125 <- rev(cum.sum$d125)[as.numeric(names(rev(cum.sum$d125))) > c50_cutoff$digital][1]
+lines(c(names(tmp.d125), names(tmp.d125)), c(-5, tmp.d125), col = "grey", lty = 2)
+lines(c(1, names(tmp.d125)), c(tmp.d125, tmp.d125), col = "grey", lty = 2)
+
+# plotting the cumulative curves
+points(names(cum.sum$d125), cum.sum$d125, type = "s", lty = 2, col = "blue")
+points(names(cum.sum$d150), cum.sum$d150, type = "s", col = "blue")
+par(mfrow = c(1,1))
+dev.off()
+
+rm(tmp.s125, tmp.s150, tmp.d125, tmp.d150)
+
 # accuracy as percentage
 table(slide125$IFmaxCon)/300 * 100
 table(slide150$IFmaxCon)/300 * 100

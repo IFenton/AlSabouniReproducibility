@@ -354,7 +354,9 @@ abline(v = 20.5, col = "grey 50")
 with(accuracy, points(1:26, cPtA125[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
 with(accuracy, arrows(1, cPtA125[PersonID == "1a"], 2, cPtA125[PersonID == "1b"], length = 0.14))
 with(accuracy, arrows(3, cPtA125[PersonID == "2a"], 4, cPtA125[PersonID == "2b"], length = 0.14))
-text(26, 90, "125", cex = 1.5)
+text(25, 90, expression(paste(">125 ", mu, "m")), cex = 1.3)
+text(1, 40, "Slide", cex = 1.3)
+text(21.75, 40, "Digital", cex = 1.3, col = "blue")
 
 with(accuracy, plot(cPtA150[match(ord.div, PersonID)], ylim = c(40, 90), type = "n", xaxt = "n", ylab = "Percentage agreement", xlab = "Participant", cex.lab = 1.5, las = 2, cex.axis = 1.1))
 axis(1, at = 1:26, labels = accuracy$PersonID[match(ord.div, accuracy$PersonID)], cex.axis = 1.1)
@@ -370,7 +372,9 @@ abline(v = 20.5, col = "grey 50")
 with(accuracy, points(1:26, cPtA150[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
 with(accuracy, arrows(1, cPtA150[PersonID == "1a"], 2, cPtA150[PersonID == "1b"], length = 0.14))
 with(accuracy, arrows(3, cPtA150[PersonID == "2a"], 4, cPtA150[PersonID == "2b"], length = 0.14))
-text(26, 90, "150", cex = 1.5)
+text(25, 90, expression(paste(">150 ", mu, "m")), cex = 1.3)
+text(1, 40, "Slide", cex = 1.3)
+text(21.75, 40, "Digital", cex = 1.3, col = "blue")
 
 par(mfrow = c(1,1))
 dev.off()
@@ -393,7 +397,10 @@ with(accuracy, points(1:26, sPtA125[match(ord.div, PersonID)], pch = 16, col = (
 with(accuracy, points(1:26, dPtA125[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
 with(accuracy, arrows(1, sPtA125[PersonID == "1a"], 2, sPtA125[PersonID == "1b"], length = 0.14))
 with(accuracy, arrows(3, sPtA125[PersonID == "2a"], 4, sPtA125[PersonID == "2b"], length = 0.14))
-text(26, 90, "125", cex = 1.5)
+text(25, 90, expression(paste(">125 ", mu, "m")), cex = 1.3)
+text(1, 40, "Slide", cex = 1.3)
+text(21.75, 40, "Digital", cex = 1.3, col = "blue")
+
 
 with(accuracy, plot(sPtA150[match(ord.div, PersonID)], ylim = c(40, 90), type = "n", xaxt = "n", ylab = "Percentage agreement", xlab = "Participant", cex.lab = 1.5, las = 2, cex.axis = 1.1))
 axis(1, at = 1:26, labels = accuracy$PersonID[match(ord.div, accuracy$PersonID)], cex.axis = 1.1)
@@ -410,7 +417,10 @@ with(accuracy, points(1:26, sPtA150[match(ord.div, PersonID)], pch = 16, col = (
 with(accuracy, points(1:26, dPtA150[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
 with(accuracy, arrows(1, sPtA150[PersonID == "1a"], 2, sPtA150[PersonID == "1b"], length = 0.14))
 with(accuracy, arrows(3, sPtA150[PersonID == "2a"], 4, sPtA150[PersonID == "2b"], length = 0.14))
-text(26, 90, "150", cex = 1.5)
+text(25, 90, expression(paste(">150 ", mu, "m")), cex = 1.3)
+text(1, 40, "Slide", cex = 1.3)
+text(21.75, 40, "Digital", cex = 1.3, col = "blue")
+
 
 par(mfrow = c(1,1))
 dev.off()
@@ -482,7 +492,10 @@ abline(v = 20.5, col = "grey 50")
 with(accuracy, points(1:26, cPtA125r[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
 with(accuracy, arrows(1, cPtA125r[PersonID == "1a"], 2, cPtA125r[PersonID == "1b"], length = 0.14))
 with(accuracy, arrows(3, cPtA125r[PersonID == "2a"], 4, cPtA125r[PersonID == "2b"], length = 0.14))
-text(26, 90, "125", cex = 1.5)
+text(25, 90, expression(paste(">125 ", mu, "m")), cex = 1.3)
+text(1, 40, "Slide", cex = 1.3)
+text(21.75, 40, "Digital", cex = 1.3, col = "blue")
+
 
 with(accuracy, plot(cPtA150r[match(ord.div, PersonID)], ylim = c(40, 90), type = "n", xaxt = "n", ylab = "Percentage agreement", xlab = "Participant", cex.lab = 1.5, las = 2, cex.axis = 1.1))
 axis(1, at = 1:26, labels = accuracy$PersonID[match(ord.div, accuracy$PersonID)], cex.axis = 1.1)
@@ -498,7 +511,10 @@ abline(v = 20.5, col = "grey 50")
 with(accuracy, points(1:26, cPtA150r[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
 with(accuracy, arrows(1, cPtA150r[PersonID == "1a"], 2, cPtA150r[PersonID == "1b"], length = 0.14))
 with(accuracy, arrows(3, cPtA150r[PersonID == "2a"], 4, cPtA150r[PersonID == "2b"], length = 0.14))
-text(26, 90, "150", cex = 1.5)
+text(25, 90, expression(paste(">150 ", mu, "m")), cex = 1.3)
+text(1, 40, "Slide", cex = 1.3)
+text(21.75, 40, "Digital", cex = 1.3, col = "blue")
+
 
 par(mfrow = c(1,1))
 dev.off()
@@ -519,7 +535,7 @@ tail(long$s125)
 
 png("ASFigures/CombCon_conf_slide125.png", 1000, 700)
 conf_mat(long$s125, "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
-mtext("Slide 125", 1, cex = 2, adj = -0.8,  line = -5)
+mtext(expression(paste("Slide >125", mu, "m")), 1, cex = 2, adj = -1.2,  line = -6)
 dev.off()
 
 # same for the other datasets
@@ -533,7 +549,7 @@ tail(long$s150)
 
 png("ASFigures/CombCon_conf_slide150.png", 1000, 610)
 conf_mat(long$s150, "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
-mtext("Slide 150", 1, cex = 2, adj = -.8,  line = -5)
+mtext(expression(paste("Slide >150", mu, "m")), 1, cex = 2, adj = -1.2,  line = -6)
 dev.off()
 
 # digital 125
@@ -546,7 +562,7 @@ tail(long$d125)
 
 png("ASFigures/CombCon_conf_digital125.png", 1000, 700)
 conf_mat(long$d125, "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
-mtext("Digital 125", 1, cex = 2, adj = -.8,  line = -5)
+mtext(expression(paste("Digital >125", mu, "m")), 1, cex = 2, adj = -1.2,  line = -6)
 dev.off()
 
 # digital 150
@@ -559,7 +575,7 @@ tail(long$d150)
 
 png("ASFigures/CombCon_conf_digital150.png", 1000, 610)
 conf_mat(long$d150, "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
-mtext("Digital 150", 1, cex = 2, adj = -.8,  line = -5)
+mtext(expression(paste("Digital >150", mu, "m")), 1, cex = 2, adj = -1.2,  line = -6)
 dev.off()
 
 # What about for the separate consensus values
@@ -692,14 +708,16 @@ stressplot(nmds$CC125f)
 
 # there is still a small amount of variation in this plot each time it is written
 png("ASFigures/CombCon_NMDS_125.png", 600, 600)
-plot(nmds$CC125f, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab = "Axis 2", las = 1, cex.lab = 1.5, cex.axis = 1.2, main = "NMDS 125")
+par(mar = c(5.1, 5.1, 3.1, 2.1))
+plot(nmds$CC125f, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab = "Axis 2", las = 1, cex.lab = 2, cex.main = 2.5, cex.axis = 1.4, main = expression(paste("NMDS >125 ", mu, "m")))
 points(nmds$CC125f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
 text(nmds$CC125f$points[nchar(rownames(nmds$CC125f$points)) <3, ], labels = rownames(nmds$CC125f$points)[nchar(rownames(nmds$CC125f$points)) <3])
 points(nmds$CC125f$points[rownames(nmds$CC125f$points) == "cCID" | rownames(nmds$CC125f$points) == "cSC50" , ], pch = "+")
 text(nmds$CC125f$points[rownames(nmds$CC125f$points) == "cCID", 1]+0.03, nmds$CC125f$points[rownames(nmds$CC125f$points) == "cCID", 2]+0.00, labels = "CID")
 text(nmds$CC125f$points[rownames(nmds$CC125f$points) == "cSC50", 1]+0.02, nmds$CC125f$points[rownames(nmds$CC125f$points) == "cSC50", 2]+0.00, labels = "sC")
 
-legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16, cex = 1.3)
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16, pt.cex = 2, cex = 1.5)
+par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
 # 6c. NMDS for combined consensus 150 -------------------------------------
@@ -737,13 +755,15 @@ stressplot(nmds$CC150f)
 
 # the full plot
 png("ASFigures/CombCon_NMDS_150.png", 600, 600)
-plot(nmds$CC150f, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab = "Axis 2", las = 1, cex.lab = 1.5, cex.axis = 1.2, main = "NMDS 150")
+par(mar = c(5.1, 5.1, 3.1, 2.1))
+plot(nmds$CC150f, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab = "Axis 2", las = 1, cex.lab = 2, cex.main = 2.5, cex.axis = 1.4, main = expression(paste("NMDS >150 ", mu, "m")))
 points(nmds$CC150f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
 text(nmds$CC150f$points[nchar(rownames(nmds$CC150f$points)) <3, ], labels = rownames(nmds$CC150f$points)[nchar(rownames(nmds$CC150f$points)) <3])
 points(nmds$CC150f$points[rownames(nmds$CC150f$points) == "cCID" | rownames(nmds$CC150f$points) == "cSC50" , ], pch = "+")
 text(nmds$CC150f$points[rownames(nmds$CC150f$points) == "cCID", 1]+0.02, nmds$CC150f$points[rownames(nmds$CC150f$points) == "cCID", 2], labels = "CID")
 text(nmds$CC150f$points[rownames(nmds$CC150f$points) == "cSC50", 1]+0.025, nmds$CC150f$points[rownames(nmds$CC150f$points) == "cSC50", 2], labels = "sC")
-legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16, cex = 1.3)
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16, pt.cex = 2, cex = 1.5)
+par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
 # focussing on the main section. As noted above, it is better to run this as a new analysis rather than just zoom in, as the influence of the outliers means that the stability of the central points hasn't been tested
@@ -782,14 +802,17 @@ stress$CCop150z
 stressplot(nmds$CC150z)
 
 # the zoomed plot
-png("ASFigures/CombCon_NMDS_150_zoom.png", 600, 600)
-plot(nmds$CC150z, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab = "Axis 2", las = 1, cex.lab = 1.5, cex.axis = 1.2, main = "NMDS 150 zoomed")
+png("ASFigures/CombCon_NMDS_150_no_out.png", 600, 600)
+par(mar = c(5.1, 5.1, 3.1, 2.1))
+plot(nmds$CC150z, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab = "Axis 2", las = 1, cex.lab = 2, cex.main = 2.5, cex.axis = 1.4, main = expression(paste("NMDS >150 ", mu, "m: no outliers")), xlim = c(-0.25, 0.25))
+
 points(nmds$CC150z, pch = 21, cex = 4, col = mds.col$pair[!(mds.col$person %in% c("3", "C", "E", "G"))], bg = brewer.pal(5, "Set2")[mds.col$sch.col[!(mds.col$person %in% c("3", "C", "E", "G"))]], lwd = 2)
 text(nmds$CC150z$points[nchar(rownames(nmds$CC150z$points)) <3, ], labels = rownames(nmds$CC150z$points)[nchar(rownames(nmds$CC150z$points)) <3])
 points(nmds$CC150z$points[rownames(nmds$CC150z$points) == "cCID" | rownames(nmds$CC150z$points) == "cSC50" , ], pch = "+")
 text(nmds$CC150z$points[rownames(nmds$CC150z$points) == "cCID", 1]+0.012, nmds$CC150z$points[rownames(nmds$CC150z$points) == "cCID", 2]+0.008, labels = "CID")
 text(nmds$CC150z$points[rownames(nmds$CC150z$points) == "cSC50", 1]+0.012, nmds$CC150z$points[rownames(nmds$CC150z$points) == "cSC50", 2]+0.008, labels = "sC")
-legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16, cex = 1.3)
+legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pt.cex = 2, cex = 1.5, pch = 16)
+par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
 # output the scree plots
@@ -1003,28 +1026,29 @@ err_bar <- function(mean, sd, xpos, length = 0.05, col = 1) {
 }
 
 # plot the data
-png("ASFigures/CombCon_SST.png", 800, 500)
+png("ASFigures/CombCon_SST.png", 800, 450)
 par(mar = c(5.1, 5.1, 4.1, 2.1))
 # points
-with(divTemp[divTemp$Size == 150,], plot(1:26, SST10m[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Participant", ylab = expression(paste("SST / ", degree, "C")), col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(20, 24), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+with(divTemp[divTemp$Size == 150,], plot(1:26, SST10m[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Participant", ylab = expression(paste("SST / ", degree, "C")), col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(20.5, 24), cex.lab = 1.5, las = 1, cex.axis = 1.1, type = "n"))
 axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
 # consensus values
-with(divTemp[row.nam$s150c,], lines(x = c(0, 20.5), y = rep(SST10m, each = 2), col = "green4"))
-with(divTemp[row.nam$d150c,], lines(x = c(20.5, 27), y = rep(SST10m, each = 2), col = "green4"))
-with(divTemp[row.nam$s150c,], lines(x = c(0, 20.5), y = rep(SST10m - SD, each = 2), col = "green4", lty = 4))
-with(divTemp[row.nam$s150c,], lines(x = c(0, 20.5), y = rep(SST10m + SD, each = 2), col = "green4", lty = 4))
-with(divTemp[row.nam$d150c,], lines(x = c(20.5, 27), y = rep(SST10m - SD, each = 2), col = "green4", lty = 4))
-with(divTemp[row.nam$d150c,], lines(x = c(20.5, 27), y = rep(SST10m + SD, each = 2), col = "green4", lty = 4))
+with(divTemp[row.nam$s150c,], lines(x = c(0, 27), y = rep(SST10m, each = 2), col = "green4"))
+with(divTemp[row.nam$s150c,], rect(0, SST10m - SD, 27, SST10m + SD, col = rgb(0, 139, 0, 75, maxColorValue = 255), border = NA))
 # mean values
 with(divTemp[row.nam$s150c,], lines(x = c(0, 20.5), y = rep(mean(divTemp$SST10m[row.nam$s150]), each = 2)))
 with(divTemp[row.nam$d150c,], lines(x = c(20.5, 27), y = rep(mean(divTemp$SST10m[row.nam$d150]), each = 2), col = 4))
 abline(v = 20.5, col = "grey 50")
+# add points
+with(divTemp[divTemp$Size == 150,], points(1:26, SST10m[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
 
 # error bars / actual  / legend
 with(divTemp[divTemp$Size == 150,], err_bar(SST10m[match(ord.div, Person)], SD[match(ord.div, Person)], 1:26, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
 abline(h = 21.76, col = "green4", lwd = 2)
-text(25, 21.65, "WOA 1998", cex = 1.3, col = "green4")
-legend("topleft", legend = c("Slide 150", "Digital 150"), pch = 16, col = c(1, 4))
+text(25.25, 21.9, "WOA 1998", cex = 1.3, col = "green4")
+legend("topleft", legend = c(expression(paste("Slide >150", mu, "m")), expression(paste("Digital >150", mu, "m"))), pch = 16, col = c(1, 4), pt.cex = 1.5, cex = 1.1)
+text(1, 20.5, "Slide", cex = 1.3)
+text(21.75, 20.5, "Digital", cex = 1.3, col = "blue")
+
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
@@ -1059,9 +1083,9 @@ divTemp$Evenness[divTemp$Size == 150] <- (exp(diversity(t(full.150sp[!grepl("nc|
 png("ASFigures/div_CombCon_Richness.png", 800, 500)
 par(mar = c(5.1, 5.1, 4.1, 2.1))
 # points
-with(divTemp[divTemp$Size == 125,], plot(1:26, Richness[match(ord.div, Person)], pch = 1, xaxt = "n", xlab = "Participant", ylab = "Richness", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(14, 30), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+with(divTemp[divTemp$Size == 125,], plot(1:26, Richness[match(ord.div, Person)], pch = 1, xaxt = "n", xlab = "Participant", ylab = "Richness", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(14, 30), cex.lab = 1.5, las = 1, cex.axis = 1.1, cex = 1.5))
 axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
-with(divTemp[divTemp$Size == 150,], points(1:26, Richness[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+with(divTemp[divTemp$Size == 150,], points(1:26, Richness[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), cex = 1.5))
 # consensus lines
 abline(h = divTemp$Richness[row.nam$c125c], col = "green4", lty = 2)
 abline(h = divTemp$Richness[row.nam$c150c], col = "green4")
@@ -1072,15 +1096,18 @@ lines(x = c(20.5, 27), y = rep(mean(divTemp$Richness[row.nam$d150]), 2), col = "
 lines(x = c(0, 20.5), y = rep(mean(divTemp$Richness[row.nam$s150]), 2))
 abline(v = 20.5, col = "grey 50")
 # legend
-legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
+legend("topleft", legend = c(expression(paste("Slide >125", mu, "m")), expression(paste("Slide >150", mu, "m")), expression(paste("Digital >125", mu, "m")), expression(paste("Digital >150", mu, "m"))), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4), pt.cex = 1.5, cex = 1.1)
+text(1, 14, "Slide", cex = 1.3)
+text(21.75, 14, "Digital", cex = 1.3, col = "blue")
+
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
 png("ASFigures/div_CombCon_Dominance.png", 800, 500)
 # points
 par(mar = c(5.1, 5.1, 4.1, 2.1))
-with(divTemp[divTemp$Size == 125,], plot(1:26, Dominance[match(ord.div, Person)], pch = 1, xaxt = "n", xlab = "Participant", ylab = "Dominance", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(0.1, 0.22), cex.lab = 1.5, las = 1, cex.axis = 1.1))
-with(divTemp[divTemp$Size == 150,], points(1:26, Dominance[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+with(divTemp[divTemp$Size == 125,], plot(1:26, Dominance[match(ord.div, Person)], pch = 1, xaxt = "n", xlab = "Participant", ylab = "Dominance", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(0.1, 0.22), cex.lab = 1.5, las = 1, cex.axis = 1.1, cex = 1.5))
+with(divTemp[divTemp$Size == 150,], points(1:26, Dominance[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), cex = 1.5))
 axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
 # consensus lines
 abline(h = divTemp$Dominance[row.nam$c125c], col = "green4", lty = 2)
@@ -1092,7 +1119,10 @@ lines(x = c(20.5, 27), y = rep(mean(divTemp$Dominance[row.nam$d150]), 2), col = 
 lines(x = c(0, 20.5), y = rep(mean(divTemp$Dominance[row.nam$s150]), 2))
 abline(v = 20.5, col = "grey 50")
 # legend
-legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
+legend("topleft", legend = c(expression(paste("Slide >125", mu, "m")), expression(paste("Slide >150", mu, "m")), expression(paste("Digital >125", mu, "m")), expression(paste("Digital >150", mu, "m"))), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4), pt.cex = 1.5, cex = 1.1)
+text(1, 0.1, "Slide", cex = 1.3)
+text(21.75, 0.1, "Digital", cex = 1.3, col = "blue")
+
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
@@ -1100,9 +1130,9 @@ png("ASFigures/div_CombCon_ShannonWiener.png", 800, 500)
 # 125
 par(mar = c(5.1, 5.1, 4.1, 2.1))
 # points
-with(divTemp[divTemp$Size == 125,], plot(1:26, ShannonWiener[match(ord.div, Person)], pch = 1, xaxt = "n", xlab = "Participant", ylab = "Shannon-Wiener Diversity", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(1.95, 2.6), cex.lab = 1.5, las = 1, cex.axis = 1.1))
+with(divTemp[divTemp$Size == 125,], plot(1:26, ShannonWiener[match(ord.div, Person)], pch = 1, xaxt = "n", xlab = "Participant", ylab = "Shannon-Wiener Diversity", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(1.95, 2.6), cex.lab = 1.5, las = 1, cex.axis = 1.1, cex = 1.5))
 axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
-with(divTemp[divTemp$Size == 150,], points(1:26, ShannonWiener[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
+with(divTemp[divTemp$Size == 150,], points(1:26, ShannonWiener[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), cex = 1.5))
 # consensus lines
 abline(h = divTemp$ShannonWiener[row.nam$c125c], col = "green4", lty = 2)
 abline(h = divTemp$ShannonWiener[row.nam$c150c], col = "green4")
@@ -1113,7 +1143,10 @@ lines(x = c(20.5, 27), y = rep(mean(divTemp$ShannonWiener[row.nam$d150]), 2), co
 lines(x = c(0, 20.5), y = rep(mean(divTemp$ShannonWiener[row.nam$s150]), 2))
 abline(v = 20.5, col = "grey 50")
 # legend
-legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
+legend("topleft", legend = c(expression(paste("Slide >125", mu, "m")), expression(paste("Slide >150", mu, "m")), expression(paste("Digital >125", mu, "m")), expression(paste("Digital >150", mu, "m"))), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4), pt.cex = 1.5, cex = 1.1)
+text(1, 1.95, "Slide", cex = 1.3)
+text(21.75, 1.95, "Digital", cex = 1.3, col = "blue")
+
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
@@ -1133,6 +1166,9 @@ lines(x = c(0, 20.5), y = rep(mean(divTemp$Evenness[row.nam$s150]), 2))
 abline(v = 20.5, col = "grey 50")
 # legend
 legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
+text(1, 0.3475, "Slide", cex = 1.3)
+text(21.75, 0.3475, "Digital", cex = 1.3, col = "blue")
+
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
@@ -1158,6 +1194,9 @@ lines(x = c(0, 20.5), y = rep(mean(divTemp$Richness[row.nam$s150]), 2))
 abline(v = 20.5, col = "grey 50")
 # legend
 legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
+text(1, 14, "Slide", cex = 1.3)
+text(21.75, 14, "Digital", cex = 1.3, col = "blue")
+
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
@@ -1180,6 +1219,9 @@ lines(x = c(0, 20.5), y = rep(mean(divTemp$Dominance[row.nam$s150]), 2))
 abline(v = 20.5, col = "grey 50")
 # legend
 legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
+text(1, 0.1, "Slide", cex = 1.3)
+text(21.75, 0.1, "Digital", cex = 1.3, col = "blue")
+
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
@@ -1203,6 +1245,9 @@ lines(x = c(0, 20.5), y = rep(mean(divTemp$ShannonWiener[row.nam$s150]), 2))
 abline(v = 20.5, col = "grey 50")
 # legend
 legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
+text(1, 1.95, "Slide", cex = 1.3)
+text(21.75, 1.95, "Digital", cex = 1.3, col = "blue")
+
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
@@ -1224,6 +1269,9 @@ lines(x = c(0, 20.5), y = rep(mean(divTemp$Evenness[row.nam$s150]), 2))
 abline(v = 20.5, col = "grey 50")
 # legend
 legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
+text(1, 0.3475, "Slide", cex = 1.3)
+text(21.75, 0.3475, "Digital", cex = 1.3, col = "blue")
+
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
@@ -1310,63 +1358,54 @@ table(divTemp$Dir_R, divTemp$Dir_D, paste(divTemp$Analysis, divTemp$Size, sep = 
 
 # 10g. Comparison with ForCenS -----------------------------------------------
 # see how the datasets compare with the ForCenS values for that latitude
+# only run with the >150 as that is what ForCenS is.
 ForCenSred <- as.data.frame(read_excel("Data/Siccha_ForCenS.xlsx", sheet = "ForCenSred", na = "N/A"))
 ForCenSred[, 22:62][is.na(ForCenSred[, 22:62])] <- 0
 str(ForCenSred)
 
-png("ASFigures/Div_cf_ForCenSred.png", 550, 600)
-par(mfrow = c(2,2))
+png("ASFigures/Div_cf_ForCenSred.png", 1200, 400)
+par(mfrow = c(1,3), mar = c(5.1, 5.1, 3.1, 2.1))
 # species richness
 tmp.rich <- specnumber(ForCenSred[, 22:62]) # richness(ForCenSred[,22:62])
-plot(ForCenSred$Latitude, tmp.rich, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness")
-points(rep(30.2, nrow(divTemp)), divTemp$Richness, col = "blue", pch = 16)
-points(rep(30.2, 2), divTemp$Richness[divTemp$Analysis == "Con"], col = "red", pch = 16)
+plot(ForCenSred$Latitude, tmp.rich, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-75, 75))
+points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$Richness[divTemp$Size == 150], col = "blue", pch = 16, cex = 2)
+points(30.2, divTemp$Richness[row.nam$c150c], col = "red", pch = 16, cex = 2)
 
 # ShannonWiener
 tmp.sw <- diversity(ForCenSred[,22:62])
-plot(ForCenSred$Latitude, tmp.sw, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener")
-points(rep(30.2, nrow(divTemp)), divTemp$ShannonWiener, col = "blue", pch = 16)
-points(rep(30.2, 2), divTemp$ShannonWiener[divTemp$Analysis == "Con"], col = "red", pch = 16)
+plot(ForCenSred$Latitude, tmp.sw, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-75, 75))
+points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$ShannonWiener[divTemp$Size == 150], col = "blue", pch = 16, cex = 1.8)
+points(30.2, divTemp$ShannonWiener[row.nam$c150c], col = "red", pch = 16, cex = 1.8)
 
 # Dominance
 tmp.dom <- (1 - diversity(ForCenSred[,22:62], index = "simpson"))
-plot(ForCenSred$Latitude, tmp.dom, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance")
-points(rep(30.2, nrow(divTemp)), divTemp$Dominance, col = "blue", pch = 16)
-points(rep(30.2, 2), divTemp$Dominance[divTemp$Analysis == "Con"], col = "red", pch = 16)
+plot(ForCenSred$Latitude, tmp.dom, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-75, 75))
+points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$Dominance[divTemp$Size == 150], col = "blue", pch = 16, cex = 1.8)
+points(30.2, divTemp$Dominance[row.nam$c150c], col = "red", pch = 16, cex = 1.8)
 
-
-# Evenness
-tmp.eve <- (exp(diversity(ForCenSred[,22:62])) / specnumber(ForCenSred[,22:62]))
-plot(ForCenSred$Latitude, tmp.eve, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Evenness")
-points(rep(30.2, nrow(divTemp)), divTemp$Evenness, col = "blue", pch = 16)
-points(rep(30.2, 2), divTemp$Evenness[divTemp$Analysis == "Con"], col = "red", pch = 16)
-par(mfrow = c(1,1))
+par(mfrow = c(1,1), mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
-png("ASFigures/Div_cf_ForCenSred_Atl.png", 550, 600)
-par(mfrow = c(2,2))
+png("ASFigures/Div_cf_ForCenSred_Atl.png", 1200, 400)
+par(mfrow = c(1,3), mar = c(5.6, 5.1, 3.1, 2.1), mgp = c(3.5, 1, 0))
 # species richness
-with(ForCenSred[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11, ], plot(Latitude, tmp.rich[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness"))
-points(rep(30.2, nrow(divTemp)), divTemp$Richness, col = "blue", pch = 16)
-points(rep(30.2, 2), divTemp$Richness[divTemp$Analysis == "Con"], col = "red", pch = 16)
-
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.rich[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-65, 65))
+points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$Richness[divTemp$Size == 150], col = "blue", pch = 16, cex = 2)
+points(30.2, divTemp$Richness[row.nam$c150c], col = "red", pch = 16, cex = 2)
 
 # ShannonWiener
-plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.sw[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener")
-points(rep(30.2, nrow(divTemp)), divTemp$ShannonWiener, col = "blue", pch = 16)
-points(rep(30.2, 2), divTemp$ShannonWiener[divTemp$Analysis == "Con"], col = "red", pch = 16)
+tmp.sw <- diversity(ForCenSred[,22:62])
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.sw[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-65, 65))
+points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$ShannonWiener[divTemp$Size == 150], col = "blue", pch = 16, cex = 1.8)
+points(30.2, divTemp$ShannonWiener[row.nam$c150c], col = "red", pch = 16, cex = 1.8)
 
 # Dominance
-plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.dom[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance")
-points(rep(30.2, nrow(divTemp)), divTemp$Dominance, col = "blue", pch = 16)
-points(rep(30.2, 2), divTemp$Dominance[divTemp$Analysis == "Con"], col = "red", pch = 16)
+tmp.dom <- (1 - diversity(ForCenSred[,22:62], index = "simpson"))
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.dom[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-65, 65))
+points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$Dominance[divTemp$Size == 150], col = "blue", pch = 16, cex = 1.8)
+points(30.2, divTemp$Dominance[row.nam$c150c], col = "red", pch = 16, cex = 1.8)
 
-
-# Evenness
-plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.eve[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Evenness")
-points(rep(30.2, nrow(divTemp)), divTemp$Evenness, col = "blue", pch = 16)
-points(rep(30.2, 2), divTemp$Evenness[divTemp$Analysis == "Con"], col = "red", pch = 16)
-par(mfrow = c(1,1))
+par(mfrow = c(1,1), mar = c(5.1, 4.1, 4.1, 2.1), mgp = c(3, 1, 0))
 dev.off()
 
 rm(tmp.sw, tmp.dom, tmp.eve, tmp.rich, ForCenSred)
@@ -1543,19 +1582,19 @@ size150$scAgreement <- rowSums(full.150[,col.nam$s150] == full.150$cCID)/length(
 size150$dcAgreement <- rowSums(full.150[,col.nam$d150] == full.150$cCID)/length(col.nam$d150)*100
 
 png("ASFigures/Size_agreement_sdc125.png")
-with(size125, plot(scAgreement, Length, pch = 16, main = "> 125", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diameter / ", mu, "m"))))
-lines(names(tapply(size125$Length, size125$scAgreement, max)), tapply(size125$Length, size125$scAgreement, max), pch = 16)
-with(size125, points(dcAgreement, Length, pch = 16, col = "blue"))
-lines(names(tapply(size125$Length, size125$dcAgreement, max)), tapply(size125$Length, size125$dcAgreement, max), pch = 16, col = 4)
-legend("topleft", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"))
+with(size125, plot(Length, scAgreement, pch = 16, main = expression(paste(">125 ", mu, "m")), las = 1, ylab = "Percentage Agreement", xlab = expression(paste("Maximum diameter / ", mu, "m")), ylim = c(0, 100), cex.main = 1.5, cex.lab = 1.3))
+lines(tapply(size125$Length, size125$scAgreement, max), names(tapply(size125$Length, size125$scAgreement, max)), pch = 16)
+with(size125, points(Length, dcAgreement, pch = 16, col = "blue"))
+lines(tapply(size125$Length, size125$dcAgreement, max), names(tapply(size125$Length, size125$dcAgreement, max)), pch = 16, col = 4)
+legend("bottomright", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"), cex = 1.2, pt.cex = 1.3)
 dev.off()
 
 png("ASFigures/Size_agreement_sdc150.png")
-with(size150, plot(scAgreement, Length, pch = 16, main = "> 150", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diameter / ", mu, "m"))))
-lines(names(tapply(size150$Length, size150$scAgreement, max)), tapply(size150$Length, size150$scAgreement, max), pch = 16)
-with(size150, points(dcAgreement, Length, pch = 16, col = "blue"))
-lines(names(tapply(size150$Length, size150$dcAgreement, max)), tapply(size150$Length, size150$dcAgreement, max), pch = 16, col = 4)
-legend("topleft", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"))
+with(size150, plot(Length, scAgreement, pch = 16, main = expression(paste(">150 ", mu, "m")), las = 1, ylab = "Percentage Agreement", xlab = expression(paste("Maximum diameter / ", mu, "m")), ylim = c(0, 100), cex.main = 1.5, cex.lab = 1.3))
+lines(tapply(size150$Length, size150$scAgreement, max), names(tapply(size150$Length, size150$scAgreement, max)), pch = 16)
+with(size150, points(Length, dcAgreement, pch = 16, col = "blue"))
+lines(tapply(size150$Length, size150$dcAgreement, max), names(tapply(size150$Length, size150$dcAgreement, max)), pch = 16, col = 4)
+legend("bottomright", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"), cex = 1.2, pt.cex = 1.3)
 dev.off()
 
 
@@ -1835,95 +1874,3 @@ write.csv(tmp.125, "ASOutputs/PersonIDs_125_IF.csv", row.names = FALSE)
 write.csv(tmp.150, "ASOutputs/PersonIDs_150_IF.csv", row.names = FALSE)
 rm(tmp.125, tmp.150, i)
 
-
-
-
-
-
-
-# see how the datasets compare with the ForCenS values for that latitude
-ForCenSred <- as.data.frame(read_excel("Data/Siccha_ForCenS.xlsx", sheet = "ForCenSred", na = "N/A"))
-ForCenSred[, 22:62][is.na(ForCenSred[, 22:62])] <- 0
-str(ForCenSred)
-
-png("ASFigures/Div_cf_ForCenSred.png", 550, 600)
-par(mfrow = c(2,2))
-# species richness
-tmp.rich <- specnumber(ForCenSred[, 22:62]) # richness(ForCenSred[,22:62])
-plot(ForCenSred$Latitude, tmp.rich, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness")
-points(rep(30.2, nrow(divTemp)), divTemp$Richness, col = "blue", pch = 16)
-points(rep(30.2, 2), divTemp$Richness[divTemp$Analysis == "Con"], col = "red", pch = 16)
-
-# ShannonWiener
-tmp.sw <- diversity(ForCenSred[,22:62])
-plot(ForCenSred$Latitude, tmp.sw, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener")
-points(rep(30.2, nrow(divTemp)), divTemp$ShannonWiener, col = "blue", pch = 16)
-points(rep(30.2, 2), divTemp$ShannonWiener[divTemp$Analysis == "Con"], col = "red", pch = 16)
-
-# Dominance
-tmp.dom <- (1 - diversity(ForCenSred[,22:62], index = "simpson"))
-plot(ForCenSred$Latitude, tmp.dom, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance")
-points(rep(30.2, nrow(divTemp)), divTemp$Dominance, col = "blue", pch = 16)
-points(rep(30.2, 2), divTemp$Dominance[divTemp$Analysis == "Con"], col = "red", pch = 16)
-
-
-# Evenness
-tmp.eve <- (exp(diversity(ForCenSred[,22:62])) / specnumber(ForCenSred[,22:62]))
-plot(ForCenSred$Latitude, tmp.eve, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Evenness")
-points(rep(30.2, nrow(divTemp)), divTemp$Evenness, col = "blue", pch = 16)
-points(rep(30.2, 2), divTemp$Evenness[divTemp$Analysis == "Con"], col = "red", pch = 16)
-par(mfrow = c(1,1))
-dev.off()
-
-png("ASFigures/Div_cf_ForCenSred_Atl_150.png", 700, 300)
-par(mfrow = c(1,3))
-# species richness
-with(ForCenSred[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11, ], plot(Latitude, tmp.rich[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness", cex = 1.5))
-points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$Richness[divTemp$Size == 150], col = "blue", pch = 16, cex = 2)
-points(rep(30.2, 1), divTemp$Richness[divTemp$Analysis == "Con" & divTemp$Size == 150], col = "red", pch = 16, cex = 2)
-
-
-# ShannonWiener
-plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.sw[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener")
-points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$ShannonWiener[divTemp$Size == 150], col = "blue", pch = 16, cex = 1.5)
-points(rep(30.2, 1), divTemp$ShannonWiener[divTemp$Analysis == "Con" & divTemp$Size == 150], col = "red", pch = 16, cex = 1.5)
-
-# Dominance
-plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.dom[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance")
-points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$Dominance[divTemp$Size == 150], col = "blue", pch = 16, cex = 1.5)
-points(rep(30.2, 1), divTemp$Dominance[divTemp$Analysis == "Con" & divTemp$Size == 150], col = "red", pch = 16, cex = 1.5)
-
-
-par(mfrow = c(1,1))
-dev.off()
-
-rm(tmp.sw, tmp.dom, tmp.eve, tmp.rich, ForCenSred)
-
-
-
-
-png("ASFigures/Div_cf_ForCenSred_Atl.png", 550, 600)
-par(mfrow = c(2,2))
-# species richness
-with(ForCenSred[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11, ], plot(Latitude, tmp.rich[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness"))
-points(rep(30.2, nrow(divTemp[divTemp$Size > 150])), divTemp$Richness[divTemp$Size > 150], col = "blue", pch = 16)
-points(rep(30.2, 2), divTemp$Richness[divTemp$Analysis == "Con" & divTemp$Size > 150], col = "red", pch = 16)
-
-
-# ShannonWiener
-plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.sw[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener")
-points(rep(30.2, nrow(divTemp)), divTemp$ShannonWiener, col = "blue", pch = 16)
-points(rep(30.2, 2), divTemp$ShannonWiener[divTemp$Analysis == "Con"], col = "red", pch = 16)
-
-# Dominance
-plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.dom[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance")
-points(rep(30.2, nrow(divTemp)), divTemp$Dominance, col = "blue", pch = 16)
-points(rep(30.2, 2), divTemp$Dominance[divTemp$Analysis == "Con"], col = "red", pch = 16)
-
-
-# Evenness
-plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.eve[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Evenness")
-points(rep(30.2, nrow(divTemp)), divTemp$Evenness, col = "blue", pch = 16)
-points(rep(30.2, 2), divTemp$Evenness[divTemp$Analysis == "Con"], col = "red", pch = 16)
-par(mfrow = c(1,1))
-dev.off()

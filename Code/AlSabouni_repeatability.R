@@ -1103,11 +1103,6 @@ divTemp$Dominance <- NA
 divTemp$Dominance[divTemp$Size == 125] <- (1 - diversity(t(full.125sp[!grepl("nc|na", full.125sp$species), c("cCID", "sCID", names(full.125sp)[col.nam$s125], "dCID", names(full.125sp)[col.nam$d125])]), index = "simpson"))
 divTemp$Dominance[divTemp$Size == 150] <- (1 - diversity(t(full.150sp[!grepl("nc|na", full.150sp$species), c("cCID", "sCID", names(full.150sp)[col.nam$s150], "dCID", names(full.150sp)[col.nam$d150])]), index = "simpson"))
 
-# Evenness
-divTemp$Evenness <- NA
-divTemp$Evenness[divTemp$Size == 125] <- (exp(diversity(t(full.125sp[!grepl("nc|na", full.125sp$species), c("cCID", "sCID", names(full.125sp)[col.nam$s125], "dCID", names(full.125sp)[col.nam$d125])]))) / specnumber(t(full.125sp[!grepl("nc|na", full.125sp$species), c("cCID", "sCID", names(full.125sp)[col.nam$s125], "dCID", names(full.125sp)[col.nam$d125])])))
-divTemp$Evenness[divTemp$Size == 150] <- (exp(diversity(t(full.150sp[!grepl("nc|na", full.150sp$species), c("cCID", "sCID", names(full.150sp)[col.nam$s150], "dCID", names(full.150sp)[col.nam$d150])]))) / specnumber(t(full.150sp[!grepl("nc|na", full.150sp$species), c("cCID", "sCID", names(full.150sp)[col.nam$s150], "dCID", names(full.150sp)[col.nam$d150])])))
-
 # 10b. Plotting diversity combined consensus --------------------------------------------------
 # Plotting diversity
 png("ASFigures/div_CombCon_Richness.png", 800, 500)
@@ -1180,27 +1175,6 @@ text(21.75, 1.95, "Digital", cex = 1.3, col = "blue")
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
-png("ASFigures/div_CombCon_Evenness.png", 800, 500)
-par(mar = c(5.1, 5.1, 4.1, 2.1))
-with(divTemp[divTemp$Size == 125,], plot(1:26, Evenness[match(ord.div, Person)], pch = 1, xaxt = "n", xlab = "Participant", ylab = "Evenness", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(0.35, 0.6), cex.lab = 1.5, las = 1, cex.axis = 1.1))
-axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
-with(divTemp[divTemp$Size == 150,], points(1:26, Evenness[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
-# consensus lines
-abline(h = divTemp$Evenness[row.nam$c125c], col = "green4", lty = 2)
-abline(h = divTemp$Evenness[row.nam$c150c], col = "green4")
-# mean values
-lines(x = c(20.5, 27), y = rep(mean(divTemp$Evenness[row.nam$d125]), 2), col = "blue", lty = 2)
-lines(x = c(0, 20.5), y = rep(mean(divTemp$Evenness[row.nam$s125]), 2), lty = 2)
-lines(x = c(20.5, 27), y = rep(mean(divTemp$Evenness[row.nam$d150]), 2), col = "blue")
-lines(x = c(0, 20.5), y = rep(mean(divTemp$Evenness[row.nam$s150]), 2))
-abline(v = 20.5, col = "grey 50")
-# legend
-legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
-text(1, 0.3475, "Slide", cex = 1.3)
-text(21.75, 0.3475, "Digital", cex = 1.3, col = "blue")
-
-par(mar = c(5.1, 4.1, 4.1, 2.1))
-dev.off()
 
 # 10b. Plotting diversity separate consensus --------------------------------------------------
 # Plotting diversity
@@ -1281,37 +1255,10 @@ text(21.75, 1.95, "Digital", cex = 1.3, col = "blue")
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
-png("ASFigures/div_Sep_Evenness.png", 800, 500)
-par(mar = c(5.1, 5.1, 4.1, 2.1))
-with(divTemp[divTemp$Size == 125,], plot(1:26, Evenness[match(ord.div, Person)], pch = 1, xaxt = "n", xlab = "Participant", ylab = "Evenness", col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(0.35, 0.6), cex.lab = 1.5, las = 1, cex.axis = 1.1))
-axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
-with(divTemp[divTemp$Size == 150,], points(1:26, Evenness[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
-# consensus lines
-lines(x = c(20.5, 27), y = rep(mean(divTemp$Evenness[row.nam$d125c]), 2), col = "green4", lty = 2)
-lines(x = c(0, 20.5), y = rep(mean(divTemp$Evenness[row.nam$s125c]), 2), col = "green4", lty = 2)
-lines(x = c(20.5, 27), y = rep(mean(divTemp$Evenness[row.nam$d150c]), 2), col = "green4")
-lines(x = c(0, 20.5), y = rep(mean(divTemp$Evenness[row.nam$s150]), 2), col = "green4")
-# mean values
-lines(x = c(20.5, 27), y = rep(mean(divTemp$Evenness[row.nam$d125]), 2), col = "blue", lty = 2)
-lines(x = c(0, 20.5), y = rep(mean(divTemp$Evenness[row.nam$s125]), 2), lty = 2)
-lines(x = c(20.5, 27), y = rep(mean(divTemp$Evenness[row.nam$d150]), 2), col = "blue")
-lines(x = c(0, 20.5), y = rep(mean(divTemp$Evenness[row.nam$s150]), 2))
-abline(v = 20.5, col = "grey 50")
-# legend
-legend("topleft", legend = c("Slide 125", "Slide 150", "Digital 125", "Digital 150"), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4))
-text(1, 0.3475, "Slide", cex = 1.3)
-text(21.75, 0.3475, "Digital", cex = 1.3, col = "blue")
-
-par(mar = c(5.1, 4.1, 4.1, 2.1))
-dev.off()
-
-
 # 10c. Diversity comparisons by size -----------------------------------------
 # the other variables show mixed results
 # richness r2 = 0.1849, p = 0.0283*
 summary(lm(divTemp$Richness[c(row.nam$s150, row.nam$d150)] ~ divTemp$Richness[c(row.nam$s125, row.nam$d125)]))
-# evenness r2 = 0.1891, p = 0.0264*
-summary(lm(divTemp$Evenness[c(row.nam$s150, row.nam$d150)] ~ divTemp$Evenness[c(row.nam$s125, row.nam$d125)]))
 # dominance r2 = 0.0551, p = 0.248
 summary(lm(divTemp$Dominance[c(row.nam$s150, row.nam$d150)] ~ divTemp$Dominance[c(row.nam$s125, row.nam$d125)]))
 # Shannon Wiener r2 = 0.1558, p = 0.04595*
@@ -1332,10 +1279,6 @@ diversity(table(full.125$cCIDr)); diversity(table(full.125$sCIDr)); diversity(ta
 divTemp$Dominance[row.nam$c125c]; divTemp$Dominance[row.nam$s125c]; divTemp$Dominance[row.nam$d125c] # 0.134 (s - 0.133, d - 0.141)
 1 - diversity(table(full.125$cCIDr), index = "simpson"); 1 - diversity(table(full.125$sCIDr), index = "simpson"); 1 - diversity(table(full.125$dCIDr), index = "simpson") # 0.137 (s - 0.138, d - 0.145)
 
-# Evenness
-divTemp$Evenness[row.nam$c125c]; divTemp$Evenness[row.nam$s125c]; divTemp$Evenness[row.nam$d125c] # 0.446 (s - 0.445, d - 0.415)
-exp(diversity(table(full.125$cCIDr))) / specnumber(table(full.125$cCIDr)); exp(diversity(table(full.125$sCIDr))) / specnumber(table(full.125$sCIDr)); exp(diversity(table(full.125$dCIDr))) / specnumber(table(full.125$dCIDr)) # 0.436 (s - 0.440, d - 0.444)
-
 # slide 150
 divTemp$Richness[row.nam$c150c]; divTemp$Richness[row.nam$s150c]; divTemp$Richness[row.nam$d150c] # 20 (s - 18, d - 21)
 specnumber(table(full.150$cCIDr)); specnumber(table(full.150$sCIDr)); specnumber(table(full.150$dCIDr)) # 20 (s - 19, d - 21)
@@ -1347,10 +1290,6 @@ diversity(table(full.150$cCIDr)); diversity(table(full.150$sCIDr)); diversity(ta
 # Dominance
 divTemp$Dominance[row.nam$c150c]; divTemp$Dominance[row.nam$s150c]; divTemp$Dominance[row.nam$d150c] # 0.164 (s - 0.166, d - 0.151)
 1 - diversity(table(full.150$cCIDr), index = "simpson"); 1 - diversity(table(full.150$sCIDr), index = "simpson"); 1 - diversity(table(full.150$dCIDr), index = "simpson") # 0.166 (s - 0.165, d - 0.156)
-
-# Evenness
-divTemp$Evenness[row.nam$c150c]; divTemp$Evenness[row.nam$s150c]; divTemp$Evenness[row.nam$d150c] # 0.457 (s - 0.496, d - 0.476)
-exp(diversity(table(full.150$cCIDr))) / specnumber(table(full.150$cCIDr)); exp(diversity(table(full.150$sCIDr))) / specnumber(table(full.150$sCIDr)); exp(diversity(table(full.150$dCIDr))) / specnumber(table(full.150$dCIDr)) # 0.457 (s - 0.478, d - 0.470)
 
 
 # 10e. Output the diversity file -------------------------------------------
@@ -1366,13 +1305,13 @@ rm(tmp.div)
 # 10f. Direction of change -------------------------------------------------
 # add some columns to the diversity dataframe to investigate the direction of the change.
 divTemp$Dir_E <- divTemp$Dir_D <- divTemp$Dir_SW <- divTemp$Dir_R <- divTemp$Dir_SST <- NA
-divTemp[row.nam$s125, grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[row.nam$s125, c("SST10m", "Richness", "ShannonWiener", "Dominance", "Evenness")]), 2, as.numeric(divTemp[row.nam$c125c, c("SST10m", "Richness", "ShannonWiener", "Dominance", "Evenness")])) > 0, 1, -1)
+divTemp[row.nam$s125, grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[row.nam$s125, c("SST10m", "Richness", "ShannonWiener", "Dominance")]), 2, as.numeric(divTemp[row.nam$c125c, c("SST10m", "Richness", "ShannonWiener", "Dominance")])) > 0, 1, -1)
 
-divTemp[row.nam$s150, grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[row.nam$s150, c("SST10m", "Richness", "ShannonWiener", "Dominance", "Evenness")]), 2, as.numeric(divTemp[row.nam$c150c, c("SST10m", "Richness", "ShannonWiener", "Dominance", "Evenness")])) > 0, 1, -1)
+divTemp[row.nam$s150, grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[row.nam$s150, c("SST10m", "Richness", "ShannonWiener", "Dominance")]), 2, as.numeric(divTemp[row.nam$c150c, c("SST10m", "Richness", "ShannonWiener", "Dominance")])) > 0, 1, -1)
 
-divTemp[row.nam$d125, grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[row.nam$d125, c("SST10m", "Richness", "ShannonWiener", "Dominance", "Evenness")]), 2, as.numeric(divTemp[row.nam$c125c, c("SST10m", "Richness", "ShannonWiener", "Dominance", "Evenness")])) > 0, 1, -1)
+divTemp[row.nam$d125, grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[row.nam$d125, c("SST10m", "Richness", "ShannonWiener", "Dominance")]), 2, as.numeric(divTemp[row.nam$c125c, c("SST10m", "Richness", "ShannonWiener", "Dominance")])) > 0, 1, -1)
 
-divTemp[row.nam$d150, grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[row.nam$d150, c("SST10m", "Richness", "ShannonWiener", "Dominance", "Evenness")]), 2, as.numeric(divTemp[row.nam$c150c, c("SST10m", "Richness", "ShannonWiener", "Dominance", "Evenness")])) > 0, 1, -1)
+divTemp[row.nam$d150, grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[row.nam$d150, c("SST10m", "Richness", "ShannonWiener", "Dominance")]), 2, as.numeric(divTemp[row.nam$c150c, c("SST10m", "Richness", "ShannonWiener", "Dominance")])) > 0, 1, -1)
 
 # look at these summaries
 table(divTemp$Dir_SST, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
@@ -1438,7 +1377,7 @@ points(30.2, divTemp$Dominance[row.nam$c150c], col = "red", pch = 16, cex = 1.8)
 par(mfrow = c(1,1), mar = c(5.1, 4.1, 4.1, 2.1), mgp = c(3, 1, 0))
 dev.off()
 
-rm(tmp.sw, tmp.dom, tmp.eve, tmp.rich, ForCenSred)
+rm(tmp.sw, tmp.dom, tmp.rich, ForCenSred)
 
 # 10h. Simulations for studying changes -----------------------------------
 tmp <- data.frame("a" = c(10, 10, 0, 20, 12, 10, 10, 5, 9, 10, 8, 8, 10, 11), "b" = c(10, 10, 10, 0, 10, 0, 10, 10, 10, 10, 12, 10, 10, 10), "c" = c(2, 2, 2, 2, 0, 12, 4, 2, 2, 1, 2, 4, 3, 1), "d" = c(2, 0, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 1, 2), "e" = c(0, 2, 10, 0, 0, 0, 0, 5, 1, 1, 0, 0, 0, 0))
@@ -1446,7 +1385,6 @@ rownames(tmp) <- c("Orig", "ChangeSpListR", "ChangeSpListC", "LumpCc", "LumpCr",
 tmp$Rich <- specnumber(tmp[, 1:5]) # richness
 tmp$SW <- diversity(tmp[, 1:5]) # Shannon-Wiener
 tmp$Dom <- (1 - diversity(tmp[, 1:5], index = "simpson")) # dominance
-tmp$Eve <- exp(diversity(tmp[, 1:5])) / specnumber(tmp[, 1:5]) # evenness
 tmp
 rm(tmp)
 
@@ -1708,26 +1646,6 @@ names(tmp.pt) <- divTemp$Person[row.nam$d150]
 outliers$Dominance150[outliers$Analysis == "Digital"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
-# Evenness
-outliers$Evenness125 <- NA
-tmp.pt <- abs(divTemp$Evenness[row.nam$s125] - divTemp$Evenness[row.nam$c125c])
-names(tmp.pt) <- divTemp$Person[row.nam$s125]
-outliers$Evenness125[outliers$Analysis == "Slide"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
-
-tmp.pt <- abs(divTemp$Evenness[row.nam$d125] - divTemp$Evenness[row.nam$c125c])
-names(tmp.pt) <- divTemp$Person[row.nam$d125]
-outliers$Evenness125[outliers$Analysis == "Digital"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
-
-outliers$Evenness150 <- NA
-tmp.pt <- abs(divTemp$Evenness[row.nam$s150] - divTemp$Evenness[row.nam$c150c])
-names(tmp.pt) <- divTemp$Person[row.nam$s150]
-outliers$Evenness150[outliers$Analysis == "Slide"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Slide"], names(tmp.pt))])] <- sort(rank(tmp.pt))
-
-tmp.pt <- abs(divTemp$Evenness[row.nam$d150] - divTemp$Evenness[row.nam$c150c])
-names(tmp.pt) <- divTemp$Person[row.nam$d150]
-outliers$Evenness150[outliers$Analysis == "Digital"][order(tmp.pt[match(outliers$PersonID[outliers$Analysis == "Digital"], names(tmp.pt))])] <- sort(rank(tmp.pt))
-rm(tmp.pt)
-
 # ShannonWiener
 outliers$ShannonWiener125 <- NA
 tmp.pt <- abs(divTemp$ShannonWiener[row.nam$s125] - divTemp$ShannonWiener[row.nam$c125c])
@@ -1751,7 +1669,7 @@ rm(tmp.pt)
 # weighted sums
 outliers$fullSum <- rowSums(outliers[, 3:15])
 
-outliers$wtSum <- rowSums(outliers[, grep("^MDS", names(outliers))])/2 + rowSums(outliers[, grep("^Pt", names(outliers))])/2 + outliers$SST + rowSums(outliers[, grep("^Richness", names(outliers))])/8 + rowSums(outliers[, grep("^Dominance", names(outliers))])/8 + rowSums(outliers[, grep("^Evenness", names(outliers))])/8 + rowSums(outliers[, grep("^ShannonWiener", names(outliers))])/8
+outliers$wtSum <- rowSums(outliers[, grep("^MDS", names(outliers))])/2 + rowSums(outliers[, grep("^Pt", names(outliers))])/2 + outliers$SST + rowSums(outliers[, grep("^Richness", names(outliers))])/6 + rowSums(outliers[, grep("^Dominance", names(outliers))])/6 + rowSums(outliers[, grep("^ShannonWiener", names(outliers))])/6
 
 outliers$wtSumPt <- outliers$wtSum / c(rep(4*17, 17), rep(4*9, 9)) * 100
 
@@ -1809,18 +1727,6 @@ names(tmp.pt) <- divTemp$Person[c(row.nam$s150, row.nam$d150)]
 outliers$cDominance150[order(tmp.pt[match(outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
 rm(tmp.pt)
 
-# Evenness
-outliers$cEvenness125 <- NA
-tmp.pt <- abs(divTemp$Evenness[c(row.nam$s125, row.nam$d125)] - divTemp$Evenness[row.nam$c125c])
-names(tmp.pt) <- divTemp$Person[c(row.nam$s125, row.nam$d125)]
-outliers$cEvenness125[order(tmp.pt[match(outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
-
-outliers$cEvenness150 <- NA
-tmp.pt <- abs(divTemp$Evenness[c(row.nam$s150, row.nam$d150)] - divTemp$Evenness[row.nam$c150c])
-names(tmp.pt) <- divTemp$Person[c(row.nam$s150, row.nam$d150)]
-outliers$cEvenness150[order(tmp.pt[match(outliers$PersonID, names(tmp.pt))])] <- sort(rank(tmp.pt))
-rm(tmp.pt)
-
 # ShannonWiener
 outliers$cShannonWiener125 <- NA
 tmp.pt <- abs(divTemp$ShannonWiener[c(row.nam$s125, row.nam$d125)] - divTemp$ShannonWiener[row.nam$c125c])
@@ -1836,7 +1742,7 @@ rm(tmp.pt)
 # weighted sums
 outliers$cfullSum <- rowSums(outliers[, grep("^c", names(outliers))])
 
-outliers$cwtSum <- rowSums(outliers[, grep("cMDS", names(outliers))])/2 + rowSums(outliers[, grep("^c.*Pt", names(outliers))])/2 + outliers$cSST + rowSums(outliers[, grep("cRichness", names(outliers))])/8 + rowSums(outliers[, grep("cDominance", names(outliers))])/8 + rowSums(outliers[, grep("cEvenness", names(outliers))])/8 + rowSums(outliers[, grep("cShannonWiener", names(outliers))])/8
+outliers$cwtSum <- rowSums(outliers[, grep("cMDS", names(outliers))])/2 + rowSums(outliers[, grep("^c.*Pt", names(outliers))])/2 + outliers$cSST + rowSums(outliers[, grep("cRichness", names(outliers))])/6 + rowSums(outliers[, grep("cDominance", names(outliers))])/6 + rowSums(outliers[, grep("cShannonWiener", names(outliers))])/6
 
 outliers$cwtSumPt <- outliers$cwtSum / (4*26) * 100
 

@@ -3,7 +3,7 @@
 # Isabel Fenton
 # Project: IF reanalysis
 # Date created: 5 / 3 / 2018
-# Date last edited: 6 / 3 / 2018
+# Date last edited: 12 / 3 / 2018
 # 
 # All the code needed to run the Al-Sabouni et al repeatability paper. Lab book repeatability
 # 
@@ -54,7 +54,7 @@ full.125 <- merge(slide125, digital125, by = "Specimen")
 full.150 <- merge(slide150, digital150, by = "Specimen")
 
 # the species abbreviations
-sp.abb <- as.data.frame(read_excel("Data/AlSabouni_PersonIDs.xlsx", sheet = "Abbreviations"))
+sp.abb <- as.data.frame(read_excel("Data/AlSabouni_PersonIDs.xlsx", sheet = "Abbreviations", na = "NA"))
 
 # people metadata
 people <- as.data.frame(read_excel("Data/AlSabouni_PeopleMetadata.xlsx", na = "NA"))
@@ -64,7 +64,7 @@ size125 <- as.data.frame(read_excel("Data/AlSabouni_SpecimenSize.xlsx", sheet = 
 size150 <- as.data.frame(read_excel("Data/AlSabouni_SpecimenSize.xlsx", sheet = "Size150"))
 
 # diversity / temperature 
-divTemp <- as.data.frame(read_excel("Data/AlSabouni_DiversityTemp.xlsx", na = "NA"))
+divTemp <- as.data.frame(read_excel("Data/AlSabouni_DiversityTemp.xlsx", na = "NA", sheet = "SST"))
 
 # 1b. Sanity check --------------------------------------------------------
 str(slide125)
@@ -996,6 +996,36 @@ text(-0.4, 1, "Consensus 150", cex = 1.5)
 dev.off()
 
 # 9. SST ------------------------------------------------------------------
+
+# 9a. Extract the species level data for the ANN --------------------------
+full.ANNsp <- full.150sp
+
+# add in the ANN species names
+full.ANNsp$order <- sp.abb$ANNorder[match(full.150sp$species, sp.abb$Abbreviation)]
+full.ANNsp$species <- sp.abb$ANNspecies[match(full.150sp$species, sp.abb$Abbreviation)]
+
+# remove NAs (i.e. species not in ANN)
+full.ANNsp <- na.omit(full.ANNsp)
+
+# merge menardii and tumida
+full.ANNsp[which(full.ANNsp$species == "Globorotalia menardii + tumida")[1], 2:(ncol(full.ANNsp) - 1)] <- colSums(full.ANNsp[full.ANNsp$species == "Globorotalia menardii + tumida", 2:(ncol(full.ANNsp) - 1)])
+full.ANNsp <- full.ANNsp[-which(full.ANNsp$species == "Globorotalia menardii + tumida")[2],]
+
+# reorder
+full.ANNsp <- full.ANNsp[order(full.ANNsp$order), ]
+
+# transpose
+full.ANNsp.t <- as.data.frame(t(full.ANNsp[2:(ncol(full.ANNsp) - 1)])) # don't include order or the species names
+colnames(full.ANNsp.t) <- full.ANNsp$species # add species names as column headings
+head(full.ANNsp.t)
+
+# calculate relative abundances
+full.ANNsp.t <- full.ANNsp.t / rowSums(full.ANNsp.t) * 100
+
+# output the data
+write.csv(full.ANNsp.t, "ASOutputs/RelativeAbun_ANN.csv")
+
+# 9b. Plot up the SST results ------------------------------------------------
 # this was only done 150 size fraction as that is what ANN works on 
 # specify the rownames
 row.nam <- list()

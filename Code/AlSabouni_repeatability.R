@@ -1304,7 +1304,7 @@ rm(tmp.div)
 
 # 10f. Direction of change -------------------------------------------------
 # add some columns to the diversity dataframe to investigate the direction of the change.
-divTemp$Dir_E <- divTemp$Dir_D <- divTemp$Dir_SW <- divTemp$Dir_R <- divTemp$Dir_SST <- NA
+divTemp$Dir_D <- divTemp$Dir_SW <- divTemp$Dir_R <- divTemp$Dir_SST <- NA
 divTemp[row.nam$s125, grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[row.nam$s125, c("SST10m", "Richness", "ShannonWiener", "Dominance")]), 2, as.numeric(divTemp[row.nam$c125c, c("SST10m", "Richness", "ShannonWiener", "Dominance")])) > 0, 1, -1)
 
 divTemp[row.nam$s150, grep("Dir", names(divTemp))] <- ifelse(sweep(data.matrix(divTemp[row.nam$s150, c("SST10m", "Richness", "ShannonWiener", "Dominance")]), 2, as.numeric(divTemp[row.nam$c150c, c("SST10m", "Richness", "ShannonWiener", "Dominance")])) > 0, 1, -1)
@@ -1318,9 +1318,7 @@ table(divTemp$Dir_SST, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
 table(divTemp$Dir_R, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
 table(divTemp$Dir_SW, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
 table(divTemp$Dir_D, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
-table(divTemp$Dir_E, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
 
-table(divTemp$Dir_R, divTemp$Dir_E, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
 table(divTemp$Dir_R, divTemp$Dir_SW, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
 table(divTemp$Dir_R, divTemp$Dir_D, paste(divTemp$Analysis, divTemp$Size, sep = "_"))
 
@@ -1667,7 +1665,7 @@ outliers$ShannonWiener150[outliers$Analysis == "Digital"][order(tmp.pt[match(out
 rm(tmp.pt)
 
 # weighted sums
-outliers$fullSum <- rowSums(outliers[, 3:15])
+outliers$fullSum <- rowSums(outliers[, 3:13])
 
 outliers$wtSum <- rowSums(outliers[, grep("^MDS", names(outliers))])/2 + rowSums(outliers[, grep("^Pt", names(outliers))])/2 + outliers$SST + rowSums(outliers[, grep("^Richness", names(outliers))])/6 + rowSums(outliers[, grep("^Dominance", names(outliers))])/6 + rowSums(outliers[, grep("^ShannonWiener", names(outliers))])/6
 
@@ -1772,10 +1770,14 @@ tmp.out <- merge(tmp.out, accuracy[, c("PersonID", "ptID125", "ptID150")])
 par(mfrow = c(4, 4))
 par(mar = c(2,2,1,1))
 for (i in c("Residence", "School", "Experience", "Routine", "Region", "ptID125", "ptID150")) {
-  for (j in names(tmp.out)[3:18])
+  for (j in names(tmp.out)[3:16]) 
     plot(factor(tmp.out[tmp.out$Analysis == "Slide",i]), tmp.out[tmp.out$Analysis == "Slide",j], main = i, col = "red")
-  for (j in names(tmp.out)[3:18])
+  plot(1,1, type = "n", axes = FALSE)
+  plot(1,1, type = "n", axes = FALSE)
+  for (j in names(tmp.out)[3:16])
     plot(factor(tmp.out[tmp.out$Analysis == "Digital",i]), tmp.out[tmp.out$Analysis == "Digital",j], main = j, col = "blue")
+  plot(1,1, type = "n", axes = FALSE)
+  plot(1,1, type = "n", axes = FALSE)
 }
 rm(i, j)
 #par(ask = FALSE)
@@ -1787,6 +1789,8 @@ par(mar = c(2,2,1,1))
 for (i in c("Residence", "School", "Experience", "Routine", "Region", "ptID125", "ptID150")) {
   for (j in grep("^c", names(tmp.out), value = TRUE))
     plot(factor(tmp.out[,i]), tmp.out[,j], main = j, col = "red")
+  plot(1,1, type = "n", axes = FALSE)
+  plot(1,1, type = "n", axes = FALSE)
 }
 rm(i, j)
 #par(ask = FALSE)

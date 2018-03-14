@@ -204,8 +204,7 @@ cum.sum$s150 <- cumsum(rev(table(full.150$sMaxCon)))/300*100
 cum.sum$d125 <- cumsum(rev(table(full.125$dMaxCon)))/300*100
 cum.sum$d150 <- cumsum(rev(table(full.150$dMaxCon)))/300*100
 
-png("ASFigures/Cumulative.png", 480, 900)
-par(mfrow = c(2, 1))
+png("ASFigures/Cumulative_slide.png")
 plot(names(cum.sum$s125), cum.sum$s125, type = "n", xlab = "Number of participants", ylab = "Fraction of specimens / %", las = 1, ylim = c(0, 100), lty = 2, main = "Slide", xaxt = "n", cex.lab = 1.5, cex.main = 1.5, cex.axis = 1.1)
 axis(1, 3:17)
 legend("topright", lty = c(2, 1), legend = c(expression(paste(">125 ", mu, "m")), expression(paste(">150 ", mu, "m"))), cex = 1.3, lwd = 2)
@@ -222,8 +221,9 @@ lines(c(2, names(tmp.s125)), c(tmp.s125, tmp.s125), col = "grey", lty = 2)
 # plotting the cumulative curves
 points(names(cum.sum$s125), cum.sum$s125, type = "s", lty = 2)
 points(names(cum.sum$s150), cum.sum$s150, type = "s")
+dev.off()
 
-
+png("ASFigures/Cumulative_digital.png", 380, 480)
 plot(names(cum.sum$d125), cum.sum$d125, type = "n", xlab = "Number of participants", ylab = "Fraction of specimens / %", las = 1, ylim = c(0, 100), lty = 2, main = "Digital", xaxt = "n", cex.lab = 1.5, cex.main = 1.5, cex.axis = 1.1)
 axis(1, 2:9)
 legend("topright", lty = c(2, 1), legend = c(expression(paste(">125 ", mu, "m")), expression(paste(">150 ", mu, "m"))), cex = 1.3, lwd = 2, col = "blue")
@@ -713,8 +713,8 @@ plot(nmds$CC125f, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab 
 points(nmds$CC125f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
 text(nmds$CC125f$points[nchar(rownames(nmds$CC125f$points)) <3, ], labels = rownames(nmds$CC125f$points)[nchar(rownames(nmds$CC125f$points)) <3])
 points(nmds$CC125f$points[rownames(nmds$CC125f$points) == "cCID" | rownames(nmds$CC125f$points) == "cSC50" , ], pch = "+")
-text(nmds$CC125f$points[rownames(nmds$CC125f$points) == "cCID", 1]+0.03, nmds$CC125f$points[rownames(nmds$CC125f$points) == "cCID", 2]+0.00, labels = "CID")
-text(nmds$CC125f$points[rownames(nmds$CC125f$points) == "cSC50", 1]+0.02, nmds$CC125f$points[rownames(nmds$CC125f$points) == "cSC50", 2]+0.00, labels = "sC")
+text(nmds$CC125f$points[rownames(nmds$CC125f$points) == "cCID", 1]+0.03, nmds$CC125f$points[rownames(nmds$CC125f$points) == "cCID", 2]+0.00, labels = "CID", cex = 1.2)
+text(nmds$CC125f$points[rownames(nmds$CC125f$points) == "cSC50", 1]+0.02, nmds$CC125f$points[rownames(nmds$CC125f$points) == "cSC50", 2]+0.00, labels = "sC", cex = 1.2)
 
 legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16, pt.cex = 2, cex = 1.5)
 par(mar = c(5.1, 4.1, 4.1, 2.1))
@@ -760,8 +760,8 @@ plot(nmds$CC150f, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab 
 points(nmds$CC150f, pch = 21, cex = 4, col = mds.col$pair, bg = brewer.pal(5, "Set2")[mds.col$sch.col], lwd = 2)
 text(nmds$CC150f$points[nchar(rownames(nmds$CC150f$points)) <3, ], labels = rownames(nmds$CC150f$points)[nchar(rownames(nmds$CC150f$points)) <3])
 points(nmds$CC150f$points[rownames(nmds$CC150f$points) == "cCID" | rownames(nmds$CC150f$points) == "cSC50" , ], pch = "+")
-text(nmds$CC150f$points[rownames(nmds$CC150f$points) == "cCID", 1]+0.02, nmds$CC150f$points[rownames(nmds$CC150f$points) == "cCID", 2], labels = "CID")
-text(nmds$CC150f$points[rownames(nmds$CC150f$points) == "cSC50", 1]+0.025, nmds$CC150f$points[rownames(nmds$CC150f$points) == "cSC50", 2], labels = "sC")
+text(nmds$CC150f$points[rownames(nmds$CC150f$points) == "cCID", 1]+0.02, nmds$CC150f$points[rownames(nmds$CC150f$points) == "cCID", 2], labels = "CID", cex = 1.2)
+text(nmds$CC150f$points[rownames(nmds$CC150f$points) == "cSC50", 1]+0.025, nmds$CC150f$points[rownames(nmds$CC150f$points) == "cSC50", 2], labels = "sC", cex = 1.2)
 legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pch = 16, pt.cex = 2, cex = 1.5)
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
@@ -809,8 +809,8 @@ plot(nmds$CC150z, type = "n", display = "sites", cex = 1, xlab = "Axis 1", ylab 
 points(nmds$CC150z, pch = 21, cex = 4, col = mds.col$pair[!(mds.col$person %in% c("3", "C", "E", "G"))], bg = brewer.pal(5, "Set2")[mds.col$sch.col[!(mds.col$person %in% c("3", "C", "E", "G"))]], lwd = 2)
 text(nmds$CC150z$points[nchar(rownames(nmds$CC150z$points)) <3, ], labels = rownames(nmds$CC150z$points)[nchar(rownames(nmds$CC150z$points)) <3])
 points(nmds$CC150z$points[rownames(nmds$CC150z$points) == "cCID" | rownames(nmds$CC150z$points) == "cSC50" , ], pch = "+")
-text(nmds$CC150z$points[rownames(nmds$CC150z$points) == "cCID", 1]+0.012, nmds$CC150z$points[rownames(nmds$CC150z$points) == "cCID", 2]+0.008, labels = "CID")
-text(nmds$CC150z$points[rownames(nmds$CC150z$points) == "cSC50", 1]+0.012, nmds$CC150z$points[rownames(nmds$CC150z$points) == "cSC50", 2]+0.008, labels = "sC")
+text(nmds$CC150z$points[rownames(nmds$CC150z$points) == "cCID", 1]+0.012, nmds$CC150z$points[rownames(nmds$CC150z$points) == "cCID", 2]+0.008, labels = "CID", cex = 1.2)
+text(nmds$CC150z$points[rownames(nmds$CC150z$points) == "cSC50", 1]+0.012, nmds$CC150z$points[rownames(nmds$CC150z$points) == "cSC50", 2]+0.008, labels = "sC", cex = 1.2)
 legend("topright", legend = paste("School", 1:5), col = brewer.pal(5, "Set2")[1:5], pt.cex = 2, cex = 1.5, pch = 16)
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
@@ -985,14 +985,14 @@ sum(full.125$sCID == full.125$dCID) # 234 or 78% accuracy
 sum(full.150$sCID == full.150$dCID) # 248 or 83% accuracy
 
 # plotting the consensus' against each other
-png("ASFigures/DigitalSlide/conf_125_Con.png", 1000, 700)
+png("ASFigures/DigitalSlide/conf_125_Con.png", 800, 700)
 conf_mat(long$f125[long$f125$Person == "1a",], "dCID", "sCID", spec.abb = sp.abb, abb.end = c("na", "nc"), xlab = "Digital", ylab = "Slide")
-text(-0.4, 1, "Consensus 125", cex = 1.5)
+text(-1, 1, "Consensus 125", cex = 1.5)
 dev.off()
 
-png("ASFigures/DigitalSlide/conf_150_Con.png", 1000, 700)
+png("ASFigures/DigitalSlide/conf_150_Con.png", 800, 700)
 conf_mat(long$f150[long$f150$Person == "1a",], "dCID", "sCID", spec.abb = sp.abb, abb.end = c("na", "nc"), xlab = "Digital", ylab = "Slide")
-text(-0.4, 1, "Consensus 150", cex = 1.5)
+text(-1, 1, "Consensus 150", cex = 1.5)
 dev.off()
 
 # 9. SST ------------------------------------------------------------------
@@ -1056,10 +1056,10 @@ err_bar <- function(mean, sd, xpos, length = 0.05, col = 1) {
 }
 
 # plot the data
-png("ASFigures/CombCon_SST.png", 800, 450)
+png("ASFigures/CombCon_SST.png", 800, 500)
 par(mar = c(5.1, 5.1, 4.1, 2.1))
 # points
-with(divTemp[divTemp$Size == 150,], plot(1:26, SST10m[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Participant", ylab = expression(paste("SST / ", degree, "C")), col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(20.5, 24), cex.lab = 1.5, las = 1, cex.axis = 1.1, type = "n"))
+with(divTemp[divTemp$Size == 150,], plot(1:26, SST10m[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Participant", ylab = expression(paste("SST / ", degree, "C")), col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(20.75, 24.35), cex.lab = 1.5, las = 1, cex.axis = 1.1, type = "n"))
 axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
 # consensus values
 with(divTemp[row.nam$s150c,], lines(x = c(0, 27), y = rep(SST10m, each = 2), col = "green4"))
@@ -1074,10 +1074,10 @@ with(divTemp[divTemp$Size == 150,], points(1:26, SST10m[match(ord.div, Person)],
 # error bars / actual  / legend
 with(divTemp[divTemp$Size == 150,], err_bar(SST10m[match(ord.div, Person)], SD[match(ord.div, Person)], 1:26, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
 abline(h = 21.76, col = "green4", lwd = 2)
-text(25.25, 21.9, "WOA 1998", cex = 1.3, col = "green4")
+text(23.25, 21.9, "WOA 1998", cex = 1.3, col = "green4")
 legend("topleft", legend = c(expression(paste("Slide >150", mu, "m")), expression(paste("Digital >150", mu, "m"))), pch = 16, col = c(1, 4), pt.cex = 1.5, cex = 1.1)
-text(1, 20.5, "Slide", cex = 1.3)
-text(21.75, 20.5, "Digital", cex = 1.3, col = "blue")
+text(1, 20.75, "Slide", cex = 1.3)
+text(21.75, 20.75, "Digital", cex = 1.3, col = "blue")
 
 par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
@@ -1330,7 +1330,7 @@ ForCenSred <- as.data.frame(read_excel("Data/Siccha_ForCenS.xlsx", sheet = "ForC
 ForCenSred[, 22:62][is.na(ForCenSred[, 22:62])] <- 0
 str(ForCenSred)
 
-png("ASFigures/Div_cf_ForCenSred.png", 1200, 400)
+png("ASFigures/Div_cf_ForCenSred.png", 1000, 400)
 par(mfrow = c(1,3), mar = c(5.1, 5.1, 3.1, 2.1))
 # species richness
 tmp.rich <- specnumber(ForCenSred[, 22:62]) # richness(ForCenSred[,22:62])
@@ -1353,7 +1353,7 @@ points(30.2, divTemp$Dominance[row.nam$c150c], col = "red", pch = 16, cex = 1.8)
 par(mfrow = c(1,1), mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
-png("ASFigures/Div_cf_ForCenSred_Atl.png", 1200, 400)
+png("ASFigures/Div_cf_ForCenSred_Atl.png", 900, 360)
 par(mfrow = c(1,3), mar = c(5.6, 5.1, 3.1, 2.1), mgp = c(3.5, 1, 0))
 # species richness
 plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.rich[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Richness", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-65, 65))
@@ -1362,7 +1362,7 @@ points(30.2, divTemp$Richness[row.nam$c150c], col = "red", pch = 16, cex = 2)
 
 # ShannonWiener
 tmp.sw <- diversity(ForCenSred[,22:62])
-plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.sw[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-65, 65))
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.sw[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener Diversity", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-65, 65))
 points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$ShannonWiener[divTemp$Size == 150], col = "blue", pch = 16, cex = 1.8)
 points(30.2, divTemp$ShannonWiener[row.nam$c150c], col = "red", pch = 16, cex = 1.8)
 
@@ -1514,7 +1514,7 @@ barplot(t(tmp[, 2:3]), beside = TRUE, legend.text = c("125", "150"), names.arg =
 dev.off()
 # 13b. Size vs. maximum agreement ------------------------------------------
 # when slide and digital consensus are calculated seperately
-png("ASFigures/Size_agreement_sd125.png")
+png("ASFigures/Size_agreement_sd125.png", 400, 480)
 with(size125, plot(sAgreement, Length, pch = 16, main = "> 125", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diameter / ", mu, "m"))))
 lines(names(tapply(size125$Length, size125$sAgreement, max)), tapply(size125$Length, size125$sAgreement, max), pch = 16)
 with(size125, points(dAgreement, Length, pch = 16, col = "blue"))
@@ -1522,7 +1522,7 @@ lines(names(tapply(size125$Length, size125$dAgreement, max)), tapply(size125$Len
 legend("topleft", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"))
 dev.off()
 
-png("ASFigures/Size_agreement_sd150.png")
+png("ASFigures/Size_agreement_sd150.png", 400, 480)
 with(size150, plot(sAgreement, Length, pch = 16, main = "> 150", las = 1, xlab = "Agreement", ylab = expression(paste("Maximum diameter / ", mu, "m"))))
 lines(names(tapply(size150$Length, size150$sAgreement, max)), tapply(size150$Length, size150$sAgreement, max), pch = 16)
 with(size150, points(dAgreement, Length, pch = 16, col = "blue"))
@@ -1547,7 +1547,7 @@ size125$dcAgreement <- rowSums(full.125[,col.nam$d125] == full.125$cCID)/length(
 size150$scAgreement <- rowSums(full.150[,col.nam$s150] == full.150$cCID)/length(col.nam$s150)*100
 size150$dcAgreement <- rowSums(full.150[,col.nam$d150] == full.150$cCID)/length(col.nam$d150)*100
 
-png("ASFigures/Size_agreement_sdc125.png")
+png("ASFigures/Size_agreement_sdc125.png", 400, 480)
 with(size125, plot(Length, scAgreement, pch = 16, main = expression(paste(">125 ", mu, "m")), las = 1, ylab = "Percentage Agreement", xlab = expression(paste("Maximum diameter / ", mu, "m")), ylim = c(0, 100), cex.main = 1.5, cex.lab = 1.3))
 lines(tapply(size125$Length, size125$scAgreement, max), names(tapply(size125$Length, size125$scAgreement, max)), pch = 16)
 with(size125, points(Length, dcAgreement, pch = 16, col = "blue"))
@@ -1555,7 +1555,7 @@ lines(tapply(size125$Length, size125$dcAgreement, max), names(tapply(size125$Len
 legend("bottomright", col = c(1, 4), pch = 16, legend = c("Slide", "Digital"), cex = 1.2, pt.cex = 1.3)
 dev.off()
 
-png("ASFigures/Size_agreement_sdc150.png")
+png("ASFigures/Size_agreement_sdc150.png", 400, 480)
 with(size150, plot(Length, scAgreement, pch = 16, main = expression(paste(">150 ", mu, "m")), las = 1, ylab = "Percentage Agreement", xlab = expression(paste("Maximum diameter / ", mu, "m")), ylim = c(0, 100), cex.main = 1.5, cex.lab = 1.3))
 lines(tapply(size150$Length, size150$scAgreement, max), names(tapply(size150$Length, size150$scAgreement, max)), pch = 16)
 with(size150, points(Length, dcAgreement, pch = 16, col = "blue"))
@@ -1810,7 +1810,7 @@ for(i in 1:nrow(sp.abb)) {
   tmp.125 <- as.data.frame(apply(tmp.125, 2, function(x) gsub(paste("^", sp.abb$Abbreviation[i], "$", sep = ""), sp.abb$Species[i], x)))
   tmp.150 <- as.data.frame(apply(tmp.150, 2, function(x) gsub(paste("^", sp.abb$Abbreviation[i], "$", sep = ""), sp.abb$Species[i], x)))
 }
-write.csv(tmp.125, "ASOutputs/PersonIDs_125_IF.csv", row.names = FALSE)
-write.csv(tmp.150, "ASOutputs/PersonIDs_150_IF.csv", row.names = FALSE)
+write.csv(tmp.125, "ASOutputs/PersonIDs_125.csv", row.names = FALSE)
+write.csv(tmp.150, "ASOutputs/PersonIDs_150.csv", row.names = FALSE)
 rm(tmp.125, tmp.150, i)
 

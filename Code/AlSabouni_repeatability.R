@@ -379,7 +379,7 @@ text(21.75, 40, "Digital", cex = 1.3, col = "blue")
 par(mfrow = c(1,1))
 dev.off()
 
-# Compare digital / slide accuracy to the combined consensus (n.b. order is approx. experience)
+# Compare digital / slide accuracy to the separate consensus' (n.b. order is approx. experience)
 png("ASFigures/SepCon_agreement_fullID.png", 800, 1000)
 par(mfrow = c(2, 1))
 with(accuracy, plot(sPtA125[match(ord.div, PersonID)], ylim = c(40, 90), type = "n", xaxt = "n", ylab = "Percentage agreement", xlab = "Participant", cex.lab = 1.5, las = 2, cex.axis = 1.1))
@@ -1069,11 +1069,11 @@ par(mar = c(5.1, 5.1, 4.1, 2.1))
 with(divTemp[divTemp$Size == 150,], plot(1:26, SST10m[match(ord.div, Person)], pch = 16, xaxt = "n", xlab = "Participant", ylab = expression(paste("SST / ", degree, "C")), col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1), ylim = c(20.75, 24.35), cex.lab = 1.5, las = 1, cex.axis = 1.1, type = "n"))
 axis(1, at = 1:26, labels = ord.div, cex.axis = 1.1)
 # consensus values
-with(divTemp[row.nam$s150c,], lines(x = c(0, 27), y = rep(SST10m, each = 2), col = "green4"))
-with(divTemp[row.nam$s150c,], rect(0, SST10m - SD, 27, SST10m + SD, col = rgb(0, 139, 0, 75, maxColorValue = 255), border = NA))
+with(divTemp[row.nam$c150c,], lines(x = c(0, 27), y = rep(SST10m, each = 2), col = "green4"))
+with(divTemp[row.nam$c150c,], rect(0, SST10m - SD, 27, SST10m + SD, col = rgb(0, 139, 0, 75, maxColorValue = 255), border = NA))
 # mean values
-with(divTemp[row.nam$s150c,], lines(x = c(0, 20.5), y = rep(mean(divTemp$SST10m[row.nam$s150]), each = 2)))
-with(divTemp[row.nam$d150c,], lines(x = c(20.5, 27), y = rep(mean(divTemp$SST10m[row.nam$d150]), each = 2), col = 4))
+lines(x = c(0, 20.5), y = rep(mean(divTemp$SST10m[row.nam$s150]), each = 2))
+lines(x = c(20.5, 27), y = rep(mean(divTemp$SST10m[row.nam$d150]), each = 2), col = 4)
 abline(v = 20.5, col = "grey 50")
 # add points
 with(divTemp[divTemp$Size == 150,], points(1:26, SST10m[match(ord.div, Person)], pch = 16, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
@@ -1180,6 +1180,10 @@ text(1, 1.95, "Slide", cex = 1.3)
 text(21.75, 1.95, "Digital", cex = 1.3, col = "blue")
 
 par(mar = c(5.1, 4.1, 4.1, 2.1))
+dev.off()
+
+png("ASFigures/Div_pairs.png", 600, 600)
+pairs(divTemp[, c("Richness", "ShannonWiener", "Dominance")], pch = c(1, 16)[(divTemp$Size == 150) + 1], col = c(2, 4, 1)[as.factor(divTemp$Analysis)], cex = 1.8, cex.axis = 1.6, las = 1)
 dev.off()
 
 
@@ -1368,16 +1372,35 @@ points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$Richness[divTemp$
 points(30.2, divTemp$Richness[row.nam$c150c], col = "red", pch = 16, cex = 2)
 
 # ShannonWiener
-tmp.sw <- diversity(ForCenSred[,22:62])
 plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.sw[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener Diversity", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-65, 65))
 points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$ShannonWiener[divTemp$Size == 150], col = "blue", pch = 16, cex = 1.8)
 points(30.2, divTemp$ShannonWiener[row.nam$c150c], col = "red", pch = 16, cex = 1.8)
 
 # Dominance
-tmp.dom <- (1 - diversity(ForCenSred[,22:62], index = "simpson"))
 plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.dom[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Dominance", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-65, 65))
 points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$Dominance[divTemp$Size == 150], col = "blue", pch = 16, cex = 1.8)
 points(30.2, divTemp$Dominance[row.nam$c150c], col = "red", pch = 16, cex = 1.8)
+
+par(mfrow = c(1,1), mar = c(5.1, 4.1, 4.1, 2.1), mgp = c(3, 1, 0))
+dev.off()
+
+# signal of diversity after richness
+png("ASFigures/Div_cf_ForCenSred_Atl_rich.png", 900, 360)
+par(mfrow = c(1,3), mar = c(5.6, 5.1, 3.1, 2.1), mgp = c(3.5, 1, 0))
+# species richness
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.rich[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = matlab.like(30)[tmp.rich[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11]], xlab = "Latitude", ylab = "Richness", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-65, 65))
+points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$Richness[divTemp$Size == 150], bg = matlab.like(30)[divTemp$Richness[divTemp$Size == 150]], pch = 21, cex = 2)
+points(30.2, divTemp$Richness[row.nam$c150c], bg = matlab.like(30)[divTemp$Richness[row.nam$c150c]], pch = 21, cex = 3)
+
+# ShannonWiener
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.sw[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = matlab.like(30)[tmp.rich[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11]], xlab = "Latitude", ylab = "Shannon Wiener Diversity", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-65, 65))
+points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$ShannonWiener[divTemp$Size == 150], bg = matlab.like(30)[divTemp$Richness[divTemp$Size == 150]], pch = 21, cex = 2)
+points(30.2, divTemp$ShannonWiener[row.nam$c150c], bg = matlab.like(30)[divTemp$Richness[row.nam$c150c]], pch = 21, cex = 3)
+
+# Dominance
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.dom[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = matlab.like(30)[tmp.rich[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11]], xlab = "Latitude", ylab = "Dominance", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-65, 65), log = "y")
+points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$Dominance[divTemp$Size == 150], bg = matlab.like(30)[divTemp$Richness[divTemp$Size == 150]], pch = 21, cex = 2)
+points(30.2, divTemp$Dominance[row.nam$c150c], bg = matlab.like(30)[divTemp$Richness[row.nam$c150c]], pch = 21, cex = 3)
 
 par(mfrow = c(1,1), mar = c(5.1, 4.1, 4.1, 2.1), mgp = c(3, 1, 0))
 dev.off()

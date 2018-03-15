@@ -1025,6 +1025,13 @@ full.ANNsp.t <- full.ANNsp.t / rowSums(full.ANNsp.t) * 100
 # output the data
 write.csv(full.ANNsp.t, "ASOutputs/RelativeAbun_ANN.csv")
 
+# check the percentage agreement when only these species are considered
+tmp <- full.150[sp.abb$Abbreviation[!is.na(sp.abb$ANNspecies)] %in% full.150$cCID, ]
+tmp2 <- apply(tmp[,col.nam$c150], 2, function(x) sum(x == tmp$cCID) / nrow(tmp) * 100)
+summary(accuracy$cPtA150 - tmp2)
+# on average the agreement is slightly lower for the species included in the ANN. 
+rm(tmp, tmp2)
+
 # 9b. Plot up the SST results ------------------------------------------------
 # this was only done 150 size fraction as that is what ANN works on 
 # specify the rownames

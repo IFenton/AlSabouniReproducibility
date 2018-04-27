@@ -34,6 +34,7 @@ library(readxl) # reading in xlsx files
 library(caret) # for the confusion matrix
 library(colorRamps) # colours
 library(RColorBrewer) # colours
+library(viridis) # colours for confusion matrix
 library(stringr) # for confusion matrix axes
 library(vegan) # for the diversity metrics
 library(cluster) # for the NMDS analysis
@@ -534,7 +535,7 @@ head(long$s125)
 tail(long$s125)
 
 png("ASFigures/CombCon_conf_slide125.png", 1000, 700)
-conf_mat(long$s125, "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+conf_mat(long$s125, "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis")
 mtext(expression(paste("Slide >125", mu, "m")), 1, cex = 2, adj = -1.2,  line = -6)
 dev.off()
 
@@ -548,7 +549,7 @@ head(long$s150)
 tail(long$s150)
 
 png("ASFigures/CombCon_conf_slide150.png", 1000, 610)
-conf_mat(long$s150, "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+conf_mat(long$s150, "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis")
 mtext(expression(paste("Slide >150", mu, "m")), 1, cex = 2, adj = -1.2,  line = -6)
 dev.off()
 
@@ -561,7 +562,7 @@ head(long$d125)
 tail(long$d125)
 
 png("ASFigures/CombCon_conf_digital125.png", 1000, 700)
-conf_mat(long$d125, "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+conf_mat(long$d125, "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis")
 mtext(expression(paste("Digital >125", mu, "m")), 1, cex = 2, adj = -1.2,  line = -6)
 dev.off()
 
@@ -574,28 +575,28 @@ head(long$d150)
 tail(long$d150)
 
 png("ASFigures/CombCon_conf_digital150.png", 1000, 610)
-conf_mat(long$d150, "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+conf_mat(long$d150, "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis")
 mtext(expression(paste("Digital >150", mu, "m")), 1, cex = 2, adj = -1.2,  line = -6)
 dev.off()
 
 # What about for the separate consensus values
 png("ASFigures/SepCon_conf_slide125.png", 1000, 700)
-conf_mat(long$s125, "origID", "sCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+conf_mat(long$s125, "origID", "sCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis")
 mtext("Sep Slide 125", 1, cex = 2, adj = -1.3,  line = -5)
 dev.off()
 
 png("ASFigures/SepCon_conf_slide150.png", 1000, 610)
-conf_mat(long$s150, "origID", "sCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+conf_mat(long$s150, "origID", "sCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis")
 mtext("Sep Slide 150", 1, cex = 2, adj = -1.3,  line = -5)
 dev.off()
 
 png("ASFigures/SepCon_conf_digital125.png", 1000, 700)
-conf_mat(long$d125, "origID", "dCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+conf_mat(long$d125, "origID", "dCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis")
 mtext("Sep Digital 125", 1, cex = 2, adj = -1.3,  line = -5)
 dev.off()
 
 png("ASFigures/SepCon_conf_digital150.png", 1000, 610)
-conf_mat(long$d150, "origID", "dCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+conf_mat(long$d150, "origID", "dCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis")
 mtext("Sep Digital 150", 1, cex = 2, adj = -1.3,  line = -5)
 dev.off()
 
@@ -683,26 +684,10 @@ plot(stress$CC125f, type = "b")
 rm(i)
 # looks like between 2 and 3 dimensions would be reasonable
 
-# check for variation
-tmp <- metaMDS(daisy(trsp$CC125f))
-tmp$stress
-plot(tmp, display = "sites", type = "t", cex = 1.5)
-# some variation, so optimise
-
+# run the NMDS
 nmds <- list()
-stress$CCop125f <- 1
-# find the nmds plot with the lowest stress out of 20000 runs
-# (n.b. this takes a while so is commented out unless necessary)
-# for (i in 1:1000) {
-#   tmp <- metaMDS(daisy(trsp$CC125f))
-#   if (stress$CCop125f > tmp$stress) {
-#     nmds$CC125f <- tmp
-#     stress$CCop125f <- tmp$stress
-#   }
-# }
-# rm(i, tmp)
-# save(stress, nmds, file = "ASOutputs/CCNMDS_125.RData")
-load("ASOutputs/CCNMDS_125.RData")
+nmds$CC125f <- metaMDS(daisy(trsp$CC125f), k = 2, trymax = 1000)
+stress$CCop125f <- nmds$CC125f$stress
 
 stressplot(nmds$CC125f)
 
@@ -732,24 +717,9 @@ plot(stress$CC150f, type = "b")
 rm(i)
 # looks like between 2 and 3 dimensions would be reasonable, although the breakpoint is less obvious for 150 than it is for 125.
 
-# check for variation
-tmp <- metaMDS(daisy(trsp$CC150f))
-tmp$stress
-plot(tmp, display = "sites", type = "t", cex = 1.5)
-# some variation, so optimise
-
-stress$CCop150f <- 1
-# find the nmds plot with the lowest stress out of 1000 runs
-# for (i in 1:1000) {
-#   tmp <- metaMDS(daisy(trsp$CC150f))
-#   if (stress$CCop150f > tmp$stress) {
-#     nmds$CC150f <- tmp
-#     stress$CCop150f <- tmp$stress
-#   }
-# }
-# rm(i, tmp)
-# save(stress, nmds, file = "ASOutputs/CCNMDS_150f.RData")
-load("ASOutputs/CCNMDS_150f.RData")
+# run the NMDS
+nmds$CC150f <- metaMDS(daisy(trsp$CC150f), k = 2, trymax = 1000)
+stress$CCop150f <- nmds$CC150f$stress
 
 stressplot(nmds$CC150f)
 
@@ -767,7 +737,6 @@ par(mar = c(5.1, 4.1, 4.1, 2.1))
 dev.off()
 
 # focussing on the main section. As noted above, it is better to run this as a new analysis rather than just zoom in, as the influence of the outliers means that the stability of the central points hasn't been tested
-nmds$CC150z <- metaMDS(daisy(trsp$CC150f[!(rownames(trsp$CC150f) %in% c("3", "C", "E", "G")),]))
 
 # consider the stress of the NMDS
 stress$CC150z <- rep(NA, 10)
@@ -776,29 +745,11 @@ for (i in 1:10) {
 }
 plot(stress$CC150z, type = "b")
 rm(i)
-stressplot(nmds$CC150z)
 # again between 2 and 3 dimensions is probably reasonable
 
-# check for variation
-tmp <- metaMDS(daisy(trsp$CC150f[!(rownames(trsp$CC150f) %in% c("3", "C", "E", "G")),]))
-tmp$stress
-plot(tmp, display = "sites", type = "t", cex = 1.5)
-# some variation, so optimise
-
-stress$CCop150z <- 1
-# find the nmds plot with the lowest stress out of 1000 runs
-# for (i in 1:1000) {
-#   tmp <- metaMDS(daisy(trsp$CC150f[!(rownames(trsp$CC150f) %in% c("3", "C", "E", "G")),]))
-#   if (stress$CCop150z > tmp$stress) {
-#     nmds$CC150z <- tmp
-#     stress$CCop150z <- tmp$stress
-#   }
-# }
-# rm(i, tmp)
-# save(stress, nmds, file = "ASOutputs/CCNMDS_150z.RData")
-load("ASOutputs/CCNMDS_150z.RData")
-
-stress$CCop150z
+# run the NMDS
+nmds$CC150z <- metaMDS(daisy(trsp$CC150f[!(rownames(trsp$CC150f) %in% c("3", "C", "E", "G")),]), k = 2, trymax = 1000)
+stress$CCop150z <- nmds$CC150z$stress
 stressplot(nmds$CC150z)
 
 # the zoomed plot
@@ -986,12 +937,12 @@ sum(full.150$sCID == full.150$dCID) # 248 or 83% accuracy
 
 # plotting the consensus' against each other
 png("ASFigures/DigitalSlide/conf_125_Con.png", 800, 700)
-conf_mat(long$f125[long$f125$Person == "1a",], "dCID", "sCID", spec.abb = sp.abb, abb.end = c("na", "nc"), xlab = "Digital", ylab = "Slide")
+conf_mat(long$f125[long$f125$Person == "1a",], "dCID", "sCID", spec.abb = sp.abb, abb.end = c("na", "nc"), xlab = "Digital", ylab = "Slide", palette = "viridis")
 text(-1, 1, "Consensus 125", cex = 1.5)
 dev.off()
 
 png("ASFigures/DigitalSlide/conf_150_Con.png", 800, 700)
-conf_mat(long$f150[long$f150$Person == "1a",], "dCID", "sCID", spec.abb = sp.abb, abb.end = c("na", "nc"), xlab = "Digital", ylab = "Slide")
+conf_mat(long$f150[long$f150$Person == "1a",], "dCID", "sCID", spec.abb = sp.abb, abb.end = c("na", "nc"), xlab = "Digital", ylab = "Slide", palette = "viridis")
 text(-1, 1, "Consensus 150", cex = 1.5)
 dev.off()
 
@@ -1082,7 +1033,7 @@ with(divTemp[divTemp$Size == 150,], points(1:26, SST10m[match(ord.div, Person)],
 with(divTemp[divTemp$Size == 150,], err_bar(SST10m[match(ord.div, Person)], SD[match(ord.div, Person)], 1:26, col = ((Analysis[match(ord.div, Person)] != "Slide")*3 + 1)))
 abline(h = 21.76, col = "green4", lwd = 2)
 text(23.25, 21.9, "WOA 1998", cex = 1.3, col = "green4")
-legend("topleft", legend = c(expression(paste("Slide >150", mu, "m")), expression(paste("Digital >150", mu, "m"))), pch = 16, col = c(1, 4), pt.cex = 1.5, cex = 1.1)
+legend("topleft", legend = c(expression(paste("Slide >150 ", mu, "m")), expression(paste("Digital >150 ", mu, "m"))), pch = 16, col = c(1, 4), pt.cex = 1.5, cex = 1.1)
 text(1, 20.75, "Slide", cex = 1.3)
 text(21.75, 20.75, "Digital", cex = 1.3, col = "blue")
 
@@ -1128,7 +1079,7 @@ lines(x = c(20.5, 27), y = rep(mean(divTemp$Richness[row.nam$d150]), 2), col = "
 lines(x = c(0, 20.5), y = rep(mean(divTemp$Richness[row.nam$s150]), 2))
 abline(v = 20.5, col = "grey 50")
 # legend
-legend("topleft", legend = c(expression(paste("Slide >125", mu, "m")), expression(paste("Slide >150", mu, "m")), expression(paste("Digital >125", mu, "m")), expression(paste("Digital >150", mu, "m"))), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4), pt.cex = 1.5, cex = 1.1)
+legend("topleft", legend = c(expression(paste("Slide >125 ", mu, "m")), expression(paste("Slide >150 ", mu, "m")), expression(paste("Digital >125 ", mu, "m")), expression(paste("Digital >150 ", mu, "m"))), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4), pt.cex = 1.5, cex = 1.1)
 text(1, 14, "Slide", cex = 1.3)
 text(21.75, 14, "Digital", cex = 1.3, col = "blue")
 
@@ -1151,7 +1102,7 @@ lines(x = c(20.5, 27), y = rep(mean(divTemp$Dominance[row.nam$d150]), 2), col = 
 lines(x = c(0, 20.5), y = rep(mean(divTemp$Dominance[row.nam$s150]), 2))
 abline(v = 20.5, col = "grey 50")
 # legend
-legend("topleft", legend = c(expression(paste("Slide >125", mu, "m")), expression(paste("Slide >150", mu, "m")), expression(paste("Digital >125", mu, "m")), expression(paste("Digital >150", mu, "m"))), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4), pt.cex = 1.5, cex = 1.1)
+legend("topleft", legend = c(expression(paste("Slide >125 ", mu, "m")), expression(paste("Slide >150 ", mu, "m")), expression(paste("Digital >125 ", mu, "m")), expression(paste("Digital >150 ", mu, "m"))), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4), pt.cex = 1.5, cex = 1.1)
 text(1, 0.1, "Slide", cex = 1.3)
 text(21.75, 0.1, "Digital", cex = 1.3, col = "blue")
 
@@ -1175,7 +1126,7 @@ lines(x = c(20.5, 27), y = rep(mean(divTemp$ShannonWiener[row.nam$d150]), 2), co
 lines(x = c(0, 20.5), y = rep(mean(divTemp$ShannonWiener[row.nam$s150]), 2))
 abline(v = 20.5, col = "grey 50")
 # legend
-legend("topleft", legend = c(expression(paste("Slide >125", mu, "m")), expression(paste("Slide >150", mu, "m")), expression(paste("Digital >125", mu, "m")), expression(paste("Digital >150", mu, "m"))), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4), pt.cex = 1.5, cex = 1.1)
+legend("topleft", legend = c(expression(paste("Slide >125 ", mu, "m")), expression(paste("Slide >150 ", mu, "m")), expression(paste("Digital >125 ", mu, "m")), expression(paste("Digital >150 ", mu, "m"))), pch = c(1, 16, 1, 16), col = c(1, 1, 4, 4), pt.cex = 1.5, cex = 1.1)
 text(1, 1.95, "Slide", cex = 1.3)
 text(21.75, 1.95, "Digital", cex = 1.3, col = "blue")
 

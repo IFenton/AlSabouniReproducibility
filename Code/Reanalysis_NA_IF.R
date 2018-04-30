@@ -2331,9 +2331,10 @@ cum.sum$s150 <- cumsum(rev(table(slide150$IFmaxCon)))/300*100
 cum.sum$d125 <- cumsum(rev(table(digital125$IFmaxCon)))/300*100
 cum.sum$d150 <- cumsum(rev(table(digital150$IFmaxCon)))/300*100
 
+
 png("Figures/Cumulative.png", 480, 900)
 par(mfrow = c(2, 1))
-plot(names(cum.sum$s125), cum.sum$s125, type = "n", xlab = "Number of participants", ylab = "Fraction of specimens / %", las = 1, ylim = c(0, 100), lty = 2, xaxt = "n", cex.lab = 1.5, cex.main = 1.5, cex.axis = 1.1, main = "Slide")
+plot(names(cum.sum$s125), cum.sum$s125, type = "n", xlab = "Number of participants", ylab = "Fraction of specimens / %", las = 1, ylim = c(0, 100), lty = 2, xaxt = "n", cex.lab = 1.5, cex.axis = 1.1)
 axis(1, 3:17)
 legend("topright", lty = c(2, 1), legend = c(expression(paste(">125 ", mu, "m")), expression(paste(">150 ", mu, "m"))), cex = 1.3, lwd = 2)
 
@@ -2351,7 +2352,7 @@ points(names(cum.sum$s125), cum.sum$s125, type = "s", lty = 2)
 points(names(cum.sum$s150), cum.sum$s150, type = "s")
 
 
-plot(names(cum.sum$d125), cum.sum$d125, type = "n", xlab = "Number of participants", ylab = "Fraction of specimens / %", las = 1, ylim = c(0, 100), lty = 2, xaxt = "n", cex.lab = 1.5, cex.main = 1.5, cex.axis = 1.1, main = "Digital")
+plot(names(cum.sum$d125), cum.sum$d125, type = "n", xlab = "Number of participants", ylab = "Fraction of specimens / %", las = 1, ylim = c(0, 100), lty = 2, xaxt = "n", cex.lab = 1.5, cex.axis = 1.1)
 axis(1, 2:9)
 legend("topright", lty = c(2, 1), legend = c(expression(paste(">125 ", mu, "m")), expression(paste(">150 ", mu, "m"))), cex = 1.3, lwd = 2, col = "blue")
 
@@ -2369,7 +2370,6 @@ points(names(cum.sum$d125), cum.sum$d125, type = "s", lty = 2, col = "blue")
 points(names(cum.sum$d150), cum.sum$d150, type = "s", col = "blue")
 par(mfrow = c(1,1))
 dev.off()
-
 rm(tmp.s125, tmp.s150, tmp.d125, tmp.d150)
 
 # accuracy as percentage
@@ -3144,6 +3144,8 @@ dev.off()
 
 # 13f. SST ----------------------------------------------------------------
 # this was only done 150 size fraction.
+
+
 # it is also not perfect as it currently uses Nadia's consensus values not mine. But that's because I can't currently rerun the ANN analysis. 
 # Figure 6
 combcon$divTemp <- divTemp[, !grepl("Cen_|Dir_", names(divTemp))]

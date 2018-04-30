@@ -3,7 +3,7 @@
 # Isabel Fenton
 # Project: IF reanalysis
 # Date created: 5 / 3 / 2018
-# Date last edited: 12 / 3 / 2018
+# Date last edited: 27 / 4 / 2018
 # 
 # All the code needed to run the Al-Sabouni et al repeatability paper. Lab book repeatability
 # 
@@ -1223,7 +1223,7 @@ dev.off()
 summary(lm(divTemp$Richness[c(row.nam$s150, row.nam$d150)] ~ divTemp$Richness[c(row.nam$s125, row.nam$d125)]))
 # dominance r2 = 0.0551, p = 0.248
 summary(lm(divTemp$Dominance[c(row.nam$s150, row.nam$d150)] ~ divTemp$Dominance[c(row.nam$s125, row.nam$d125)]))
-# Shannon Wiener r2 = 0.1558, p = 0.04595*
+# Shannon-Wiener r2 = 0.1558, p = 0.04595*
 summary(lm(divTemp$ShannonWiener[c(row.nam$s150, row.nam$d150)] ~ divTemp$ShannonWiener[c(row.nam$s125, row.nam$d125)]))
 
 
@@ -1302,7 +1302,7 @@ points(30.2, divTemp$Richness[row.nam$c150c], col = "red", pch = 16, cex = 2)
 
 # ShannonWiener
 tmp.sw <- diversity(ForCenSred[,22:62])
-plot(ForCenSred$Latitude, tmp.sw, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-75, 75))
+plot(ForCenSred$Latitude, tmp.sw, pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon-Wiener", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-75, 75))
 points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$ShannonWiener[divTemp$Size == 150], col = "blue", pch = 16, cex = 1.8)
 points(30.2, divTemp$ShannonWiener[row.nam$c150c], col = "red", pch = 16, cex = 1.8)
 
@@ -1323,7 +1323,7 @@ points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$Richness[divTemp$
 points(30.2, divTemp$Richness[row.nam$c150c], col = "red", pch = 16, cex = 2)
 
 # ShannonWiener
-plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.sw[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon Wiener Diversity", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-65, 65))
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.sw[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = "grey50", xlab = "Latitude", ylab = "Shannon-Wiener Diversity", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-65, 65))
 points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$ShannonWiener[divTemp$Size == 150], col = "blue", pch = 16, cex = 1.8)
 points(30.2, divTemp$ShannonWiener[row.nam$c150c], col = "red", pch = 16, cex = 1.8)
 
@@ -1344,7 +1344,7 @@ points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$Richness[divTemp$
 points(30.2, divTemp$Richness[row.nam$c150c], bg = matlab.like(30)[divTemp$Richness[row.nam$c150c]], pch = 21, cex = 3)
 
 # ShannonWiener
-plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.sw[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = matlab.like(30)[tmp.rich[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11]], xlab = "Latitude", ylab = "Shannon Wiener Diversity", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-65, 65))
+plot(ForCenSred$Latitude[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], tmp.sw[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11], pch = 16, col = matlab.like(30)[tmp.rich[ForCenSred$Ocean == 7|ForCenSred$Ocean == 11]], xlab = "Latitude", ylab = "Shannon-Wiener Diversity", cex.lab = 2, cex.axis = 1.5, las = 1, xlim = c(-65, 65))
 points(rep(30.2, nrow(divTemp[divTemp$Size == 150,])), divTemp$ShannonWiener[divTemp$Size == 150], bg = matlab.like(30)[divTemp$Richness[divTemp$Size == 150]], pch = 21, cex = 2)
 points(30.2, divTemp$ShannonWiener[row.nam$c150c], bg = matlab.like(30)[divTemp$Richness[row.nam$c150c]], pch = 21, cex = 3)
 

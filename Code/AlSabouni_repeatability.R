@@ -3,7 +3,7 @@
 # Isabel Fenton
 # Project: IF reanalysis
 # Date created: 5 / 3 / 2018
-# Date last edited: 27 / 4 / 2018
+# Date last edited: 17 / 8 / 2018
 # 
 # All the code needed to run the Al-Sabouni et al repeatability paper. Lab book repeatability
 # 
@@ -521,6 +521,94 @@ par(mfrow = c(1,1))
 dev.off()
 
 
+# 4d. Excluding points with no consensus ----------------------------------
+# for the combined consensus
+full.125$cCIDnc <- apply(full.125[, col.nam$c125], 1, function (x) ifelse(sum(table(x[x != 'na']) == max(table(x[x != 'na']))) == 1, names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))], "nca"))
+full.150$cCIDnc <- apply(full.150[, col.nam$c150], 1, function (x) ifelse(sum(table(x[x != 'na']) == max(table(x[x != 'na']))) == 1, names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))], "nca"))
+# and split by slide / digital
+full.125$sCIDnc <- apply(full.125[, col.nam$s125], 1, function (x) ifelse(sum(table(x[x != 'na']) == max(table(x[x != 'na']))) == 1, names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))], "nca"))
+full.150$sCIDnc <- apply(full.150[, col.nam$s150], 1, function (x) ifelse(sum(table(x[x != 'na']) == max(table(x[x != 'na']))) == 1, names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))], "nca"))
+full.125$dCIDnc <- apply(full.125[, col.nam$d125], 1, function (x) ifelse(sum(table(x[x != 'na']) == max(table(x[x != 'na']))) == 1, names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))], "nca"))
+full.150$dCIDnc <- apply(full.150[, col.nam$d150], 1, function (x) ifelse(sum(table(x[x != 'na']) == max(table(x[x != 'na']))) == 1, names(table(x[x != 'na']))[table(x[x != 'na']) == max(table(x[x != 'na']))], "nca"))
+
+# based on the consensus for the combined
+accuracy$cPtA125nc <- apply(full.125[,col.nam$c125], 2, function(x) sum(x == full.125$cCIDnc) / 300 * 100)
+accuracy$cPtA150nc <- apply(full.150[,col.nam$c150], 2, function(x) sum(x == full.150$cCIDnc) / 300 * 100)
+
+# then split by slide / digital
+accuracy$dPtA150nc <- accuracy$dPtA125nc <- accuracy$sPtA150nc <- accuracy$sPtA125nc <- NA 
+accuracy$sPtA125nc[accuracy$Analysis == "Slide"] <- apply(full.125[,col.nam$s125], 2, function(x) sum(x == full.125$sCIDnc) / 300 * 100)
+accuracy$sPtA150nc[accuracy$Analysis == "Slide"] <- apply(full.150[,col.nam$s150], 2, function(x) sum(x == full.150$sCIDnc) / 300 * 100)
+accuracy$dPtA125nc[accuracy$Analysis == "Digital"] <- apply(full.125[,col.nam$d125], 2, function(x) sum(x == full.125$dCIDnc) / 300 * 100)
+accuracy$dPtA150nc[accuracy$Analysis == "Digital"] <- apply(full.150[,col.nam$d150], 2, function(x) sum(x == full.150$dCIDnc) / 300 * 100)
+
+# calculate the mean using the combined consensus
+CID_mn$csPtA125nc <- mean(accuracy$cPtA125nc[accuracy$Analysis == "Slide"])
+CID_mn$csPtA150nc <- mean(accuracy$cPtA150nc[accuracy$Analysis == "Slide"])
+CID_mn$cdPtA125nc <- mean(accuracy$cPtA125nc[accuracy$Analysis == "Digital"])
+CID_mn$cdPtA150nc <- mean(accuracy$cPtA150nc[accuracy$Analysis == "Digital"])
+# and with the separate consensus'
+CID_mn$ssPtA125nc <- mean(accuracy$sPtA125nc, na.rm = TRUE)
+CID_mn$ssPtA150nc <- mean(accuracy$sPtA150nc, na.rm = TRUE)
+CID_mn$ddPtA125nc <- mean(accuracy$dPtA125nc, na.rm = TRUE)
+CID_mn$ddPtA150nc <- mean(accuracy$dPtA150nc, na.rm = TRUE)
+
+# calculate the sd percentage agreement for each of the four analyses, using initially the combined consensus
+CID_sd$csPtA125nc <- sd(accuracy$cPtA125nc[accuracy$Analysis == "Slide"])
+CID_sd$csPtA150nc <- sd(accuracy$cPtA150nc[accuracy$Analysis == "Slide"])
+CID_sd$cdPtA125nc <- sd(accuracy$cPtA125nc[accuracy$Analysis == "Digital"])
+CID_sd$cdPtA150nc <- sd(accuracy$cPtA150nc[accuracy$Analysis == "Digital"])
+# and with the separate consensus'
+CID_sd$ssPtA125nc <- sd(accuracy$sPtA125nc, na.rm = TRUE)
+CID_sd$ssPtA150nc <- sd(accuracy$sPtA150nc, na.rm = TRUE)
+CID_sd$ddPtA125nc <- sd(accuracy$dPtA125nc, na.rm = TRUE)
+CID_sd$ddPtA150nc <- sd(accuracy$dPtA150nc, na.rm = TRUE)
+
+# Influence on the agreement plots 
+png("ASFigures/CombCon_agreement_fullID_nc.png", 800, 1000)
+par(mfrow = c(2, 1))
+with(accuracy, plot(cPtA125nc[match(ord.div, PersonID)], ylim = c(40, 90), type = "n", xaxt = "n", ylab = "Percentage agreement", xlab = "Participant", cex.lab = 1.5, las = 2, cex.axis = 1.1))
+axis(1, at = 1:26, labels = accuracy$PersonID[match(ord.div, accuracy$PersonID)], cex.axis = 1.1)
+# adding mean values
+lines(x = c(0, 20.5), y = rep(CID_mn$csPtA125nc, 2), lty = 1)
+lines(x = c(0, 20.5), y = rep(CID_mn$csPtA125nc - CID_sd$csPtA125nc, 2), lty = 4)
+lines(x = c(0, 20.5), y = rep(CID_mn$csPtA125nc + CID_sd$csPtA125nc, 2), lty = 4)
+lines(x = c(20.5, 27), y = rep(CID_mn$cdPtA125nc, 2), lty = 1, col = "blue")
+lines(x = c(20.5, 27), y = rep(CID_mn$cdPtA125nc - CID_sd$cdPtA125nc, 2), lty = 4, col = "blue")
+lines(x = c(20.5, 27), y = rep(CID_mn$cdPtA125nc + CID_sd$cdPtA125nc, 2), lty = 4, col = "blue")
+abline(v = 20.5, col = "grey 50")
+# points
+with(accuracy, points(1:26, cPtA125nc[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
+with(accuracy, arrows(1, cPtA125nc[PersonID == "1a"], 2, cPtA125nc[PersonID == "1b"], length = 0.14))
+with(accuracy, arrows(3, cPtA125nc[PersonID == "2a"], 4, cPtA125nc[PersonID == "2b"], length = 0.14))
+text(25, 90, expression(paste(">125 ", mu, "m")), cex = 1.3)
+text(1, 40, "Slide", cex = 1.3)
+text(21.75, 40, "Digital", cex = 1.3, col = "blue")
+
+
+with(accuracy, plot(cPtA150nc[match(ord.div, PersonID)], ylim = c(40, 90), type = "n", xaxt = "n", ylab = "Percentage agreement", xlab = "Participant", cex.lab = 1.5, las = 2, cex.axis = 1.1))
+axis(1, at = 1:26, labels = accuracy$PersonID[match(ord.div, accuracy$PersonID)], cex.axis = 1.1)
+# adding mean values
+lines(x = c(0, 20.5), y = rep(CID_mn$csPtA150nc, 2), lty = 1)
+lines(x = c(0, 20.5), y = rep(CID_mn$csPtA150nc - CID_sd$csPtA150nc, 2), lty = 4)
+lines(x = c(0, 20.5), y = rep(CID_mn$csPtA150nc + CID_sd$csPtA150nc, 2), lty = 4)
+lines(x = c(20.5, 27), y = rep(CID_mn$cdPtA150nc, 2), lty = 1, col = "blue")
+lines(x = c(20.5, 27), y = rep(CID_mn$cdPtA150nc - CID_sd$cdPtA150nc, 2), lty = 4, col = "blue")
+lines(x = c(20.5, 27), y = rep(CID_mn$cdPtA150nc + CID_sd$cdPtA150nc, 2), lty = 4, col = "blue")
+abline(v = 20.5, col = "grey 50")
+# points
+with(accuracy, points(1:26, cPtA150nc[match(ord.div, PersonID)], pch = 16, col = (Analysis[match(ord.div, PersonID)] == "Digital")*3 + 1))
+with(accuracy, arrows(1, cPtA150nc[PersonID == "1a"], 2, cPtA150nc[PersonID == "1b"], length = 0.14))
+with(accuracy, arrows(3, cPtA150nc[PersonID == "2a"], 4, cPtA150nc[PersonID == "2b"], length = 0.14))
+text(25, 90, expression(paste(">150 ", mu, "m")), cex = 1.3)
+text(1, 40, "Slide", cex = 1.3)
+text(21.75, 40, "Digital", cex = 1.3, col = "blue")
+
+
+par(mfrow = c(1,1))
+dev.off()
+
+
 # 5. Confusion matrix ----------------------------------------------------
 
 # 5a. Confusion matrices for the main results -----------------------------
@@ -534,10 +622,20 @@ names(long$s125)[names(long$s125) == "1a"] <- "origID"
 head(long$s125)
 tail(long$s125)
 
+conf.mat <- list()
+
+# plot the confusion matrix
 png("ASFigures/CombCon_conf_slide125.png", 1000, 700)
-conf_mat(long$s125, "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis")
+conf_mat(long$s125, "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
 mtext(expression(paste("Slide >125", mu, "m")), 1, cex = 2, adj = -1.2,  line = -6)
 dev.off()
+
+# work out the order
+sp.abb$confOrder <- NA
+sp.abb$confOrder[sp.abb$Abbreviation %in% c("nc", "na", "nca")] <- nrow(sp.abb) - 0:2
+sp.abb$confOrder[is.na(sp.abb$confOrder)] <- 1:(nrow(sp.abb) - 3)
+# calculate the confusion matrix
+conf.mat$s125 <- confusionMatrix(factor(sp.abb$Species[match(long$s125$cCID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s125$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
 
 # same for the other datasets
 # so slide 150
@@ -549,9 +647,13 @@ head(long$s150)
 tail(long$s150)
 
 png("ASFigures/CombCon_conf_slide150.png", 1000, 610)
-conf_mat(long$s150, "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis")
+conf_mat(long$s150, "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
 mtext(expression(paste("Slide >150", mu, "m")), 1, cex = 2, adj = -1.2,  line = -6)
 dev.off()
+conf.mat$s150 <- confusionMatrix(factor(sp.abb$Species[match(long$s150$cCID, sp.abb$Abbreviation)], levels = sp.abb$Species), factor(sp.abb$Species[match(long$s150$origID, sp.abb$Abbreviation)], levels = sp.abb$Species))
+
+# calculate the confusion matrix
+conf.mat$s150 <- confusionMatrix(factor(sp.abb$Species[match(long$s150$cCID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s150$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
 
 # digital 125
 long$d125 <- reshape(full.125[, -col.nam$s125], varying = list(names(full.125)[col.nam$d125]), direction = "long", times = names(full.125)[col.nam$d125], timevar = "Person")
@@ -562,9 +664,12 @@ head(long$d125)
 tail(long$d125)
 
 png("ASFigures/CombCon_conf_digital125.png", 1000, 700)
-conf_mat(long$d125, "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis")
+conf_mat(long$d125, "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
 mtext(expression(paste("Digital >125", mu, "m")), 1, cex = 2, adj = -1.2,  line = -6)
 dev.off()
+
+# calculate the confusion matrix
+conf.mat$d125 <- confusionMatrix(factor(sp.abb$Species[match(long$d125$cCID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$d125$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
 
 # digital 150
 long$d150 <- reshape(full.150[, -col.nam$s125], varying = list(names(full.150)[col.nam$d150]), direction = "long", times = names(full.150)[col.nam$d150], timevar = "Person")
@@ -575,73 +680,163 @@ head(long$d150)
 tail(long$d150)
 
 png("ASFigures/CombCon_conf_digital150.png", 1000, 610)
-conf_mat(long$d150, "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis")
+conf_mat(long$d150, "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
 mtext(expression(paste("Digital >150", mu, "m")), 1, cex = 2, adj = -1.2,  line = -6)
 dev.off()
 
+# calculate the confusion matrix
+conf.mat$d150 <- confusionMatrix(factor(sp.abb$Species[match(long$d150$cCID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$d150$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 # What about for the separate consensus values
 png("ASFigures/SepCon_conf_slide125.png", 1000, 700)
-conf_mat(long$s125, "origID", "sCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis")
+conf_mat(long$s125, "origID", "sCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
 mtext("Sep Slide 125", 1, cex = 2, adj = -1.3,  line = -5)
 dev.off()
 
+# calculate the confusion matrix
+conf.mat$s125SC <- confusionMatrix(factor(sp.abb$Species[match(long$s125$sCID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s125$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/SepCon_conf_slide150.png", 1000, 610)
-conf_mat(long$s150, "origID", "sCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis")
+conf_mat(long$s150, "origID", "sCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
 mtext("Sep Slide 150", 1, cex = 2, adj = -1.3,  line = -5)
 dev.off()
 
+# calculate the confusion matrix
+conf.mat$s150SC <- confusionMatrix(factor(sp.abb$Species[match(long$s150$sCID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s150$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/SepCon_conf_digital125.png", 1000, 700)
-conf_mat(long$d125, "origID", "dCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis")
+conf_mat(long$d125, "origID", "dCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
 mtext("Sep Digital 125", 1, cex = 2, adj = -1.3,  line = -5)
 dev.off()
 
+# calculate the confusion matrix
+conf.mat$d125SC <- confusionMatrix(factor(sp.abb$Species[match(long$d125$dCID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$d125$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/SepCon_conf_digital150.png", 1000, 610)
-conf_mat(long$d150, "origID", "dCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis")
+conf_mat(long$d150, "origID", "dCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
 mtext("Sep Digital 150", 1, cex = 2, adj = -1.3,  line = -5)
 dev.off()
+
+conf.mat$d125SC <- confusionMatrix(factor(sp.abb$Species[match(long$d125$sCID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$d125$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
 
 # 5b. Influence of reversed order on the confusion matrices ---------------------------------
 # influence of the alphabetical ordering
 png("ASFigures/CombCon_conf_slide125r.png", 1000, 700)
-conf_mat(long$s125, "origID", "cCIDr", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+conf_mat(long$s125, "origID", "cCIDr", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
 mtext("Slide 125", 1, cex = 2, adj = -0.8,  line = -5)
 dev.off()
 
+conf.mat$s125r <- confusionMatrix(factor(sp.abb$Species[match(long$s125$cCIDr, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s125$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/CombCon_conf_slide150r.png", 1000, 610)
-conf_mat(long$s150, "origID", "cCIDr", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+conf_mat(long$s150, "origID", "cCIDr", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
 mtext("Slide 150", 1, cex = 2, adj = -.8,  line = -5)
 dev.off()
 
+conf.mat$s150r <- confusionMatrix(factor(sp.abb$Species[match(long$s150$cCIDr, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s150$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/CombCon_conf_digital125r.png", 1000, 700)
-conf_mat(long$d125, "origID", "cCIDr", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+conf_mat(long$d125, "origID", "cCIDr", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
 mtext("Digital 125", 1, cex = 2, adj = -.8,  line = -5)
 dev.off()
 
+conf.mat$d125r <- confusionMatrix(factor(sp.abb$Species[match(long$d125$cCIDr, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$d125$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/CombCon_conf_digital150r.png", 1000, 610)
-conf_mat(long$d150, "origID", "cCIDr", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+conf_mat(long$d150, "origID", "cCIDr", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
 mtext("Digital 150", 1, cex = 2, adj = -.8,  line = -5)
 dev.off()
 
+conf.mat$d150r <- confusionMatrix(factor(sp.abb$Species[match(long$d150$cCIDr, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$d150$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 # and for the separate consensus values
 png("ASFigures/SepCon_conf_slide125r.png", 1000, 700)
-conf_mat(long$s125, "origID", "sCIDr", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+conf_mat(long$s125, "origID", "sCIDr", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
 mtext("Sep Slide 125", 1, cex = 2, adj = -1.3,  line = -5)
 dev.off()
 
+conf.mat$s125scr <- confusionMatrix(factor(sp.abb$Species[match(long$s125$sCIDr, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s125$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/SepCon_conf_slide150r.png", 1000, 610)
-conf_mat(long$s150, "origID", "sCIDr", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+conf_mat(long$s150, "origID", "sCIDr", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
 mtext("Sep Slide 150", 1, cex = 2, adj = -1.3,  line = -5)
 dev.off()
 
+conf.mat$s150scr <- confusionMatrix(factor(sp.abb$Species[match(long$s150$sCIDr, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s150$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/SepCon_conf_digital125r.png", 1000, 700)
-conf_mat(long$d125, "origID", "dCIDr", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+conf_mat(long$d125, "origID", "dCIDr", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
 mtext("Sep Digital 125", 1, cex = 2, adj = -1.3,  line = -5)
 dev.off()
 
+conf.mat$d125scr <- confusionMatrix(factor(sp.abb$Species[match(long$d125$dCIDr, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$d125$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/SepCon_conf_digital150r.png", 1000, 610)
-conf_mat(long$d150, "origID", "dCIDr", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID")
+conf_mat(long$d150, "origID", "dCIDr", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
 mtext("Sep Digital 150", 1, cex = 2, adj = -1.3,  line = -5)
 dev.off()
+
+conf.mat$d150scr <- confusionMatrix(factor(sp.abb$Species[match(long$d150$dCIDr, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$d150$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
+# 5c. Influence of no consensus (nca) on the confusion matrices ---------------------------------
+# influence of the alphabetical ordering
+png("ASFigures/CombCon_conf_slide125nc.png", 1000, 700)
+conf_mat(long$s125, "origID", "cCIDnc", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nc')), ], abb.end = c("na", "nca"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
+mtext(expression(paste("Slide >125", mu, "m")), 1, cex = 2, adj = -1.2,  line = -5)
+dev.off()
+
+conf.mat$s125nc <- confusionMatrix(factor(sp.abb$Species[match(long$s125$cCIDnc, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s125$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
+png("ASFigures/CombCon_conf_slide150nc.png", 1000, 610)
+conf_mat(long$s150, "origID", "cCIDnc", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nc')), ], abb.end = c("na", "nca"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
+mtext(expression(paste("Slide >150", mu, "m")), 1, cex = 2, adj = -1.2,  line = -5)
+dev.off()
+
+conf.mat$s150nc <- confusionMatrix(factor(sp.abb$Species[match(long$s150$cCIDnc, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s150$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
+png("ASFigures/CombCon_conf_digital125nc.png", 1000, 700)
+conf_mat(long$d125, "origID", "cCIDnc", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nc')), ], abb.end = c("na", "nca"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
+mtext(expression(paste("Digital >125", mu, "m")), 1, cex = 2, adj = -1.2,  line = -5)
+dev.off()
+
+conf.mat$d125nc <- confusionMatrix(factor(sp.abb$Species[match(long$d125$cCIDnc, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$d125$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
+png("ASFigures/CombCon_conf_digital150nc.png", 1000, 610)
+conf_mat(long$d150, "origID", "cCIDnc", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nc')), ], abb.end = c("na", "nca"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
+mtext(expression(paste("Digital >150", mu, "m")), 1, cex = 2, adj = -1.2,  line = -5)
+dev.off()
+
+conf.mat$d150nc <- confusionMatrix(factor(sp.abb$Species[match(long$d150$cCIDnc, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$d150$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
+# and for the separate consensus values
+png("ASFigures/SepCon_conf_slide125nc.png", 1000, 700)
+conf_mat(long$s125, "origID", "sCIDnc", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nc')), ], abb.end = c("na", "nca"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
+mtext("Sep Slide 125", 1, cex = 2, adj = -1.3,  line = -5)
+dev.off()
+
+conf.mat$s125scr <- confusionMatrix(factor(sp.abb$Species[match(long$s125$sCIDnc, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s125$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
+png("ASFigures/SepCon_conf_slide150nc.png", 1000, 610)
+conf_mat(long$s150, "origID", "sCIDnc", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nc')), ], abb.end = c("na", "nca"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
+mtext("Sep Slide 150", 1, cex = 2, adj = -1.3,  line = -5)
+dev.off()
+
+conf.mat$s150scr <- confusionMatrix(factor(sp.abb$Species[match(long$s150$sCIDnc, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s150$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
+png("ASFigures/SepCon_conf_digital125nc.png", 1000, 700)
+conf_mat(long$d125, "origID", "dCIDnc", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nc')), ], abb.end = c("na", "nca"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
+mtext("Sep Digital 125", 1, cex = 2, adj = -1.3,  line = -5)
+dev.off()
+
+conf.mat$d125scr <- confusionMatrix(factor(sp.abb$Species[match(long$d125$dCIDnc, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$d125$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
+png("ASFigures/SepCon_conf_digital150nc.png", 1000, 610)
+conf_mat(long$d150, "origID", "dCIDnc", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nc')), ], abb.end = c("na", "nca"), axes.same = FALSE, sp.list = "full", xlab = "Participant ID", ylab = "Consensus ID", palette = "viridis", grid = TRUE)
+mtext("Sep Digital 150", 1, cex = 2, adj = -1.3,  line = -5)
+dev.off()
+
+conf.mat$d150scr <- confusionMatrix(factor(sp.abb$Species[match(long$d150$dCIDnc, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$d150$origID, sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 
 # 6. NMDS -----------------------------------------------------------------
 
@@ -784,11 +979,16 @@ sum(full.125$`1a` == full.125$cCID); sum(full.125$`1a` == full.125$sCID) # 192 o
 sum(full.125$`1b` == full.125$cCID); sum(full.125$`1b` == full.125$sCID) # 227 or 76% accuracy (cf. 228)
 
 png("ASFigures/Time/CombCon_conf_125_1aCon.png", 1000, 700)
-conf_mat(long$s125[long$s125$Person == "1a", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "1a", ylab = "Consensus")
+conf_mat(long$s125[long$s125$Person == "1a", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "1a", ylab = "Consensus", palette = "viridis", grid = TRUE)
 dev.off()
+
+conf.mat$s125c1a <- confusionMatrix(factor(sp.abb$Species[match(long$s125$cCID[long$s125$Person == "1a"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s125$origID[long$s125$Person == "1a"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/Time/CombCon_conf_125_1bCon.png", 1000, 700)
-conf_mat(long$s125[long$s125$Person == "1b", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "1b", ylab = "Consensus")
+conf_mat(long$s125[long$s125$Person == "1b", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "1b", ylab = "Consensus", palette = "viridis", grid = TRUE)
 dev.off()
+
+conf.mat$s125c1b <- confusionMatrix(factor(sp.abb$Species[match(long$s125$cCID[long$s125$Person == "1b"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s125$origID[long$s125$Person == "1b"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
 
 # and for 2a / 2b
 sum(full.125$`2a` == full.125$`2b`) # 241 or 80% similarity
@@ -797,11 +997,16 @@ sum(full.125$`2b` == full.125$cCID); sum(full.125$`2b` == full.125$sCID) # 240 o
 
 # again, do this as a confusion matrix
 png("ASFigures/Time/comb_Con_conf_125_2aCon.png", 1000, 700)
-conf_mat(long$s125[long$s125$Person == "2a", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2a", ylab = "Consensus")
+conf_mat(long$s125[long$s125$Person == "2a", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "2a", ylab = "Consensus", palette = "viridis", grid = TRUE)
 dev.off()
+
+conf.mat$s125c2a <- confusionMatrix(factor(sp.abb$Species[match(long$s125$cCID[long$s125$Person == "2a"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s125$origID[long$s125$Person == "2a"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/Time/comb_Con_conf_125_2bCon.png", 1000, 700)
-conf_mat(long$s125[long$s125$Person == "2b", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2b", ylab = "Consensus")
+conf_mat(long$s125[long$s125$Person == "2b", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "2b", ylab = "Consensus", palette = "viridis", grid = TRUE)
 dev.off()
+
+conf.mat$s125c2b <- confusionMatrix(factor(sp.abb$Species[match(long$s125$cCID[long$s125$Person == "2b"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s125$origID[long$s125$Person == "2b"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
 
 # And for 150
 sum(full.150$`1a` == full.150$`1b`) # 204 or 68% similarity
@@ -809,11 +1014,16 @@ sum(full.150$`1a` == full.150$cCID); sum(full.150$`1a` == full.150$sCID) # 221 o
 sum(full.150$`1b` == full.150$cCID); sum(full.150$`1b` == full.150$sCID) # 219 or 73% accuracy (cf. 223)
 
 png("ASFigures/Time/comb_Con_conf_150_1aCon.png", 1000, 700)
-conf_mat(long$s150[long$s150$Person == "1a", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "1a", ylab = "Consensus")
+conf_mat(long$s150[long$s150$Person == "1a", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "1a", ylab = "Consensus", palette = "viridis", grid = TRUE)
 dev.off()
+
+conf.mat$s150c1a <- confusionMatrix(factor(sp.abb$Species[match(long$s150$cCID[long$s150$Person == "1a"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s150$origID[long$s150$Person == "1a"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/Time/comb_Con_conf_150_1bCon.png", 1000, 700)
-conf_mat(long$s150[long$s150$Person == "1b", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "1b", ylab = "Consensus")
+conf_mat(long$s150[long$s150$Person == "1b", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "1b", ylab = "Consensus", palette = "viridis", grid = TRUE)
 dev.off()
+
+conf.mat$s150c1b <- confusionMatrix(factor(sp.abb$Species[match(long$s150$cCID[long$s150$Person == "1b"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s150$origID[long$s150$Person == "1b"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
 
 # 2a/2b
 sum(full.150$`2a` == full.150$`2b`) # 288 or 96% similarity
@@ -821,11 +1031,16 @@ sum(full.150$`2a` == full.150$cCID); sum(full.150$`2a` == full.150$sCID) # 257 o
 sum(full.150$`2b` == full.150$cCID); sum(full.150$`2b` == full.150$sCID) # 257 or 86% accuracy (cf. 255)
 
 png("ASFigures/Time/comb_Con_conf_150_2aCon.png", 1000, 700)
-conf_mat(long$s150[long$s150$Person == "2a", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2a", ylab = "Consensus")
+conf_mat(long$s150[long$s150$Person == "2a", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "2a", ylab = "Consensus", palette = "viridis", grid = TRUE)
 dev.off()
+
+conf.mat$s150c2a <- confusionMatrix(factor(sp.abb$Species[match(long$s150$cCID[long$s150$Person == "2a"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s150$origID[long$s150$Person == "2a"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/Time/comb_Con_conf_150_2bCon.png", 1000, 700)
-conf_mat(long$s150[long$s150$Person == "2b", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2b", ylab = "Consensus")
+conf_mat(long$s150[long$s150$Person == "2b", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "2b", ylab = "Consensus", palette = "viridis", grid = TRUE)
 dev.off()
+
+conf.mat$s150c2b <- confusionMatrix(factor(sp.abb$Species[match(long$s150$cCID[long$s150$Person == "2b"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$s150$origID[long$s150$Person == "2b"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
 
 # 8. Digital vs. slides ---------------------------------------------------
 
@@ -838,15 +1053,22 @@ sum(full.125$`2b` == full.125$cCID); sum(full.125$`2b` == full.125$sCID) # 240 o
 sum(full.125$`A` == full.125$cCID); sum(full.125$`A` == full.125$dCID) # 175 or 58% accuracy (cf. 181)
 
 png("ASFigures/DigitalSlide/CombCon_conf_125_2bA.png", 1000, 700)
-conf_mat(long$f125, "origID", axis.col = "Person", axis1 = "2b", axis2 = "A", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
+conf_mat(long$f125, "origID", axis.col = "Person", axis1 = "2b", axis2 = "A", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, grid = TRUE, palette = "viridis")
 dev.off()
 
+conf.mat$c125A2b <- confusionMatrix(factor(sp.abb$Species[match(long$f125$origID[long$f125$Person == "A"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f125$origID[long$f125$Person == "2b"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/DigitalSlide/CombCon_conf_125_2bCon.png", 1000, 700)
-conf_mat(long$f125[long$f125$Person == "2b", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2b", ylab = "Consensus")
+conf_mat(long$f125[long$f125$Person == "2b", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "2b", ylab = "Consensus", grid = TRUE, palette = "viridis")
 dev.off()
+
+conf.mat$c125c2b <- confusionMatrix(factor(sp.abb$Species[match(long$f125$cCID[long$f125$Person == "2b"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f125$origID[long$f125$Person == "2b"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/DigitalSlide/CombCon_conf_125_ACon.png", 1000, 700)
-conf_mat(long$f125[long$f125$Person == "A", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "A", ylab = "Consensus")
+conf_mat(long$f125[long$f125$Person == "A", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "A", ylab = "Consensus", grid = TRUE, palette = "viridis")
 dev.off()
+
+conf.mat$c125cA <- confusionMatrix(factor(sp.abb$Species[match(long$f125$cCID[long$f125$Person == "A"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f125$origID[long$f125$Person == "A"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
 
 # 125 6 vs. F
 sum(full.125$`6` == full.125$F) # 187 or 62% similarity
@@ -854,14 +1076,22 @@ sum(full.125$`6` == full.125$cCID); sum(full.125$`6` == full.125$sCID) # 212 or 
 sum(full.125$`F` == full.125$cCID); sum(full.125$`F` == full.125$dCID) # 229 or 76% accuracy (cf. 226)
 
 png("ASFigures/DigitalSlide/CombCon_conf_125_6F.png", 1000, 700)
-conf_mat(long$f125, "origID", axis.col = "Person", axis1 = "6", axis2 = "F", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
+conf_mat(long$f125, "origID", axis.col = "Person", axis1 = "6", axis2 = "F", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, grid = TRUE, palette = "viridis")
 dev.off()
+
+conf.mat$c125F6 <- confusionMatrix(factor(sp.abb$Species[match(long$f125$origID[long$f125$Person == "F"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f125$origID[long$f125$Person == "6"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/DigitalSlide/CombCon_conf_125_FCon.png", 1000, 700)
-conf_mat(long$f125[long$f125$Person == "F", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "F", ylab = "Consensus")
+conf_mat(long$f125[long$f125$Person == "F", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "F", ylab = "Consensus", grid = TRUE, palette = "viridis")
 dev.off()
+
+conf.mat$c125cF <- confusionMatrix(factor(sp.abb$Species[match(long$f125$cCID[long$f125$Person == "F"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f125$origID[long$f125$Person == "F"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/DigitalSlide/CombCon_conf_125_6Con.png", 1000, 700)
-conf_mat(long$f125[long$f125$Person == "6", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "6", ylab = "Consensus")
+conf_mat(long$f125[long$f125$Person == "6", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "6", ylab = "Consensus", grid = TRUE, palette = "viridis")
 dev.off()
+
+conf.mat$c125c6 <- confusionMatrix(factor(sp.abb$Species[match(long$f125$cCID[long$f125$Person == "6"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f125$origID[long$f125$Person == "6"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
 
 # 125 9 vs. G
 sum(full.125$`9` == full.125$G) # 232 or 77% similarity
@@ -869,15 +1099,22 @@ sum(full.125$`9` == full.125$cCID); sum(full.125$`9` == full.125$sCID) # 212 or 
 sum(full.125$`G` == full.125$cCID); sum(full.125$`G` == full.125$dCID) # 160 or 53% accuracy (cf. 157)
 
 png("ASFigures/DigitalSlide/CombCon_conf_125_9G.png", 1000, 700)
-conf_mat(long$f125, "origID", axis.col = "Person", axis1 = "9", axis2 = "G", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
+conf_mat(long$f125, "origID", axis.col = "Person", axis1 = "9", axis2 = "G", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, grid = TRUE, palette = "viridis")
 dev.off()
 
+conf.mat$c125G9 <- confusionMatrix(factor(sp.abb$Species[match(long$f125$origID[long$f125$Person == "G"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f125$origID[long$f125$Person == "9"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/DigitalSlide/CombCon_conf_125_GCon.png", 1000, 700)
-conf_mat(long$f125[long$f125$Person == "G", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "G", ylab = "Consensus")
+conf_mat(long$f125[long$f125$Person == "G", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "G", ylab = "Consensus", grid = TRUE, palette = "viridis")
 dev.off()
+
+conf.mat$c125cG <- confusionMatrix(factor(sp.abb$Species[match(long$f125$cCID[long$f125$Person == "G"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f125$origID[long$f125$Person == "G"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/DigitalSlide/CombCon_conf_125_9Con.png", 1000, 700)
-conf_mat(long$f125[long$f125$Person == "9", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "9", ylab = "Consensus")
+conf_mat(long$f125[long$f125$Person == "9", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "9", ylab = "Consensus", grid = TRUE, palette = "viridis")
 dev.off()
+
+conf.mat$c125c9 <- confusionMatrix(factor(sp.abb$Species[match(long$f125$cCID[long$f125$Person == "9"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f125$origID[long$f125$Person == "9"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
 
 # 8b. for 150 -----------------------------------------------------------------
 long$f150 <- rbind(long$s150, long$d150)
@@ -888,15 +1125,22 @@ sum(full.150$`2b` == full.150$cCID); sum(full.150$`2b` == full.150$sCID) # 257 o
 sum(full.150$`A` == full.150$cCID); sum(full.150$`A` == full.150$dCID) # 241 or 80% accuracy  (cf. 246)
 
 png("ASFigures/DigitalSlide/CombCon_conf_150_2bA.png", 1000, 700)
-conf_mat(long$f150, "origID", axis.col = "Person", axis1 = "2b", axis2 = "A", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
+conf_mat(long$f150, "origID", axis.col = "Person", axis1 = "2b", axis2 = "A", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, grid = TRUE, palette = "viridis")
 dev.off()
 
+conf.mat$c150A2b <- confusionMatrix(factor(sp.abb$Species[match(long$f150$origID[long$f150$Person == "A"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f150$origID[long$f150$Person == "2b"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/DigitalSlide/CombCon_conf_150_2bCon.png", 1000, 700)
-conf_mat(long$f150[long$f150$Person == "2b", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "2b", ylab = "Consensus")
+conf_mat(long$f150[long$f150$Person == "2b", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "2b", ylab = "Consensus", palette = "viridis", grid = TRUE)
 dev.off()
+
+conf.mat$c150c2b <- confusionMatrix(factor(sp.abb$Species[match(long$f150$cCID[long$f150$Person == "2b"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f150$origID[long$f150$Person == "2b"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/DigitalSlide/CombCon_conf_150_ACon.png", 1000, 700)
-conf_mat(long$f150[long$f150$Person == "A", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "A", ylab = "Consensus")
+conf_mat(long$f150[long$f150$Person == "A", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "A", ylab = "Consensus", palette = "viridis", grid = TRUE)
 dev.off()
+
+conf.mat$c150cA <- confusionMatrix(factor(sp.abb$Species[match(long$f150$cCID[long$f150$Person == "A"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f150$origID[long$f150$Person == "A"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
 
 # 150 6 vs. F
 sum(full.150$`6` == full.150$F) # 216 or 72% similarity
@@ -904,15 +1148,23 @@ sum(full.150$`6` == full.150$cCID); sum(full.150$`6` == full.150$sCID) # 246 or 
 sum(full.150$`F` == full.150$cCID); sum(full.150$`F` == full.150$dCID) # 244 or 81% accuracy (cf. 242)
 
 png("ASFigures/DigitalSlide/CombCon_conf_150_6F.png", 1000, 700)
-conf_mat(long$f150, "origID", axis.col = "Person", axis1 = "6", axis2 = "F", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
+conf_mat(long$f150, "origID", axis.col = "Person", axis1 = "6", axis2 = "F", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, grid = TRUE, palette = "viridis")
 dev.off()
 
+conf.mat$c150F6 <- confusionMatrix(factor(sp.abb$Species[match(long$f150$origID[long$f150$Person == "F"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f150$origID[long$f150$Person == "6"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/DigitalSlide/CombCon_conf_150_FCon.png", 1000, 700)
-conf_mat(long$f150[long$f150$Person == "F", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "F", ylab = "Consensus")
+conf_mat(long$f150[long$f150$Person == "F", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "F", ylab = "Consensus", palette = "viridis", grid = TRUE)
 dev.off()
+
+conf.mat$c150cF <- confusionMatrix(factor(sp.abb$Species[match(long$f150$cCID[long$f150$Person == "F"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f150$origID[long$f150$Person == "F"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/DigitalSlide/CombCon_conf_150_6Con.png", 1000, 700)
-conf_mat(long$f150[long$f150$Person == "6", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "6", ylab = "Consensus")
+conf_mat(long$f150[long$f150$Person == "6", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "6", ylab = "Consensus", palette = "viridis", grid = TRUE)
 dev.off()
+
+conf.mat$c150c6 <- confusionMatrix(factor(sp.abb$Species[match(long$f150$cCID[long$f150$Person == "6"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f150$origID[long$f150$Person == "6"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 
 # 150 9 vs. G
 sum(full.150$`9` == full.150$G) # 212 or 71% similarity
@@ -920,15 +1172,22 @@ sum(full.150$`9` == full.150$cCID); sum(full.150$`9` == full.150$sCID) # 216 or 
 sum(full.150$`G` == full.150$cCID); sum(full.150$`G` == full.150$dCID) # 148 or 49% accuracy (cf. 149)
 
 png("ASFigures/DigitalSlide/CombCon_conf_150_9G.png", 1000, 700)
-conf_mat(long$f150, "origID", axis.col = "Person", axis1 = "9", axis2 = "G", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE)
+conf_mat(long$f150, "origID", axis.col = "Person", axis1 = "9", axis2 = "G", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, palette = "viridis", grid = TRUE)
 dev.off()
 
+conf.mat$c150G9 <- confusionMatrix(factor(sp.abb$Species[match(long$f150$origID[long$f150$Person == "G"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f150$origID[long$f150$Person == "9"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/DigitalSlide/CombCon_conf_150_GCon.png", 1000, 700)
-conf_mat(long$f150[long$f150$Person == "G", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "G", ylab = "Consensus")
+conf_mat(long$f150[long$f150$Person == "G", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "G", ylab = "Consensus", palette = "viridis", grid = TRUE)
 dev.off()
+
+conf.mat$c150cG <- confusionMatrix(factor(sp.abb$Species[match(long$f150$cCID[long$f150$Person == "G"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f150$origID[long$f150$Person == "G"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/DigitalSlide/CombCon_conf_150_9Con.png", 1000, 700)
-conf_mat(long$f150[long$f150$Person == "9", ], "origID", "cCID", spec.abb = sp.abb, abb.end = c("na", "nc"), axes.same = TRUE, xlab = "9", ylab = "Consensus")
+conf_mat(long$f150[long$f150$Person == "9", ], "origID", "cCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), axes.same = TRUE, xlab = "9", ylab = "Consensus", palette = "viridis", grid = TRUE)
 dev.off()
+
+conf.mat$c150c9 <- confusionMatrix(factor(sp.abb$Species[match(long$f150$cCID[long$f150$Person == "9"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f150$origID[long$f150$Person == "9"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
 
 # 8c. Consensus comparisons -----------------------------------------------
 
@@ -937,14 +1196,34 @@ sum(full.150$sCID == full.150$dCID) # 248 or 83% accuracy
 
 # plotting the consensus' against each other
 png("ASFigures/DigitalSlide/conf_125_Con.png", 800, 700)
-conf_mat(long$f125[long$f125$Person == "1a",], "dCID", "sCID", spec.abb = sp.abb, abb.end = c("na", "nc"), xlab = "Digital", ylab = "Slide", palette = "viridis")
+conf_mat(long$f125[long$f125$Person == "1a",], "dCID", "sCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), xlab = "Digital", ylab = "Slide", palette = "viridis", grid = TRUE)
 text(-1, 1, "Consensus 125", cex = 1.5)
 dev.off()
 
+conf.mat$c125 <- confusionMatrix(factor(sp.abb$Species[match(long$f125$sCID[long$f125$Person == "1a"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f125$dCID[long$f125$Person == "1a"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 png("ASFigures/DigitalSlide/conf_150_Con.png", 800, 700)
-conf_mat(long$f150[long$f150$Person == "1a",], "dCID", "sCID", spec.abb = sp.abb, abb.end = c("na", "nc"), xlab = "Digital", ylab = "Slide", palette = "viridis")
+conf_mat(long$f150[long$f150$Person == "1a",], "dCID", "sCID", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nca', 'nc')), ], abb.end = c("na"), xlab = "Digital", ylab = "Slide", palette = "viridis", grid = TRUE)
 text(-1, 1, "Consensus 150", cex = 1.5)
 dev.off()
+
+conf.mat$c150 <- confusionMatrix(factor(sp.abb$Species[match(long$f150$sCID[long$f150$Person == "1a"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f150$dCID[long$f150$Person == "1a"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
+# and with the tied IDs excluded
+png("ASFigures/DigitalSlide/conf_125_Con_nc.png", 800, 700)
+conf_mat(long$f125[long$f125$Person == "1a",], "dCIDnc", "sCIDnc", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nc')), ], abb.end = c("nca"), xlab = "Digital", ylab = "Slide", palette = "viridis", grid = TRUE)
+text(-1, 1, "Consensus 125", cex = 1.5)
+dev.off()
+
+conf.mat$c125nc <- confusionMatrix(factor(sp.abb$Species[match(long$f125$sCIDnc[long$f125$Person == "1a"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f125$dCIDnc[long$f125$Person == "1a"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
+png("ASFigures/DigitalSlide/conf_150_Con_nc.png", 800, 700)
+conf_mat(long$f150[long$f150$Person == "1a",], "dCIDnc", "sCIDnc", spec.abb = sp.abb[!(sp.abb$Abbreviation %in% c('nc')), ], abb.end = c("nca"), xlab = "Digital", ylab = "Slide", palette = "viridis", grid = TRUE)
+text(-1, 1, "Consensus 150", cex = 1.5)
+dev.off()
+
+conf.mat$c150nc <- confusionMatrix(factor(sp.abb$Species[match(long$f150$sCIDnc[long$f150$Person == "1a"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]), factor(sp.abb$Species[match(long$f150$dCIDnc[long$f150$Person == "1a"], sp.abb$Abbreviation)], levels = sp.abb$Species[order(sp.abb$confOrder)]))
+
 
 # 9. SST ------------------------------------------------------------------
 
@@ -1794,4 +2073,7 @@ for(i in 1:nrow(sp.abb)) {
 write.csv(tmp.125, "ASOutputs/PersonIDs_125.csv", row.names = FALSE)
 write.csv(tmp.150, "ASOutputs/PersonIDs_150.csv", row.names = FALSE)
 rm(tmp.125, tmp.150, i)
+
+# write out the confusion matrices
+lapply(seq_along(conf.mat), function(i) write.csv(conf.mat[[i]]$table, paste("ASOutputs/Confusion matrices/", names(conf.mat)[i], ".csv", sep = "")))
 
